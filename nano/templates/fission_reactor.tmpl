@@ -68,11 +68,11 @@
 		Control rod position:
 	</div>
 	<div class="itemContent">
-		{{:helper.displayBar(data.rate, data.minrate, data.maxrate)}}
+		{{:helper.displayBar(data.controlRodPosition, data.minwork, data.maxwork)}}
 		<div style="clear: both; padding-top: 4px;">
 			{{:helper.link('-', null, {'rod_adj' : -10}, (data.setControlRod > data.minwork) ? null : 'disabled')}}
 			{{:helper.link('-', null, {'rod_adj' : -1}, (data.setControlRod > data.minwork) ? null : 'disabled')}}
-			<div style="float: left; width: 80px; text-align: center;">&nbsp;{{:data.controlRodPosition}} L/s&nbsp;</div>
+			<div style="float: left; width: 80px; text-align: center;">&nbsp;{{:data.controlRodPosition}} mCm&nbsp;</div>
 			{{:helper.link('+', null, {'rod_adj' : 1}, (data.setControlRod < data.maxwork) ? null : 'disabled')}}
 			{{:helper.link('+', null, {'rod_adj' : 10}, (data.setControlRod < data.maxwork) ? null : 'disabled')}}
 		</div>
@@ -84,6 +84,6 @@
 		Fission:
 	</div>
 	<div class="itemContent">
-		{{:helper.link('Initialize nuclear plant', 'unlocked', {'startFission' : 1})}} {{:helper.link('Stop the reaction', 'locked', {'stopFission' : 1})}}
+		{{:helper.link('Initialise fission reaction', 'unlocked', {'startFission' : 1})}} {{:helper.link('System shutdown', 'locked', {'stopFission' : 1})}}
 	</div>
 </div>

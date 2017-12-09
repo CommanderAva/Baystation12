@@ -202,7 +202,9 @@ obj/structure/closet/crate
 	icon_closed = "radiation"
 
 /obj/structure/closet/crate/radiation_gear/WillContain()
-	return list(/obj/item/clothing/suit/radiation = 8)
+	return list(/obj/item/clothing/suit/radiation = 8,
+				/obj/item/clothing/head/radiation = 8,
+				/obj/item/device/geiger= 8)
 
 /obj/structure/closet/crate/secure/weapon
 	name = "weapons crate"

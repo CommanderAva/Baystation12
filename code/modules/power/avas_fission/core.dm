@@ -8,6 +8,7 @@
 	idle_power_usage = 50
 	active_power_usage = 200
 
+	var/radiation = 15
 	var/core_max_temp = 1000
 	var/initial_temperature = 200
 	var/light_e = 0
@@ -145,13 +146,26 @@
 /obj/machinery/power/fission_reactor/proc/check_reaction()
 	if(!fission)
 		fission_check = "Dead"
+		update_icon()
 	if(fission)
 		fission_check = "Active"
+		update_icon()
+
+/obj/machinery/power/fission_reactor/proc/radiate()
+	var/radiation = 0
+	if (src.temperature > max_temperature)
+		radiation = radiation * ((src.temperature - max_temperature)*0.5)
+	else if (src.temperature > shielding_max_temp)
+		radiation = round(((src.temperature - shielding_max_temp)/50))
+	radiation_repository.radiate(src, radiation) //Always radiate at max, so a decent dose of radiation is applied
+	return
 
 
 /obj/machinery/power/fission_reactor/Process(mob/user as mob)
 	check_parts()
+	radiate()
 	check_reaction()
+	update_icon()
 	if(temperature > 0)
 		temperature -= 10
 	if(temperature < 0)
@@ -161,6 +175,7 @@
 		return
 	if(control_rod_position == 0)
 		fission = 0
+		update_icon()
 		return
 	for(var/obj/item/weapon/fuel_rod/I in src.fuel_rods)
 		I.divide_k = src.divide_k
@@ -216,8 +231,9 @@
 
 	if(href_list["startFission"])
 		fission = 1
-		temperature += initial_temperature
 		update_icon()
+		temperature += initial_temperature
+
 
 	if(href_list["stopFission"])
 		control_rod_position = 0
@@ -229,9 +245,21 @@
 
 
 /obj/machinery/power/fission_reactor/attack_hand(mob/user)
-	if(fuel_rods && reactor_open)
-		check_parts()
-		return
+	if(fuel_rods && reactor_open && (!issilicon(user)))
+		if(temperature > 100)
+			to_chat(user, "You think about removing the fuel rod, but then reconsider since it's too hot and you don't want to burn your hand to ashes.")
+			return
+		else
+			for(var/obj/item/weapon/fuel_rod/I in src.fuel_rods)
+				user.put_in_hands(I)
+				check_parts()
+				I.add_fingerprint(user)
+				I.update_icon()
+				src.fuel_rods -= I
+				user.visible_message("<span class='warning'>[user.name] removes the fuel rod from [src.name]!</span>",\
+								 "<span class='notice'>You remove the fuel rod.</span>")
+
+				return
 	if(!reactor_open)
 		check_parts()
 		ui_interact(user)
@@ -244,20 +272,36 @@
 	if(reactor_open)
 		to_chat(user, "<span class='notice'>You've closed the [src] chamber</span>")
 		reactor_open = 0
+		flick("habar_close_anim", src)
 		check_parts()
 		connect_to_network()
+		update_icon()
+		return
+	if(!reactor_open && fission)
+		to_chat(user, "<span class='notice'>You are no idiot to open the [src] chamber while it works</span>")
 		return
 	if(!reactor_open)
 		to_chat(user, "<span class='notice'>You've opened the [src] chamber</span>")
 		reactor_open = 1
+		flick("habar_open_anim", src)
 		check_parts()
 		disconnect_from_network()
+		update_icon()
 		return
 
 /obj/machinery/power/fission_reactor/habar
 	name = "Habar X-1 Nuclear Reactor"
 	desc = "Habar X-1 Nuclear Reactor, old but trustworhy, don't expect a lot from it though."
 	icon = 'icons/obj/machines/power/fission.dmi'
-	icon_state = "core"
+	icon_state = "habar"
+	core_max_temp = 1500
+
+/obj/machinery/power/fission_reactor/habar/update_icon()
+	if(!fission && !reactor_open)
+		icon_state = "habar"
+	else if(!fission && reactor_open)
+		icon_state = "habar_open"
+	else if(fission)
+		icon_state = "habar_work"
 
 

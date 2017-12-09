@@ -90,3 +90,11 @@
 	icon_state = "fuel_rod"
 	fuel_life = 1000
 	divide_k = 1.3
+
+/obj/item/weapon/fuel_rod/uranium238/update_icon()
+	if(fuel_life > 500)
+		icon_state = "fuel_rod"
+	else if(fuel_life > 200 && fuel_life < 500)
+		icon_state = "fuel_rod_decayed"
+	else if(fuel_life < 200)
+		icon_state = "fuel_rod_depleted"

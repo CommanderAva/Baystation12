@@ -22,7 +22,7 @@
 		Maximal Temperature:
 	</div>
 	<div class="itemContent">
-		{{:data.maxTotalOutput}} C
+		{{:data.maxTotalTemperature}} C
 	</div>
 </div>
 
@@ -46,10 +46,19 @@
 
 <div class="item">
 	<div class="itemLabel">
+		Interchange Coefficient:
+	</div>
+	<div class="itemContent">
+		{{:data.interchangeCoefficient}}
+	</div>
+</div>
+
+<div class="item">
+	<div class="itemLabel">
 		Reaction Status:
 	</div>
 	<div class="itemContent">
-		{{:data.active}}
+		{{:data.fission}}
 	</div>
 </div>
 
@@ -61,15 +70,11 @@
 	<div class="itemContent">
 		{{:helper.displayBar(data.rate, data.minrate, data.maxrate)}}
 		<div style="clear: both; padding-top: 4px;">
-			{{:helper.link('-', null, {'rod_adj' : -1000}, (data.rate > data.minrate) ? null : 'disabled')}}
-			{{:helper.link('-', null, {'rod_adj' : -100}, (data.rate > data.minrate) ? null : 'disabled')}}
-			{{:helper.link('-', null, {'rod_adj' : -10}, (data.rate > data.minrate) ? null : 'disabled')}}
-			{{:helper.link('-', null, {'rod_adj' : -1}, (data.rate > data.minrate) ? null : 'disabled')}}
-			<div style="float: left; width: 80px; text-align: center;">&nbsp;{{:data.rate}} L/s&nbsp;</div>
-			{{:helper.link('+', null, {'rod_adj' : 1}, (data.rate < data.maxrate) ? null : 'disabled')}}
-			{{:helper.link('+', null, {'rod_adj' : 10}, (data.rate < data.maxrate) ? null : 'disabled')}}
-			{{:helper.link('+', null, {'rod_adj' : 100}, (data.rate < data.maxrate) ? null : 'disabled')}}
-			{{:helper.link('+', null, {'rod_adj' : 1000}, (data.rate < data.maxrate) ? null : 'disabled')}}
+			{{:helper.link('-', null, {'rod_adj' : -10}, (data.setControlRod > data.minwork) ? null : 'disabled')}}
+			{{:helper.link('-', null, {'rod_adj' : -1}, (data.setControlRod > data.minwork) ? null : 'disabled')}}
+			<div style="float: left; width: 80px; text-align: center;">&nbsp;{{:data.controlRodPosition}} L/s&nbsp;</div>
+			{{:helper.link('+', null, {'rod_adj' : 1}, (data.setControlRod < data.maxwork) ? null : 'disabled')}}
+			{{:helper.link('+', null, {'rod_adj' : 10}, (data.setControlRod < data.maxwork) ? null : 'disabled')}}
 		</div>
 	</div>
 </div>
@@ -79,6 +84,6 @@
 		Fission:
 	</div>
 	<div class="itemContent">
-		{{:helper.link('On', 'unlocked', {'power' : 1}, data.fission ? 'selected' : null)}} {{:helper.link('Off', 'locked', {'power' : 1}, data.fission ? null : 'selected')}}
+		{{:helper.link('Initialize nuclear plant', 'unlocked', {'startFission' : 1})}} {{:helper.link('Stop the reaction', 'locked', {'stopFission' : 1})}}
 	</div>
 </div>

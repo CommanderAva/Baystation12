@@ -71,7 +71,7 @@
 
 /obj/item/weapon/stock_parts/fission/turbine/chorus
 	name = "Chorus Mark 1 turbine"
-	desc = "Turbine for the nuclear reactor. Used everywhere, not only in reactor, but this has port for circular system"
+	desc = "Turbine for the nuclear reactor"
 	icon = 'icons/obj/machines/power/fission.dmi'
 	icon_state = "turbine"
 	turbine_quality = 0.16

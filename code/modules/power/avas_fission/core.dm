@@ -10,38 +10,26 @@
 
 	var/core_max_temp = 1000
 	var/initial_temperature = 200
-	var/light_e = null
-	var/rod_quality = null
-	var/control_rod_position = 1
-	var/circular_system_quality = null
-	var/shielding_max_temp = null
-	var/turbine_quality = null
-	var/fail_percentage = null
-	var/divide_k
+	var/light_e = 0
+	var/rod_quality = 0
+	var/control_rod_position = 0
+	var/circular_system_quality = 0
+	var/shielding_max_temp = 0
+	var/turbine_quality = 0
+	var/fail_percentage = 0
+	var/divide_k = 0
 	var/list/fuel_rods = null
 	var/reactor_open = 0
-	var/output = null
-	var/power_output = null
-	var/temperature = null
-	var/temperature_interchange = null
-	var/max_temperature = null
-	var/power_produced = null
-	var/fission = null
+	var/output = 0
+	var/power_output = 0
+	var/temperature = 0
+	var/temperature_interchange = 0
+	var/max_temperature = 0
+	var/power_produced = 0
+	var/fission = 0
 	var/minwork = 0
 	var/maxwork = 100
-
-/obj/machinery/power/fission_reactor/New()
-	..()
-
-	component_parts = list()
-	component_parts += new /obj/item/weapon/stock_parts/fission/control_rod/graphite(src)
-	component_parts += new /obj/item/weapon/stock_parts/fission/circular_system/maverick(src)
-	component_parts += new /obj/item/weapon/stock_parts/fission/shielding/plumbum(src)
-	component_parts += new /obj/item/weapon/stock_parts/fission/turbine/chorus(src)
-	component_parts += new /obj/item/weapon/stock_parts/fission/safety_system/nato(src)
-	component_parts += new /obj/item/weapon/stock_parts/fission/circular_system/maverick(src)
-
-	RefreshParts()
+	var/fission_check = 0
 
 /obj/machinery/power/fission_reactor/habar/New()
 	..()
@@ -53,16 +41,28 @@
 	component_parts += new /obj/item/weapon/stock_parts/fission/turbine/chorus(src)
 	component_parts += new /obj/item/weapon/stock_parts/fission/safety_system/nato(src)
 	component_parts += new /obj/item/weapon/stock_parts/fission/circular_system/maverick(src)
+	fuel_rods = list()
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
 
 	RefreshParts()
 
 
-
+/*
 /obj/machinery/power/fission_reactor/New()
 	..()
 
 	fuel_rods = list()
 	fuel_rods += new /obj/item/weapon/fuel_rod/uranium238(src)
+*/
 
 /obj/machinery/power/fission_reactor/attack_ai(mob/user)
 	attack_hand(user)
@@ -77,25 +77,33 @@
 		for(var/obj/item/weapon/stock_parts/fission/shielding/I in component_parts)
 			src.shielding_max_temp = I.shielding_max_temp
 		for(var/obj/item/weapon/stock_parts/fission/turbine/I in component_parts)
-			turbine_quality = I.turbine_quality
+			src.turbine_quality = I.turbine_quality
 		for(var/obj/item/weapon/stock_parts/fission/circular_system/I in component_parts)
-			circular_system_quality = I.circular_system_quality
+			src.circular_system_quality = I.circular_system_quality
 		for(var/obj/item/weapon/stock_parts/fission/control_rod/I in component_parts)
-			rod_quality = I.rod_quality
+			src.rod_quality = I.rod_quality
 		for(var/obj/item/weapon/stock_parts/fission/safety_system/I in component_parts)
-			fail_percentage = I.fail_percentage
+			src.fail_percentage = I.fail_percentage
+
+	max_temperature = core_max_temp + shielding_max_temp
+	temperature_interchange = circular_system_quality + turbine_quality
+	for(var/obj/item/weapon/fuel_rod/I in fuel_rods)
+		src.divide_k = I.divide_k
 
 /obj/machinery/power/fission_reactor/attackby(var/obj/item/weapon/fuel_rod/A, mob/user as mob)
 	if (src.reactor_open == 0)
 		to_chat(user, "<span class='notice'>You'll have to open the \"[src]\" first.</span>")
 		return
-	else if(!istype(A, /obj/item/weapon/fuel_rod && src.reactor_open == 1))
+	else if(!typesof(A, /obj/item/weapon/fuel_rod) && src.reactor_open == 1)
 		to_chat(user, "<span class='notice'>You can't put that into reactor fuel slot!.</span>")
 		return
-	else if(istype(A, /obj/item/weapon/fuel_rod))
+	else
 		if(A.fuel_life != 0)
-			to_chat(user, "<span class='notice'>You add \"[A]\" into \the [src].</span>")
+			user.drop_item()
+			A.forceMove(src)
 			src.fuel_rods += A
+			to_chat(user, "<span class='notice'>You add \"[A]\" into \the [src].</span>")
+
 			return
 		else if (fuel_rods.len == 10)
 			to_chat(user, "<span class='notice'>All slots for fuel rods are full.</span>")
@@ -134,39 +142,38 @@
 	if(I.fail_percentage != 0)
 		return fail_percentage
 */
+/obj/machinery/power/fission_reactor/proc/check_reaction()
+	if(!fission)
+		fission_check = "Dead"
+	if(fission)
+		fission_check = "Active"
 
 
 /obj/machinery/power/fission_reactor/Process(mob/user as mob)
 	check_parts()
-	if(!fission)
-		return
+	check_reaction()
+	if(temperature > 0)
+		temperature -= 10
+	if(temperature < 0)
+		temperature = 0
 	if(reactor_open == 1)
 		to_chat(user, "<span class='notice'>Reactor chamber opened. Close it before start.</span>")
 		return
-	if(fuel_rods.len <= 10)
-		to_chat(user, "<span class='notice'>Not enough fuel for reaction start. Fill the fuel rod slots</span>")
+	if(control_rod_position == 0)
+		fission = 0
 		return
 	for(var/obj/item/weapon/fuel_rod/I in src.fuel_rods)
+		I.divide_k = src.divide_k
 		if(I.fuel_life == 0)
 			fission = 0
 			return
-		if(control_rod_position == 1)
-			fission = 0
-			return
-		if(fission && fuel_rods == 10)
-			max_temperature = core_max_temp + shielding_max_temp
-			temperature_interchange = circular_system_quality + turbine_quality
-			temperature += initial_temperature
-			temperature *= (divide_k * control_rod_position)
-			temperature -= 10
+	if(fission && fuel_rods.len > 0)
+		temperature = temperature * (divide_k * (control_rod_position * 0.01))
+		power_produced = temperature * temperature_interchange
+		add_avail(power_produced * 3) //Don't ask me why the fuck i did it. BALANCE!
+
+		for(var/obj/item/weapon/fuel_rod/I in src.fuel_rods)
 			I.fuel_life -= 1
-
-
-
-
-
-			power_produced = temperature * temperature_interchange
-			add_avail(power_produced)
 
 
 
@@ -180,8 +187,11 @@
 	data["controlRodPosition"] = control_rod_position
 	data["fuelRods"] = fuel_rods
 	data["divideCoefficient"] = divide_k
-	data["fission"] = fission ? 1 : 0
-
+	data["interchangeCoefficient"] = temperature_interchange
+	data["fission"] = fission_check
+	data["minwork"] = minwork
+	data["maxwork"] = maxwork
+	data["setControlRod"] = round(control_rod_position)
 
 
 
@@ -204,13 +214,19 @@
 	if(..())
 		return 1
 
-	if(href_list["fission"])
-		fission = !fission
-		. = 1
+	if(href_list["startFission"])
+		fission = 1
+		temperature += initial_temperature
+		update_icon()
+
+	if(href_list["stopFission"])
+		control_rod_position = 0
+		update_icon()
+
 	if (href_list["rod_adj"])
 		var/diff = text2num(href_list["rod_adj"])
-		control_rod_position = Clamp(control_rod_position+diff, minwork, maxwork)
-		. = 1
+		control_rod_position += diff
+
 
 /obj/machinery/power/fission_reactor/attack_hand(mob/user)
 	if(fuel_rods && reactor_open)
@@ -229,11 +245,13 @@
 		to_chat(user, "<span class='notice'>You've closed the [src] chamber</span>")
 		reactor_open = 0
 		check_parts()
+		connect_to_network()
 		return
 	if(!reactor_open)
 		to_chat(user, "<span class='notice'>You've opened the [src] chamber</span>")
 		reactor_open = 1
 		check_parts()
+		disconnect_from_network()
 		return
 
 /obj/machinery/power/fission_reactor/habar
@@ -241,4 +259,5 @@
 	desc = "Habar X-1 Nuclear Reactor, old but trustworhy, don't expect a lot from it though."
 	icon = 'icons/obj/machines/power/fission.dmi'
 	icon_state = "core"
+
 

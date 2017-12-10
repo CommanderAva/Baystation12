@@ -1,4 +1,4 @@
-/obj/machinery/ammo_workbench
+/obj/machinery/ammo_workbench   //Thanks F-TangSteve#0439, Hubble#2807 and BlueNexus#0489 from Baystation12 discord for helping with this
 	name = "ammunition workbench"
 	desc = "A workbench for making custom ammunition"
 	icon = 'icons/obj/machines/ammocraft.dmi'
@@ -32,8 +32,8 @@
 	var/list/casing_storage = null
 	var/show_category = "All"
 	var/busy = 0
-	var/selected_caliber = null
-	var/selected_type = null
+	var/selected_caliber = ""
+	var/selected_type = ""
 
 	var/bullet_ready = 0
 	var/mat_efficiency = 1
@@ -111,11 +111,27 @@
 			var/result = N
 			N = null
 			if (result == "Replicate programmed bullet")
-				var/obj/item/ammo_casing/custom/T = /obj/item/ammo_casing/custom
-				T.caliber = selected_caliber
+				if(current_bullet == /obj/item/projectile/bullet/custom/fmj)
+					var/obj/item/projectile/bullet/custom/fmj/C = current_bullet
+					C.check_parts()
+				if(current_bullet == /obj/item/projectile/bullet/custom/hp)
+					var/obj/item/projectile/bullet/custom/hp/C = current_bullet
+					C.check_parts()
+				if(current_bullet == /obj/item/projectile/bullet/custom/ap)
+					var/obj/item/projectile/bullet/custom/ap/C = current_bullet
+					C.check_parts()
+				if(current_bullet == /obj/item/projectile/bullet/custom/sabot)
+					var/obj/item/projectile/bullet/custom/sabot/C = current_bullet
+					C.check_parts()
+				if(current_bullet == /obj/item/projectile/bullet/custom/incendiary)
+					var/obj/item/projectile/bullet/custom/incendiary/C = current_bullet
+					C.check_parts()
+				var/obj/item/ammo_casing/custom/T = new /obj/item/ammo_casing/custom
+				var/obj/item/ammo_magazine/custom_box/E = /obj/item/ammo_magazine/custom_box
+				T.caliber = src.selected_caliber
 				T.projectile_type = src.current_bullet
 				T.BB = new src.current_bullet(src)
-				var/obj/item/ammo_magazine/custom_box/E = /obj/item/ammo_magazine/custom_box
+
 				E.caliber = selected_caliber
 				E.ammo_type =  T
 				src.loc += new E(src)
@@ -146,6 +162,17 @@
 			current_bullet += new /obj/item/projectile/bullet/custom/incendiary(src)
 
 	var/obj/item/projectile/bullet/custom/A = current_bullet
+
+	N = input("Select the type of material for charge", "[src]") as null|anything in charge_list
+	if(N)
+		selected_material = N
+		N = null
+		if(selected_material == "gunpowder")
+			A.composition += new /obj/item/ammo_parts/gunpowder(src)
+		current_bullet = A
+
+	A = current_bullet
+
 
 	N = input("Select the type of material for jacket", "[src]") as null|anything in stored_material
 	if(N)
@@ -273,17 +300,8 @@
 					B.check_parts()
 			current_bullet = A
 
-	A = current_bullet
-
-	N = input("Select the type of material for charge", "[src]") as null|anything in charge_list
-	if(N)
-		selected_material = N
-		N = null
-		if(selected_material == "gunpowder")
-			A.composition += new /obj/item/ammo_parts/gunpowder(src)
-		current_bullet = A
-
 	if(selected_type == "incendiary")
+		A = current_bullet
 		N = input("Select the type of material for incendiary", "[src]") as null|anything in stored_material
 		if(N)
 			selected_material = N
@@ -301,6 +319,7 @@
 			current_bullet = A
 
 	bullet_ready = 1
+	return
 
 
 

@@ -2,21 +2,21 @@
 	fire_sound = 'sound/weapons/gunshot/gunshot_pistol.ogg'
 	damage = 0 //9mm, .38, etc
 	armor_penetration = 0
-	var/list/composition = null
+	var/list/composition = list()
 	var/list/radioactivity = 0
 	var/dens = 0
 	var/weight = 0
 	var/rad = 0
 	var/power = 0
 	var/incendiary = 0
-	var/ammo_type = null
+	var/ammo_type = ""
 
 /obj/item/projectile/bullet/custom/fmj/proc/count_chars()
 	damage = (weight*5)
 	armor_penetration = (dens * 12)
 	return
 
-/obj/item/projectile/bullet/custom/fmj/
+/obj/item/projectile/bullet/custom/fmj
 	name = "custom FMJ bullet"
 	desc = "A custom FMJ bullet."
 	ammo_type = "FMJ"
@@ -49,7 +49,7 @@
 		src.power += P.power
 		return
 
-/obj/item/projectile/bullet/custom/hp/
+/obj/item/projectile/bullet/custom/hp
 	name = "custom HP bullet"
 	desc = "A custom HP bullet."
 	ammo_type = "HP"
@@ -90,7 +90,7 @@
 	armor_penetration = (dens * 8)
 	return
 
-/obj/item/projectile/bullet/custom/sabot/
+/obj/item/projectile/bullet/custom/sabot
 	name = "custom sabot bullet"
 	desc = "A custom sabot bullet."
 	ammo_type = "Sabot"
@@ -132,7 +132,7 @@ obj/item/projectile/bullet/custom/sabot/proc/count_chars()
 	return
 
 
-/obj/item/projectile/bullet/custom/ap/
+/obj/item/projectile/bullet/custom/ap
 	name = "custom ap bullet"
 	desc = "A custom ap bullet."
 	ammo_type = "AP"
@@ -173,7 +173,7 @@ obj/item/projectile/bullet/custom/ap/proc/count_chars()
 	armor_penetration = (dens * 10)
 	return
 
-/obj/item/projectile/bullet/custom/incendiary/
+/obj/item/projectile/bullet/custom/incendiary
 	name = "custom incendiary bullet"
 	desc = "A custom incendiary bullet."
 	ammo_type = "Incendiary"
@@ -227,7 +227,7 @@ obj/item/projectile/bullet/custom/incendiary/proc/count_chars()
 
 /obj/item/ammo_casing/custom
 	desc = "A 9mm custom bullet casing."
-	caliber = null
+	caliber = ""
 	projectile_type = null
 
 /obj/item/ammo_casing/custom/fmj_stand

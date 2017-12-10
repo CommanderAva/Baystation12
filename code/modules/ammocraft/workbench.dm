@@ -104,7 +104,7 @@
 	else
 		return
 */
-/obj/machinery/ammo_workbench/proc/ask()
+/obj/machinery/ammo_workbench/proc/ask(mob/user as mob)
 	if(bullet_ready == 1)
 		var/N = input("Use old design or build new?", "[src]") as null|anything in start_ask
 		if(N)
@@ -127,15 +127,16 @@
 					var/obj/item/projectile/bullet/custom/incendiary/C = current_bullet
 					C.check_parts()
 				var/obj/item/ammo_casing/custom/T = new /obj/item/ammo_casing/custom
-				var/obj/item/ammo_magazine/custom_box/E = /obj/item/ammo_magazine/custom_box
+				var/obj/item/ammo_magazine/custom_box/E = new /obj/item/ammo_magazine/custom_box
 				T.caliber = src.selected_caliber
-				T.projectile_type = src.current_bullet
-				T.BB = new src.current_bullet(src)
+				T.New()
 
 				E.caliber = selected_caliber
 				E.ammo_type =  T
-				src.loc += new E(src)
-
+				E.New()
+				E.forceMove(src.loc)
+				E = null
+				return
 			else if (result == "Design new bullet")
 				bullet_ready = 0
 				current_bullet = null

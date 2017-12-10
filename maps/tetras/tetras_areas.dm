@@ -1075,7 +1075,7 @@
 	requires_power = 1
 	always_unpowered = 1
 	has_gravity = FALSE
-	base_turf = /turf/space
+	base_turf = /turf/unsimulated/planet
 
 /area/solar/auxstarboard
 	name = "\improper Fore Starboard Solar Array"
@@ -1543,6 +1543,14 @@
 	name = "Abandoned Outpost"
 	icon_state = "dark"
 
+
 area/tetras/surface
 	name = "Tetras surface"
 	icon_state = "dark"
+	base_turf = /turf/unsimulated/planet
+
+
+area/tetras/surface/test_area
+	name = "Tetras test area"
+	icon_state = "explored"
+	base_turf = /turf/unsimulated/planet

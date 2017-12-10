@@ -289,7 +289,7 @@
 	//default point blank multiplier
 	var/max_mult = 1.3
 
-	//determine multiplier due to the target being grabbed
+	//determine multiplier due to the target being graBed
 	if(ishuman(target))
 		var/mob/living/carbon/human/H = target
 		for(var/obj/item/grab/G in H.grabbed_by)

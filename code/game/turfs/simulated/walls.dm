@@ -20,7 +20,7 @@
 	var/construction_stage
 	var/hitsound = 'sound/weapons/Genhit.ogg'
 	var/list/wall_connections = list("0", "0", "0", "0")
-	var/floor_type = /turf/simulated/floor/plating //turf it leaves after destruction
+	var/floor_type = /turf/unsimulated/planet //turf it leaves after destruction
 
 /turf/simulated/wall/New(var/newloc, var/materialtype, var/rmaterialtype)
 	..(newloc)

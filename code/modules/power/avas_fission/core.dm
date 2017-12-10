@@ -31,7 +31,11 @@
 	var/minwork = 0
 	var/maxwork = 100
 	var/fission_check = 0
-
+	var/critical_temp = 0
+	var/explosion_power = 3
+	var/nu_alarm_time = 280
+	var/delay_time = 0
+	var/delay_time2 = 0
 /obj/machinery/power/fission_reactor/habar/New()
 	..()
 
@@ -88,6 +92,7 @@
 
 	max_temperature = core_max_temp + shielding_max_temp
 	temperature_interchange = circular_system_quality + turbine_quality
+	critical_temp = max_temperature * 0.33
 	for(var/obj/item/weapon/fuel_rod/I in fuel_rods)
 		src.divide_k = I.divide_k
 
@@ -112,37 +117,7 @@
 		else if (A.fuel_life != 0)
 			to_chat(user, "<span class='notice'>This \"[A]\" is depleted.</span>")
 			return
-/*
-/obj/machinery/power/fission_reactor/proc/check_divide_k()
-	var/obj/item/I = locate(/obj/item/fission_reactor/internal/fuel_rod/) in fuel_rods
-	if(I.divide_k != 0)
-		return divide_k
 
-/obj/machinery/power/fission_reactor/proc/check_shielding_max_temp()
-	var/obj/item/I = locate(/obj/item/fission_reactor/internal/shielding/) in component_parts
-	if(I.shielding_max_temp != 0)
-		return shielding_max_temp
-
-/obj/machinery/power/fission_reactor/proc/check_turbine_quality()
-	var/obj/item/I = locate(/obj/item/fission_reactor/internal/turbine/) in component_parts
-	if(I.turbine_quality != 0)
-		return turbine_quality
-
-/obj/machinery/power/fission_reactor/proc/check_circular_system_quality()
-	var/obj/item/I = locate(/obj/item/fission_reactor/internal/circular_system/) in component_parts
-	if(I.circular_system_quality != 0)
-		return circular_system_quality
-
-/obj/machinery/power/fission_reactor/proc/check_control_rod_quality()
-	var/obj/item/I = locate(/obj/item/fission_reactor/internal/control_rod/) in component_parts
-	if(I.rod_quality != 0)
-		return rod_quality
-
-/obj/machinery/power/fission_reactor/proc/check_safety_system_quality()
-	var/obj/item/I = locate(/obj/item/fission_reactor/internal/safety_system/) in component_parts
-	if(I.fail_percentage != 0)
-		return fail_percentage
-*/
 /obj/machinery/power/fission_reactor/proc/check_reaction()
 	if(!fission)
 		fission_check = "Dead"
@@ -150,6 +125,25 @@
 	if(fission)
 		fission_check = "Active"
 		update_icon()
+
+/obj/machinery/power/fission_reactor/proc/check_integrity()
+	if(temperature - max_temperature > 0 && delay_time == 0)
+		GLOB.global_announcer.autosay("WARNING: [src] MELTDOWN IMMENENT!", "Nuclear Reactor Monitor")
+		delay_time += 10
+	else if (temperature - max_temperature > 0 && delay_time > 0)
+		delay_time -= 1
+	else if(temperature - max_temperature + critical_temp > 0 && delay_time2 == 0)
+		command_announcement.Announce("[src] meltdown . All personell evacuate to nearest bunker", "Nuclear Supervision Monitor")
+		to_world(sound('sound/ambience/nuclear_warning.ogg', repeat = 0, wait = 0, volume = 50, channel = 3))
+		spawn(nu_alarm_time)
+			explosion(get_turf(src), 10, 8, 22)
+			radiation_repository.flat_radiate(get_turf(src), 50, 150, TRUE)
+			qdel(src)
+
+	else if (temperature - max_temperature + critical_temp > 0 && delay_time2 > 0)
+		delay_time2 -= 1
+	else
+		return
 
 /obj/machinery/power/fission_reactor/proc/radiate()
 	var/radiation = 0
@@ -166,6 +160,7 @@
 	radiate()
 	check_reaction()
 	update_icon()
+	check_integrity()
 	if(temperature > 0)
 		temperature -= 10
 	if(temperature < 0)

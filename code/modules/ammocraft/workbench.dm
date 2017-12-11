@@ -43,7 +43,7 @@
 	var/list/ammo_types = list("FMJ", "HP", "AP", "Sabot", "Incendiary")
 	var/list/start_ask = list ("Replicate programmed bullet", "Design new bullet")
 	var/current_bullet = null
-
+	var/obj/item/projectile/bullet/custom/A = null
 
 /obj/machinery/ammo_workbench/New()
 
@@ -106,46 +106,55 @@
 		return
 */
 /obj/machinery/ammo_workbench/proc/ask(mob/user as mob)
+
 	if(bullet_ready == 1)
 		var/N = input("Use old design or build new?", "[src]") as null|anything in start_ask
 		if(N)
 			var/result = N
 			N = null
 			if (result == "Replicate programmed bullet")
-				for(var/obj/item/projectile/bullet/custom/K in src.current_bullet)
-					if(istype(K, /obj/item/projectile/bullet/custom/fmj))
-						var/obj/item/projectile/bullet/custom/fmj/C = K
-						C.check_inside_parts()
-						C.count_chars()
-					if(istype(K, /obj/item/projectile/bullet/custom/hp))
-						var/obj/item/projectile/bullet/custom/hp/C = K
-						C.check_inside_parts()
-						C.count_chars()
-					if(istype(K, /obj/item/projectile/bullet/custom/ap))
-						var/obj/item/projectile/bullet/custom/ap/C = K
-						C.check_inside_parts()
-						C.count_chars()
-					if(istype(K, /obj/item/projectile/bullet/custom/sabot))
-						var/obj/item/projectile/bullet/custom/sabot/C = K
-						C.check_inside_parts()
-						C.count_chars()
-					if(istype(K, /obj/item/projectile/bullet/custom/incendiary))
-						var/obj/item/projectile/bullet/custom/incendiary/C = K
-						C.check_inside_parts()
-						C.count_chars()
-				var/obj/item/ammo_casing/custom/T = new /obj/item/ammo_casing/custom
-				for(var/obj/item/ammo_casing/M in T)
-					M.caliber = src.selected_caliber
-					for(var/obj/item/projectile/bullet/custom/K in src.current_bullet)
-						M.BB = new K
-						M.forceMove(src.loc)
-						M = null
+				var/obj/item/ammo_magazine/custom_box/T = new /obj/item/ammo_magazine/custom_box
+				T.stored_ammo = list( new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom,
+									  new /obj/item/ammo_casing/custom
+				)
+				for(var/obj/item/ammo_casing/custom/X in T.stored_ammo)
+					X.BB = new /obj/item/projectile/bullet/custom/
+					X.caliber = selected_caliber
+					for(var/obj/item/projectile/bullet/custom/Y in X.BB)
+						Y.damage = A.damage
+						Y.armor_penetration = A.armor_penetration
+						Y.incendiary = A.incendiary
+						Y.rad = A.rad
+				T.forceMove(src.loc)
+				T = null
+
+
+
+
+
 
 				return
 			else if (result == "Design new bullet")
 				bullet_ready = 0
 				src.current_bullet = null
+				A = null
 
+	current_bullet = new /obj/item/projectile/bullet/custom/
+	A = current_bullet
 
 	var/N = input("Select the calibre", "[src]") as null|anything in caliber_types
 	if(N)
@@ -154,20 +163,11 @@
 	N = input("Select the type of ammunition", "[src]") as null|anything in ammo_types
 	if(N)
 		selected_type = N
+
+
+		A.bullet_type = selected_type
 		N = null
 
-		if(selected_type == "FMJ")
-			current_bullet = new /obj/item/projectile/bullet/custom/fmj
-		if(selected_type == "HP")
-			current_bullet = new /obj/item/projectile/bullet/custom/hp
-		if(selected_type == "AP")
-			current_bullet = new /obj/item/projectile/bullet/custom/ap
-		if(selected_type == "Sabot")
-			current_bullet = new /obj/item/projectile/bullet/custom/sabot
-		if(selected_type == "Incendiary")
-			current_bullet = new /obj/item/projectile/bullet/custom/incendiary
-
-	var/obj/item/projectile/bullet/custom/A = current_bullet
 
 	N = input("Select the type of material for charge", "[src]") as null|anything in charge_list
 	if(N)
@@ -182,13 +182,13 @@
 		A.composition += new /obj/item/ammo_parts/jacket(src, N)
 		N = null
 
-	if(selected_type != "Sabot")
+	if(A.type != "Sabot")
 		N = input("Select the type of material for heart", "[src]") as null|anything in stored_material
 		if(N)
 			A.composition += new /obj/item/ammo_parts/heart(src, N)
 			N = null
 
-	else if (selected_type == "Sabot")
+	else if (A.type == "Sabot")
 		N = input("Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
 			A.composition += new /obj/item/ammo_parts/needle(src, N)
@@ -205,6 +205,7 @@
 
 	A.check_inside_parts()
 
+
 	current_bullet = A
 	bullet_ready = 1
 	return
@@ -218,42 +219,3 @@
 	ask()
 	return
 
-/*
-/obj/machinery/ammo_workbench/proc/ask(mob/user as mob)
-	if(bullet_ready == 1)
-		var/N = input("Use old design or build new?", "[src]") as null|anything in start_ask
-		if(N)
-			var/result = N
-			N = null
-			if (result == "Replicate programmed bullet")
-				for(var/obj/item/projectile/bullet/custom/K in src.current_bullet)
-					if(istype(K, /obj/item/projectile/bullet/custom/fmj))
-						var/obj/item/projectile/bullet/custom/fmj/C = K
-						C.check_parts()
-					if(istype(K, /obj/item/projectile/bullet/custom/hp))
-						var/obj/item/projectile/bullet/custom/hp/C = K
-						C.check_parts()
-					if(istype(K, /obj/item/projectile/bullet/custom/ap))
-						var/obj/item/projectile/bullet/custom/ap/C = K
-						C.check_parts()
-					if(istype(K, /obj/item/projectile/bullet/custom/sabot))
-						var/obj/item/projectile/bullet/custom/sabot/C = K
-						C.check_parts()
-					if(istype(K, /obj/item/projectile/bullet/custom/incendiary))
-						var/obj/item/projectile/bullet/custom/incendiary/C = K
-						C.check_parts()
-				var/obj/item/ammo_casing/custom/T = new /obj/item/ammo_casing/custom
-				var/obj/item/ammo_magazine/custom_box/E = new /obj/item/ammo_magazine/custom_box
-				for(var/obj/item/ammo_casing/custom/M in T)
-					M.caliber = src.selected_caliber
-					M.New()
-					E.caliber = selected_caliber
-					E.ammo_type =  T
-					E.New()
-					E.forceMove(src.loc)
-					E = null
-				return
-			else if (result == "Design new bullet")
-				bullet_ready = 0
-				src.current_bullet = null
-*/

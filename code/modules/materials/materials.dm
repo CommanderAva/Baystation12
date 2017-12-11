@@ -295,6 +295,7 @@ var/list/name_to_material
 	sheet_singular_name = "crystal"
 	sheet_plural_name = "crystals"
 	is_fusion_fuel = 1
+	var/incendiary = 1.2
 
 /material/phoron/supermatter
 	name = "supermatter"

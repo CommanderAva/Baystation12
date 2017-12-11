@@ -10,25 +10,26 @@
 	var/selected_material = null
 	var/list/workbench_recipes = null
 	var/list/ammo_recipes = null
-	var/list/stored_material = list("ammunition iron material" = 0,
-									"ammunition copper material" = 0,
-									"ammunition steel material" = 0,
-									"ammunition plasteel material" = 0,
-									"ammunition depleted uranium material" = 0,
-									"ammunition lead material" = 0,
-									"ammunition solid phoron material" = 0
+	var/list/stored_material = list("iron" = 0,
+									"copper" = 0,
+									"steel" = 0,
+									"plasteel" = 0,
+									"depleted uranium" = 0,
+									"lead" = 0,
+									"phoron" = 0
 
 	)
-	var/list/storage_capacity = list("ammunition iron material" = 0,
-									"ammunition copper material" = 0,
-									"ammunition steel material" = 0,
-									"ammunition plasteel material" = 0,
-									"ammunition depleted uranium material" = 0,
-									"ammunition lead material" = 0,
-									"ammunition solid phoron material" = 0
+	var/list/storage_capacity = list("iron" = 0,
+									"copper" = 0,
+									"steel" = 0,
+									"plasteel" = 0,
+									"depleted uranium" = 0,
+									"lead" = 0,
+									"phoron" = 0
 
 	)
 	var/list/charge_list = list("gunpowder")
+	var/list/incendiary_list = list("phoron", "depleted uranium")
 	var/list/casing_storage = null
 	var/show_category = "All"
 	var/busy = 0
@@ -71,13 +72,13 @@
 		man_rating += M.rating
 
 	build_time = 50 / man_rating
-	storage_capacity["ammunition iron material"] = mb_rating  * 25000
-	storage_capacity["ammunition copper material"] = mb_rating  * 25000
-	storage_capacity["ammunition steel material"]  = mb_rating  * 12500
-	storage_capacity["ammunition plasteel material"]  = mb_rating  * 10000
-	storage_capacity["ammunition depleted uranium material"]  = mb_rating  * 5000
-	storage_capacity["ammunition lead material"] = mb_rating  * 25000
-	storage_capacity["ammunition solid phoron material"]  = mb_rating  * 10000
+	storage_capacity["iron"] = mb_rating  * 25000
+	storage_capacity["copper"] = mb_rating  * 25000
+	storage_capacity["steel"]  = mb_rating  * 12500
+	storage_capacity["plasteel"]  = mb_rating  * 10000
+	storage_capacity["depleted uranium"]  = mb_rating  * 5000
+	storage_capacity["lead"] = mb_rating  * 25000
+	storage_capacity["phoron"]  = mb_rating  * 10000
 
 /obj/machinery/ammo_workbench/Destroy()
 	return ..()
@@ -173,8 +174,7 @@
 	if(N)
 		selected_material = N
 		N = null
-		if(selected_material == "gunpowder")
-			A.composition += new /obj/item/ammo_parts/gunpowder
+		new /obj/item/ammo_parts/gunpowder(A.composition, [selected_material])
 
 
 
@@ -183,41 +183,7 @@
 	if(N)
 		selected_material = N
 		N = null
-		if(selected_material == "ammunition iron material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/iron
-				B.check_composition()
-		if(selected_material == "ammunition copper material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/copper
-				B.check_composition()
-		if(selected_material == "ammunition steel material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/steel
-				B.check_composition()
-		if(selected_material == "ammunition plasteel material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/plasteel
-				B.check_composition()
-		if(selected_material == "ammunition depleted uranium material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/depleted_uranium
-				B.check_composition()
-		if(selected_material == "ammunition lead material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/lead
-				B.check_composition()
-		if(selected_material == "ammunition solid phoron material")
-			A.composition += new /obj/item/ammo_parts/jacket
-			for(var/obj/item/ammo_parts/jacket/B in A.composition)
-				B.material += new /obj/item/stack/material/ammo_material/phoron
-				B.check_composition()
+		new /obj/item/ammo_parts/jacket(A.composition, [selected_material])
 
 
 	if(selected_type != "Sabot")
@@ -225,100 +191,23 @@
 		if(N)
 			selected_material = N
 			N = null
-			if(selected_material == "ammunition iron material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/iron
-					B.check_composition()
-			if(selected_material == "ammunition copper material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/copper
-					B.check_composition()
-			if(selected_material == "ammunition steel material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/steel
-					B.check_composition()
-			if(selected_material == "ammunition plasteel material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/plasteel
-					B.check_composition()
-			if(selected_material == "ammunition depleted uranium material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/depleted_uranium
-					B.check_composition()
-			if(selected_material == "ammunition lead material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/lead
-					B.check_composition()
-			if(selected_material == "ammunition solid phoron material")
-				A.composition += new /obj/item/ammo_parts/heart
-				for(var/obj/item/ammo_parts/heart/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/phoron
-					B.check_composition()
+			new /obj/item/ammo_parts/heart(A.composition, [selected_material])
 
 	else if (selected_type == "Sabot")
 		N = input("Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
 			selected_material = N
 			N = null
-			if(selected_material == "ammunition iron material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/iron
-					B.check_composition()
-			if(selected_material == "ammunition copper material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/copper
-					B.check_composition()
-			if(selected_material == "ammunition steel material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/steel
-					B.check_composition()
-			if(selected_material == "ammunition plasteel material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/plasteel
-					B.check_composition()
-			if(selected_material == "ammunition depleted uranium material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/depleted_uranium
-					B.check_composition()
-			if(selected_material == "ammunition lead material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/lead
-					B.check_composition()
-			if(selected_material == "ammunition solid phoron material")
-				A.composition += new /obj/item/ammo_parts/needle
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/phoron
-					B.check_composition()
+			new /obj/item/ammo_parts/needle(A.composition, [selected_material])
 
 
 	if(selected_type == "incendiary")
 		A = current_bullet
-		N = input("Select the type of material for incendiary", "[src]") as null|anything in stored_material
+		N = input("Select the type of material for incendiary", "[src]") as null|anything in incendiary_list
 		if(N)
 			selected_material = N
 			N = null
-			if(selected_material == "ammunition depleted uranium material")
-				A.composition += new /obj/item/ammo_parts/incendiary
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/depleted_uranium
-					B.check_composition()
-			if(selected_material == "ammunition solid phoron material")
-				A.composition += new /obj/item/ammo_parts/incendiary
-				for(var/obj/item/ammo_parts/needle/B in A.composition)
-					B.material += new /obj/item/stack/material/ammo_material/phoron
-					B.check_composition()
+			new /obj/item/ammo_parts/incendiary(A.composition, [selected_material])
 
 	current_bullet = A
 	bullet_ready = 1

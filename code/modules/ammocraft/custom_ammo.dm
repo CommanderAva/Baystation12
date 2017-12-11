@@ -3,7 +3,7 @@
 	damage = 0 //9mm, .38, etc
 	armor_penetration = 0
 	var/list/composition = list()
-	var/list/radioactivity = list()
+	var/rad = 0
 	var/dens = 0
 	var/weight = 0
 	var/rad = 0
@@ -11,16 +11,27 @@
 	var/incendiary = 0
 	var/ammo_type = ""
 
-/obj/item/projectile/bullet/custom/New()
-	check_inside_parts()
-	count_chars()
-
 /obj/item/projectile/bullet/custom/proc/count_chars()
 	damage = (weight*5)
 	armor_penetration = (dens * 12)
 	return
+
 /obj/item/projectile/bullet/custom/proc/check_inside_parts()
+	for(var/obj/item/ammo_parts/P in composition)
+		if(istype(P, /obj/item/ammo_parts/jacket/))
+			src.dens += P.material.hardness*1.1
+			src.weight += P.material.weight*0.3
+			src.rad += P.material.radioactivity
+		else if(istype(P, /obj/item/ammo_parts/heart/))
+			src.dens += P.material.hardness*0.5
+			src.weight += P.material.weight
+			src.rad += P.material.radioactivity
+		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
+			src.power += P.material.power
+
 	return
+
+
 
 /obj/item/projectile/bullet/custom/fmj/count_chars()
 	damage = (weight*5)
@@ -50,15 +61,15 @@
 /obj/item/projectile/bullet/custom/fmj/check_inside_parts()
 	for(var/obj/item/ammo_parts/P in composition)
 		if(istype(P, /obj/item/ammo_parts/jacket/))
-			src.dens += P.dens*1.1
-			src.weight += P.weight*0.3
-			src.rad += P.rad
+			src.dens += P.material.hardness*1.1
+			src.weight += P.material.weight*0.3
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/heart/))
-			src.dens += P.dens*0.5
-			src.weight += P.weight*0.9
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.5
+			src.weight += P.material.weight*0.9
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
-			src.power += P.power
+			src.power += P.material.power
 	return
 
 /obj/item/projectile/bullet/custom/hp
@@ -87,15 +98,15 @@
 /obj/item/projectile/bullet/custom/hp/check_inside_parts()
 	for(var/obj/item/ammo_parts/P in composition)
 		if(istype(P, /obj/item/ammo_parts/jacket/))
-			src.dens += P.dens*1.1
-			src.weight += P.weight*0.3
-			src.rad += P.rad
+			src.dens += P.material.hardness*1.1
+			src.weight += P.material.weight*0.4
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/heart/))
-			src.dens += P.dens*0.5
-			src.weight += P.weight
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.3
+			src.weight += P.material.weight*0.1
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
-			src.power += P.power
+			src.power += P.material.power
 	return
 
 /obj/item/projectile/bullet/custom/hp/count_chars()
@@ -129,15 +140,15 @@
 /obj/item/projectile/bullet/custom/sabot/check_inside_parts()
 	for(var/obj/item/ammo_parts/P in composition)
 		if(istype(P, /obj/item/ammo_parts/jacket/))
-			src.dens += P.dens*0.6
-			src.weight += P.weight*0.6
-			src.rad += P.rad
-		else if(istype(P, /obj/item/ammo_parts/needle/))
-			src.dens += P.dens*1.5
-			src.weight += P.weight*0.3
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.6
+			src.weight += P.material.weight*0.5
+			src.rad += P.material.radioactivity
+		else if(istype(P, /obj/item/ammo_parts/heart/))
+			src.dens += P.material.hardness*1.5
+			src.weight += P.material.weight*0.3
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
-			src.power += P.power*0.9
+			src.power += P.material.power*0.9
 	return
 
 obj/item/projectile/bullet/custom/sabot/count_chars()
@@ -172,15 +183,15 @@ obj/item/projectile/bullet/custom/sabot/count_chars()
 /obj/item/projectile/bullet/custom/ap/check_inside_parts()
 	for(var/obj/item/ammo_parts/P in composition)
 		if(istype(P, /obj/item/ammo_parts/jacket/))
-			src.dens += P.dens*0.8
-			src.weight += P.weight*0.4
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.9
+			src.weight += P.material.weight*0.4
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/heart/))
-			src.dens += P.dens*0.7
-			src.weight += P.weight*0.8
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.8
+			src.weight += P.material.weight*0.5
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
-			src.power += P.power
+			src.power += P.material.power
 	return
 
 obj/item/projectile/bullet/custom/ap/count_chars()
@@ -222,17 +233,17 @@ obj/item/projectile/bullet/custom/ap/count_chars()
 /obj/item/projectile/bullet/custom/incendiary/check_inside_parts()
 	for(var/obj/item/ammo_parts/P in composition)
 		if(istype(P, /obj/item/ammo_parts/jacket/))
-			src.dens += P.dens*0.7
-			src.weight += P.weight*0.5
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.7
+			src.weight += P.material.weight*0.5
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/heart/))
-			src.dens += P.dens*0.6
-			src.weight += P.weight*0.8
-			src.rad += P.rad
+			src.dens += P.material.hardness*0.6
+			src.weight += P.material.weight*0.8
+			src.rad += P.material.radioactivity
 		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
-			src.power += P.power
+			src.power += P.material.power
 		else if(istype(P, /obj/item/ammo_parts/incendiary/))
-			src.incendiary += P.incendiary
+			src.incendiary = P.material.incendiary
 	return
 
 obj/item/projectile/bullet/custom/incendiary/count_chars()

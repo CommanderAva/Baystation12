@@ -7,7 +7,18 @@
 	var/weight = 0
 	var/rad = 0
 	var/power = 0
-	var/list/material = null
+	var/list/material = list()
+
+/obj/item/ammo_parts/New()
+	check_composition()
+	return
+
+/obj/item/ammo_parts/proc/check_composition()
+	for(var/obj/item/stack/material/ammo_material/P in material)
+		src.dens = P.dens
+		src.weight = P.weight
+		src.rad = P.rad
+	return
 
 
 /obj/item/ammo_parts/jacket
@@ -17,9 +28,9 @@
 	icon_state = "jacket"
 
 
-/obj/item/ammo_parts/jacket/proc/check_parts()
+/obj/item/ammo_parts/jacket/check_composition()
 	for(var/obj/item/stack/material/ammo_material/P in material)
-		src.dens = P.density
+		src.dens = P.dens
 		src.weight = P.weight
 		src.rad = P.rad
 
@@ -44,9 +55,9 @@
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "heart"
 
-/obj/item/ammo_parts/heart/proc/check_parts()
+/obj/item/ammo_parts/heart/check_composition()
 	for(var/obj/item/stack/material/ammo_material/P in material)
-		src.dens = P.density
+		src.dens = P.dens
 		src.weight = P.weight
 		src.rad = P.rad
 
@@ -72,9 +83,9 @@
 	icon_state = "needle"
 
 
-/obj/item/ammo_parts/needle/proc/check_parts()
+/obj/item/ammo_parts/needle/check_composition()
 	for(var/obj/item/stack/material/ammo_material/P in material)
-		src.dens = P.density
+		src.dens = P.dens
 		src.weight = P.weight
 		src.rad = P.rad
 
@@ -100,7 +111,7 @@
 	icon_state = "gunpowder"
 	power = 1
 
-/obj/item/ammo_parts/gunpowder/proc/check_parts()
+/obj/item/ammo_parts/gunpowder/check_composition()
 	for(var/obj/item/stack/material/ammo_material/P in material)
 		src.power = P.power
 		return
@@ -112,7 +123,7 @@
 	icon_state = "incendiary"
 	var/incendiary = 1.1
 
-/obj/item/ammo_parts/incendiary/proc/check_parts()
+/obj/item/ammo_parts/incendiary/check_composition()
 	for(var/obj/item/stack/material/ammo_material/P in material)
 		src.incendiary += P.incendiary
 		return
@@ -126,7 +137,7 @@
 	..()
 	material = list()
 	material += new /obj/item/stack/material/ammo_material/copper(src)
-	check_parts()
+	check_composition()
 
 /obj/item/ammo_parts/heart/lead
 	name = "c bullet jacket"
@@ -136,7 +147,7 @@
 	..()
 	material = list()
 	material += new /obj/item/stack/material/ammo_material/lead(src)
-	check_parts()
+	check_composition()
 
 /obj/item/ammo_parts/needle/steel
 	name = "bullet needle"
@@ -146,6 +157,6 @@
 	..()
 	material = list()
 	material += new /obj/item/stack/material/ammo_material/steel(src)
-	check_parts()
+	check_composition()
 
 

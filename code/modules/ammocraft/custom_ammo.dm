@@ -3,7 +3,7 @@
 	damage = 0 //9mm, .38, etc
 	armor_penetration = 0
 	var/list/composition = list()
-	var/list/radioactivity = 0
+	var/list/radioactivity = list()
 	var/dens = 0
 	var/weight = 0
 	var/rad = 0
@@ -11,7 +11,18 @@
 	var/incendiary = 0
 	var/ammo_type = ""
 
-/obj/item/projectile/bullet/custom/fmj/proc/count_chars()
+/obj/item/projectile/bullet/custom/New()
+	check_parts()
+	count_chars()
+
+/obj/item/projectile/bullet/custom/proc/count_chars()
+	damage = (weight*5)
+	armor_penetration = (dens * 12)
+	return
+/obj/item/projectile/bullet/custom/proc/check_parts()
+	return
+
+/obj/item/projectile/bullet/custom/fmj/count_chars()
 	damage = (weight*5)
 	armor_penetration = (dens * 12)
 	return
@@ -36,13 +47,13 @@
 	count_chars()
 
 
-/obj/item/projectile/bullet/custom/fmj/proc/check_parts()
+/obj/item/projectile/bullet/custom/fmj/check_parts()
 	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.density*1.1
+		src.dens += P.dens*1.1
 		src.weight += P.weight*0.3
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.density*0.5
+		src.dens += P.dens*0.5
 		src.weight += P.weight*0.9
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/gunpowder/P in composition)
@@ -72,20 +83,20 @@
 
 
 
-/obj/item/projectile/bullet/custom/hp/proc/check_parts()
+/obj/item/projectile/bullet/custom/hp/check_parts()
 	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.density*1.1
+		src.dens += P.dens*1.1
 		src.weight += P.weight*0.3
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.density*0.5
+		src.dens += P.dens*0.5
 		src.weight += P.weight
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/gunpowder/P in composition)
 		src.power += P.power
 		return
 
-/obj/item/projectile/bullet/custom/hp/proc/count_chars()
+/obj/item/projectile/bullet/custom/hp/count_chars()
 	damage = (weight*7)
 	armor_penetration = (dens * 8)
 	return
@@ -113,20 +124,20 @@
 
 
 
-/obj/item/projectile/bullet/custom/sabot/proc/check_parts()
+/obj/item/projectile/bullet/custom/sabot/check_parts()
 	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.density*0.6
+		src.dens += P.dens*0.6
 		src.weight += P.weight*0.6
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/needle/P in composition)
-		src.dens += P.density*1.5
+		src.dens += P.dens*1.5
 		src.weight += P.weight*0.2
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/gunpowder/P in composition)
 		src.power += P.power*0.8
 		return
 
-obj/item/projectile/bullet/custom/sabot/proc/count_chars()
+obj/item/projectile/bullet/custom/sabot/count_chars()
 	damage = (weight*5)
 	armor_penetration = (dens * 12)
 	return
@@ -155,20 +166,20 @@ obj/item/projectile/bullet/custom/sabot/proc/count_chars()
 
 
 
-/obj/item/projectile/bullet/custom/ap/proc/check_parts()
+/obj/item/projectile/bullet/custom/ap/check_parts()
 	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.density*0.7
+		src.dens += P.dens*0.7
 		src.weight += P.weight*0.4
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.density*0.7
+		src.dens += P.dens*0.7
 		src.weight += P.weight*0.7
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/gunpowder/P in composition)
 		src.power += P.power
 		return
 
-obj/item/projectile/bullet/custom/ap/proc/count_chars()
+obj/item/projectile/bullet/custom/ap/count_chars()
 	damage = (weight*6)
 	armor_penetration = (dens * 10)
 	return
@@ -204,22 +215,22 @@ obj/item/projectile/bullet/custom/ap/proc/count_chars()
 
 
 
-/obj/item/projectile/bullet/custom/incendiary/proc/check_parts()
+/obj/item/projectile/bullet/custom/incendiary/check_parts()
 	for(var/obj/item/ammo_parts/incendiary/P in composition)
 		src.incendiary += P.incendiary
 	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.density*0.5
+		src.dens += P.dens*0.5
 		src.weight += P.weight*0.5
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.density*0.6
+		src.dens += P.dens*0.6
 		src.weight += P.weight*0.7
 		src.rad += P.rad
 	for(var/obj/item/ammo_parts/gunpowder/P in composition)
 		src.power += P.power
 		return
 
-obj/item/projectile/bullet/custom/incendiary/proc/count_chars()
+obj/item/projectile/bullet/custom/incendiary/count_chars()
 	damage = (weight*6*incendiary)
 	armor_penetration = (dens * 10)
 	return

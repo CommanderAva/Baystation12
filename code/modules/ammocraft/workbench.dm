@@ -1,4 +1,4 @@
-/obj/machinery/ammo_workbench   //Thanks F-TangSteve#0439, Hubble#2807 and BlueNexus#0489 from Baystation12 discord for helping with this
+/obj/machinery/ammo_workbench   //Thanks F-TangSteve#0439, Hubble#2807 and BlueNexus#0489, GinjaNinja32 from Baystation12 discord for helping with this
 	name = "ammunition workbench"
 	desc = "A workbench for making custom ammunition"
 	icon = 'icons/obj/machines/ammocraft.dmi'
@@ -174,7 +174,7 @@
 	if(N)
 		selected_material = N
 		N = null
-		new /obj/item/ammo_parts/gunpowder(A.composition, [selected_material])
+		new /obj/item/ammo_parts/gunpowder(A.composition, "[selected_material]")
 
 
 
@@ -183,7 +183,7 @@
 	if(N)
 		selected_material = N
 		N = null
-		new /obj/item/ammo_parts/jacket(A.composition, [selected_material])
+		new /obj/item/ammo_parts/jacket(A.composition, "[selected_material]")
 
 
 	if(selected_type != "Sabot")
@@ -191,14 +191,14 @@
 		if(N)
 			selected_material = N
 			N = null
-			new /obj/item/ammo_parts/heart(A.composition, [selected_material])
+			new /obj/item/ammo_parts/heart(A.composition, "[selected_material]")
 
 	else if (selected_type == "Sabot")
 		N = input("Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
 			selected_material = N
 			N = null
-			new /obj/item/ammo_parts/needle(A.composition, [selected_material])
+			new /obj/item/ammo_parts/needle(A.composition, "[selected_material]")
 
 
 	if(selected_type == "incendiary")
@@ -207,7 +207,7 @@
 		if(N)
 			selected_material = N
 			N = null
-			new /obj/item/ammo_parts/incendiary(A.composition, [selected_material])
+			new /obj/item/ammo_parts/incendiary(A.composition, "[selected_material]")
 
 	current_bullet = A
 	bullet_ready = 1

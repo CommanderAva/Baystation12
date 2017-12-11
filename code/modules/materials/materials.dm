@@ -633,6 +633,7 @@ var/list/name_to_material
 
 /material/iron
 	name = "iron"
+	display_name = "iron"
 	stack_type = /obj/item/stack/material/iron
 	icon_colour = "#5c5454"
 	weight = 22

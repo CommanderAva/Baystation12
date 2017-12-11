@@ -7,8 +7,8 @@
 	var/weight = 0
 	var/rad = 0
 	var/power = 0
-	var/material
-	var/default_material = iron
+	var/material = ""
+	var/default_material = "copper"
 
 /obj/item/ammo_parts/proc/set_material(var/new_material)
 	material = get_material_by_name(new_material)
@@ -35,24 +35,28 @@
 	desc = "bullet jacket. Contact admin or developer if you see this"
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "jacket"
+	default_material = "copper"
 
 /obj/item/ammo_parts/heart
 	name = "bullet heart"
 	desc = "bullet heart. Contact admin or developer if you see this"
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "heart"
+	default_material = "lead"
 
 /obj/item/ammo_parts/needle
 	name = "bullet needle"
 	desc = "bullet needle. Contact admin or developer if you see this"
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "needle"
+	default_material = "steel"
 
 /obj/item/ammo_parts/gunpowder
 	name = "gunpowder"
 	desc = "gunpowder. Contact admin or developer if you see this"
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "gunpowder"
+	default_material = "gunpowder"
 	power = 1
 
 /obj/item/ammo_parts/incendiary
@@ -61,6 +65,7 @@
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "incendiary"
 	var/incendiary = 1.1
+	default_material = "phoron"
 
 
 /obj/item/ammo_parts/jacket/copper

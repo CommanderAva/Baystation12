@@ -3,6 +3,7 @@
 	stack_type = /obj/item/stack/material/depleted_uranium
 	radioactivity = 8
 	icon_base = "stone"
+	display_name = "depleted uranium"
 	icon_reinf = "reinf_stone"
 	icon_colour = "#001a00"
 	weight = 28
@@ -18,6 +19,7 @@
 /material/copper
 	name = "copper"
 	stack_type = /obj/item/stack/material/copper
+	display_name = "copper"
 	icon_colour = "#cc3300"
 	weight = 20
 	hardness = 15
@@ -32,6 +34,7 @@
 	icon_colour = "#999966"
 	weight = 40
 	hardness = 7
+	display_name = "lead"
 	integrity = 80
 	stack_origin_tech = list(TECH_MATERIAL = 4)
 	sheet_singular_name = "ingot"
@@ -42,6 +45,7 @@
 	stack_type = /obj/item/stack/material/lead
 	icon_colour = "#999966"
 	weight = 7
+	display_name = "gunpowder"
 	hardness = 1
 	integrity = 10
 	ignition_point = T0C+100

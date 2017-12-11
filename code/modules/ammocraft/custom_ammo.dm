@@ -6,7 +6,6 @@
 	var/rad = 0
 	var/dens = 0
 	var/weight = 0
-	var/rad = 0
 	var/power = 0
 	var/incendiary = 0
 	var/ammo_type = ""

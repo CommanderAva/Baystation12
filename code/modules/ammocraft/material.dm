@@ -14,7 +14,7 @@
 	sheet_singular_name = "pellet"
 	sheet_plural_name = "pellets"
 	ignition_point = T0C+350
-	var/incendiary = 1.1
+	incendiary = 1.1
 
 /material/copper
 	name = "copper"
@@ -42,7 +42,7 @@
 
 /material/gunpowder
 	name = "gunpowder"
-	stack_type = /obj/item/stack/material/lead
+	stack_type = /obj/item/stack/material/gunpowder
 	icon_colour = "#999966"
 	weight = 7
 	display_name = "gunpowder"
@@ -52,7 +52,7 @@
 	stack_origin_tech = list(TECH_MATERIAL = 4)
 	sheet_singular_name = "brick"
 	sheet_plural_name = "bricks"
-
+	power = 1
 
 
 /obj/item/stack/material/copper
@@ -77,7 +77,7 @@
 	name = "gunpowder"
 	icon_state = "sheet-uranium"
 	default_type = "gunpowder"
-	var/power = 1
+
 
 
 

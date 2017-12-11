@@ -101,6 +101,8 @@ var/list/name_to_material
 	var/conductive = 1           // Objects with this var add CONDUCTS to flags on spawn.
 	var/luminescence
 	var/list/composite_material  // If set, object matter var will be a list containing these values.
+	var/power //This one and lower are for ammo creation
+	var/incendiary
 
 	// Placeholder vars for the time being, todo properly integrate windows/light tiles/rods.
 	var/created_window
@@ -295,7 +297,7 @@ var/list/name_to_material
 	sheet_singular_name = "crystal"
 	sheet_plural_name = "crystals"
 	is_fusion_fuel = 1
-	var/incendiary = 1.2
+	incendiary = 1.2
 
 /material/phoron/supermatter
 	name = "supermatter"

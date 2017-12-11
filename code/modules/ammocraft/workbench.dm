@@ -1,4 +1,4 @@
-/obj/machinery/ammo_workbench   //Thanks F-TangSteve#0439, Hubble#2807 and BlueNexus#0489, GinjaNinja32 from Baystation12 discord for helping with this
+/obj/machinery/ammo_workbench   //Thanks Hubble#2807 and BlueNexus#0489, huge ones and F-TangSteve#0439 and infinite ones for  GinjaNinja32 from Baystation12 discord for helping with this. It wouldn't work without these people.
 	name = "ammunition workbench"
 	desc = "A workbench for making custom ammunition"
 	icon = 'icons/obj/machines/ammocraft.dmi'
@@ -134,7 +134,6 @@
 						C.check_inside_parts()
 						C.count_chars()
 				var/obj/item/ammo_casing/custom/T = new /obj/item/ammo_casing/custom
-				//var/obj/item/ammo_magazine/custom_box/E = new /obj/item/ammo_magazine/custom_box
 				for(var/obj/item/ammo_casing/M in T)
 					M.caliber = src.selected_caliber
 					for(var/obj/item/projectile/bullet/custom/K in src.current_bullet)
@@ -142,7 +141,7 @@
 						M.forceMove(src.loc)
 						M = null
 
-						return
+				return
 			else if (result == "Design new bullet")
 				bullet_ready = 0
 				src.current_bullet = null
@@ -172,42 +171,39 @@
 
 	N = input("Select the type of material for charge", "[src]") as null|anything in charge_list
 	if(N)
-		selected_material = N
+		A.composition += new /obj/item/ammo_parts/gunpowder(src, N)
 		N = null
-		new /obj/item/ammo_parts/gunpowder(A.composition, "[selected_material]")
 
 
 
 
 	N = input("Select the type of material for jacket", "[src]") as null|anything in stored_material
 	if(N)
-		selected_material = N
+		A.composition += new /obj/item/ammo_parts/jacket(src, N)
 		N = null
-		new /obj/item/ammo_parts/jacket(A.composition, "[selected_material]")
-
 
 	if(selected_type != "Sabot")
 		N = input("Select the type of material for heart", "[src]") as null|anything in stored_material
 		if(N)
-			selected_material = N
+			A.composition += new /obj/item/ammo_parts/heart(src, N)
 			N = null
-			new /obj/item/ammo_parts/heart(A.composition, "[selected_material]")
 
 	else if (selected_type == "Sabot")
 		N = input("Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
-			selected_material = N
+			A.composition += new /obj/item/ammo_parts/needle(src, N)
 			N = null
-			new /obj/item/ammo_parts/needle(A.composition, "[selected_material]")
 
 
 	if(selected_type == "incendiary")
 		A = current_bullet
 		N = input("Select the type of material for incendiary", "[src]") as null|anything in incendiary_list
 		if(N)
-			selected_material = N
+			A.composition += new /obj/item/ammo_parts/incendiary(src, N)
 			N = null
-			new /obj/item/ammo_parts/incendiary(A.composition, "[selected_material]")
+
+
+	A.check_inside_parts()
 
 	current_bullet = A
 	bullet_ready = 1

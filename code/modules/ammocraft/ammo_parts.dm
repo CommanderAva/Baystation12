@@ -7,8 +7,9 @@
 	var/weight = 0
 	var/rad = 0
 	var/power = 0
-	var/material = ""
-	var/default_material = "copper"
+	var/material/material
+	var/default_material
+	var/applies_material_colour = 1
 
 /obj/item/ammo_parts/proc/set_material(var/new_material)
 	material = get_material_by_name(new_material)
@@ -18,7 +19,6 @@
 		name = "[material.display_name] [initial(name)]"
 		if(applies_material_colour)
 			color = material.icon_colour
-		update_force()
 
 
 /obj/item/ammo_parts/New(var/newloc, var/material_key)

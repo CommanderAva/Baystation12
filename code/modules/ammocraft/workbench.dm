@@ -114,27 +114,27 @@
 				for(var/obj/item/projectile/bullet/custom/K in src.current_bullet)
 					if(istype(K, /obj/item/projectile/bullet/custom/fmj))
 						var/obj/item/projectile/bullet/custom/fmj/C = K
-						C.check_parts()
+						C.check_inside_parts()
 						C.count_chars()
 					if(istype(K, /obj/item/projectile/bullet/custom/hp))
 						var/obj/item/projectile/bullet/custom/hp/C = K
-						C.check_parts()
+						C.check_inside_parts()
 						C.count_chars()
 					if(istype(K, /obj/item/projectile/bullet/custom/ap))
 						var/obj/item/projectile/bullet/custom/ap/C = K
-						C.check_parts()
+						C.check_inside_parts()
 						C.count_chars()
 					if(istype(K, /obj/item/projectile/bullet/custom/sabot))
 						var/obj/item/projectile/bullet/custom/sabot/C = K
-						C.check_parts()
+						C.check_inside_parts()
 						C.count_chars()
 					if(istype(K, /obj/item/projectile/bullet/custom/incendiary))
 						var/obj/item/projectile/bullet/custom/incendiary/C = K
-						C.check_parts()
+						C.check_inside_parts()
 						C.count_chars()
 				var/obj/item/ammo_casing/custom/T = new /obj/item/ammo_casing/custom
 				//var/obj/item/ammo_magazine/custom_box/E = new /obj/item/ammo_magazine/custom_box
-				for(var/obj/item/ammo_casing/custom/M in T)
+				for(var/obj/item/ammo_casing/M in T)
 					M.caliber = src.selected_caliber
 					for(var/obj/item/projectile/bullet/custom/K in src.current_bullet)
 						M.BB = new K

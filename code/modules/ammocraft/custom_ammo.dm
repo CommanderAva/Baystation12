@@ -12,14 +12,14 @@
 	var/ammo_type = ""
 
 /obj/item/projectile/bullet/custom/New()
-	check_parts()
+	check_inside_parts()
 	count_chars()
 
 /obj/item/projectile/bullet/custom/proc/count_chars()
 	damage = (weight*5)
 	armor_penetration = (dens * 12)
 	return
-/obj/item/projectile/bullet/custom/proc/check_parts()
+/obj/item/projectile/bullet/custom/proc/check_inside_parts()
 	return
 
 /obj/item/projectile/bullet/custom/fmj/count_chars()
@@ -43,22 +43,23 @@
 	composition += new /obj/item/ammo_parts/jacket/copper(src)
 	composition += new /obj/item/ammo_parts/heart/lead(src)
 	composition += new /obj/item/ammo_parts/gunpowder(src)
-	check_parts()
+	check_inside_parts()
 	count_chars()
 
 
-/obj/item/projectile/bullet/custom/fmj/check_parts()
-	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.dens*1.1
-		src.weight += P.weight*0.3
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.dens*0.5
-		src.weight += P.weight*0.9
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/gunpowder/P in composition)
-		src.power += P.power
-		return
+/obj/item/projectile/bullet/custom/fmj/check_inside_parts()
+	for(var/obj/item/ammo_parts/P in composition)
+		if(istype(P, /obj/item/ammo_parts/jacket/))
+			src.dens += P.dens*1.1
+			src.weight += P.weight*0.3
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/heart/))
+			src.dens += P.dens*0.5
+			src.weight += P.weight*0.9
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
+			src.power += P.power
+	return
 
 /obj/item/projectile/bullet/custom/hp
 	name = "custom HP bullet"
@@ -77,24 +78,25 @@
 	composition += new /obj/item/ammo_parts/jacket/copper(src)
 	composition += new /obj/item/ammo_parts/heart/lead(src)
 	composition += new /obj/item/ammo_parts/gunpowder(src)
-	check_parts()
+	check_inside_parts()
 	count_chars()
 
 
 
 
-/obj/item/projectile/bullet/custom/hp/check_parts()
-	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.dens*1.1
-		src.weight += P.weight*0.3
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.dens*0.5
-		src.weight += P.weight
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/gunpowder/P in composition)
-		src.power += P.power
-		return
+/obj/item/projectile/bullet/custom/hp/check_inside_parts()
+	for(var/obj/item/ammo_parts/P in composition)
+		if(istype(P, /obj/item/ammo_parts/jacket/))
+			src.dens += P.dens*1.1
+			src.weight += P.weight*0.3
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/heart/))
+			src.dens += P.dens*0.5
+			src.weight += P.weight
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
+			src.power += P.power
+	return
 
 /obj/item/projectile/bullet/custom/hp/count_chars()
 	damage = (weight*7)
@@ -118,24 +120,25 @@
 	composition += new /obj/item/ammo_parts/jacket/copper(src)
 	composition += new /obj/item/ammo_parts/needle/steel(src)
 	composition += new /obj/item/ammo_parts/gunpowder(src)
-	check_parts()
+	check_inside_parts()
 	count_chars()
 
 
 
 
-/obj/item/projectile/bullet/custom/sabot/check_parts()
-	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.dens*0.6
-		src.weight += P.weight*0.6
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/needle/P in composition)
-		src.dens += P.dens*1.5
-		src.weight += P.weight*0.2
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/gunpowder/P in composition)
-		src.power += P.power*0.8
-		return
+/obj/item/projectile/bullet/custom/sabot/check_inside_parts()
+	for(var/obj/item/ammo_parts/P in composition)
+		if(istype(P, /obj/item/ammo_parts/jacket/))
+			src.dens += P.dens*0.6
+			src.weight += P.weight*0.6
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/needle/))
+			src.dens += P.dens*1.5
+			src.weight += P.weight*0.3
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
+			src.power += P.power*0.9
+	return
 
 obj/item/projectile/bullet/custom/sabot/count_chars()
 	damage = (weight*5)
@@ -160,24 +163,25 @@ obj/item/projectile/bullet/custom/sabot/count_chars()
 	composition += new /obj/item/ammo_parts/jacket/copper(src)
 	composition += new /obj/item/ammo_parts/heart(src)
 	composition += new /obj/item/ammo_parts/gunpowder(src)
-	check_parts()
+	check_inside_parts()
 	count_chars()
 
 
 
 
-/obj/item/projectile/bullet/custom/ap/check_parts()
-	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.dens*0.7
-		src.weight += P.weight*0.4
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.dens*0.7
-		src.weight += P.weight*0.7
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/gunpowder/P in composition)
-		src.power += P.power
-		return
+/obj/item/projectile/bullet/custom/ap/check_inside_parts()
+	for(var/obj/item/ammo_parts/P in composition)
+		if(istype(P, /obj/item/ammo_parts/jacket/))
+			src.dens += P.dens*0.8
+			src.weight += P.weight*0.4
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/heart/))
+			src.dens += P.dens*0.7
+			src.weight += P.weight*0.8
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
+			src.power += P.power
+	return
 
 obj/item/projectile/bullet/custom/ap/count_chars()
 	damage = (weight*6)
@@ -209,26 +213,27 @@ obj/item/projectile/bullet/custom/ap/count_chars()
 	composition += new /obj/item/ammo_parts/heart(src)
 	composition += new /obj/item/ammo_parts/gunpowder(src)
 	composition += new /obj/item/ammo_parts/incendiary(src)
-	check_parts()
+	check_inside_parts()
 	count_chars()
 
 
 
 
-/obj/item/projectile/bullet/custom/incendiary/check_parts()
-	for(var/obj/item/ammo_parts/incendiary/P in composition)
-		src.incendiary += P.incendiary
-	for(var/obj/item/ammo_parts/jacket/P in composition)
-		src.dens += P.dens*0.5
-		src.weight += P.weight*0.5
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/heart/P in composition)
-		src.dens += P.dens*0.6
-		src.weight += P.weight*0.7
-		src.rad += P.rad
-	for(var/obj/item/ammo_parts/gunpowder/P in composition)
-		src.power += P.power
-		return
+/obj/item/projectile/bullet/custom/incendiary/check_inside_parts()
+	for(var/obj/item/ammo_parts/P in composition)
+		if(istype(P, /obj/item/ammo_parts/jacket/))
+			src.dens += P.dens*0.7
+			src.weight += P.weight*0.5
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/heart/))
+			src.dens += P.dens*0.6
+			src.weight += P.weight*0.8
+			src.rad += P.rad
+		else if(istype(P, /obj/item/ammo_parts/gunpowder/))
+			src.power += P.power
+		else if(istype(P, /obj/item/ammo_parts/incendiary/))
+			src.incendiary += P.incendiary
+	return
 
 obj/item/projectile/bullet/custom/incendiary/count_chars()
 	damage = (weight*6*incendiary)

@@ -85,7 +85,7 @@
 
 /obj/item/weapon/fuel_rod/uranium238
 	name = "Uranium-238 fuel rod"
-	desc = "Uranium-238 fuel rod for the nuclear reactor. It's in the protective casing, so it won't irradiate you"
+	desc = "Uranium-238 fuel rod for the nuclear reactor. It has enough of U235 to work. It's in the protective casing, so it won't irradiate you"
 	icon = 'icons/obj/machines/power/fission.dmi'
 	icon_state = "fuel_rod"
 	fuel_life = 1000
@@ -98,3 +98,11 @@
 		icon_state = "fuel_rod_decayed"
 	else if(fuel_life < 200)
 		icon_state = "fuel_rod_depleted"
+
+/obj/item/weapon/fuel_rod/uranium235
+	name = "Uranium-235 fuel rod"
+	desc = "Uranium-235 fuel rod for the nuclear reactor. Enriched to the point of U235 being the 90% of this rod. It's in the protective casing, so it won't irradiate you"
+	icon = 'icons/obj/machines/power/fission.dmi'
+	icon_state = "fuel_rod"
+	fuel_life = 1500
+	divide_k = 2.3

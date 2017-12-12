@@ -14,6 +14,7 @@
 									"plasteel" = 0,
 									"depleted uranium" = 0,
 									"lead" = 0,
+									"gunpowder" = 0,
 									"phoron" = 0
 
 	)
@@ -23,6 +24,7 @@
 									"plasteel" = 0,
 									"depleted uranium" = 0,
 									"lead" = 0,
+									"gunpowder" = 0,
 									"phoron" = 0
 
 	)
@@ -77,6 +79,7 @@
 	storage_capacity["depleted uranium"]  = mb_rating  * 5000
 	storage_capacity["lead"] = mb_rating  * 25000
 	storage_capacity["phoron"]  = mb_rating  * 10000
+	storage_capacity["gunpowder"]  = mb_rating  * 100000
 
 /obj/machinery/ammo_workbench/Destroy()
 	return ..()
@@ -99,29 +102,34 @@
 	else
 		return
 */
-/obj/machinery/ammo_workbench/proc/check_material()
+/obj/machinery/ammo_workbench/proc/check_material(mob/user as mob)
 	for(var/obj/item/ammo_parts/V in A)
 		if (V.cost > src.stored_material[V.material.name])
-			to_chat(usr, "<span class='notice'>Insufficient material to replicate.</span>")
+			to_chat(user, "<span class='notice'>Insufficient material to replicate.</span>")
 			update_use_power(1)
 			busy = 0
+			allow_work = 0
 			return
-	allow_work = 1
+		else
+			allow_work = 1
+			return
 
 /obj/machinery/ammo_workbench/proc/eat_material()
 	if(allow_work == 1)
 		for(var/obj/item/ammo_parts/V in A)
 			src.stored_material[V.material.name] -= V.cost
-
-/obj/machinery/ammo_workbench/proc/ask()
+		return
+	else
+		return
+/obj/machinery/ammo_workbench/proc/ask(mob/user as mob)
 
 	if(bullet_ready == 1)
 		var/N = input("Use old design or build new?", "[src]") as null|anything in start_ask
 		if(N)
 			var/result = N
 			N = null
-			if (result == "Replicate programmed bullet")
-				check_material()
+			check_material()
+			if (result == "Replicate programmed bullet" && allow_work == 1)
 				eat_material()
 				busy = 1
 				update_use_power(2)
@@ -169,6 +177,9 @@
 				bullet_ready = 0
 				src.current_bullet = null
 				A = null
+			else
+				to_chat(user, "<span class='notice'>Insufficient material to replicate.</span>")
+				return
 
 	current_bullet = new /obj/item/projectile/bullet/custom/
 	A = current_bullet

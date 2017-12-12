@@ -42,7 +42,6 @@
 	var/list/caliber_types = list("9mm")
 	var/list/ammo_types = list("FMJ", "HP", "AP", "Sabot", "Incendiary")
 	var/current_bullet = null
-	var/obj/item/projectile/bullet/custom/A = null
 	var/allow_work = 0
 /obj/machinery/ammo_workbench/New()
 
@@ -104,7 +103,7 @@
 /obj/machinery/ammo_workbench/proc/check_material(mob/user)
 
 	var/list/required_materials = list()
-	for(var/obj/item/ammo_parts/V in A)
+	for(var/obj/item/ammo_parts/V in current_bullet)
 		required_materials[V.material.name] += V.cost
 	for(var/mat in required_materials)
 		if(stored_material[mat] < required_materials[mat])
@@ -118,7 +117,7 @@
 
 /obj/machinery/ammo_workbench/proc/eat_material()
 	if(allow_work == 1)
-		for(var/obj/item/ammo_parts/V in A)
+		for(var/obj/item/ammo_parts/V in current_bullet)
 			src.stored_material[V.material.name] -= V.cost
 
 /obj/machinery/ammo_workbench/proc/ask(mob/user)
@@ -143,10 +142,10 @@
 					C.BB = BB
 					C.caliber = selected_caliber
 					BB.bullet_type = src.selected_type
-					BB.damage = A.damage
-					BB.armor_penetration = A.armor_penetration
-					BB.incendiary = A.incendiary
-					BB.rad = A.rad
+					BB.damage = current_bullet.damage
+					BB.armor_penetration = current_bullet.armor_penetration
+					BB.incendiary = current_bullet.incendiary
+					BB.rad = current_bullet.rad
 					T.stored_ammo += C
 				sleep(build_time)
 				T.forceMove(src.loc)
@@ -155,13 +154,13 @@
 			else if (result == "Design new bullet")
 				bullet_ready = 0
 				src.current_bullet = null
-				A = null
+				current_bullet = null
 			else
 				to_chat(user, "<span class='notice'>Insufficient material to replicate.</span>")
 				return
-
+	if(current_bullet)
+		qdel(current_bullet)
 	current_bullet = new /obj/item/projectile/bullet/custom/
-	A = current_bullet
 
 	var/N = input(user, "Select the calibre", "[src]") as null|anything in caliber_types
 	if(N)
@@ -172,13 +171,13 @@
 		selected_type = N
 
 
-		A.bullet_type = selected_type
+		current_bullet.bullet_type = selected_type
 		N = null
 
 
 	N = input(user,"Select the type of material for charge", "[src]") as null|anything in charge_list
 	if(N)
-		A.composition += new /obj/item/ammo_parts/gunpowder(src, N)
+		current_bullet.composition += new /obj/item/ammo_parts/gunpowder(current_bullet, N)
 
 
 		N = null
@@ -186,37 +185,36 @@
 
 	N = input(user, "Select the type of material for jacket", "[src]") as null|anything in stored_material
 	if(N)
-		A.composition += new /obj/item/ammo_parts/jacket(src, N)
+		current_bullet.composition += new /obj/item/ammo_parts/jacket(current_bullet, N)
 		N = null
 
-	if(A.type != "Sabot")
+	if(current_bullet.type != "Sabot")
 		N = input(user, "Select the type of material for heart", "[src]") as null|anything in stored_material
 		if(N)
-			A.composition += new /obj/item/ammo_parts/heart(src, N)
+			current_bullet.composition += new /obj/item/ammo_parts/heart(current_bullet, N)
 
 
 			N = null
 
-	else if (A.type == "Sabot")
+	else if (current_bullet.type == "Sabot")
 		N = input(user, "Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
-			A.composition += new /obj/item/ammo_parts/needle(src, N)
+			current_bullet.composition += new /obj/item/ammo_parts/needle(current_bullet, N)
 
 			N = null
 
 
 	if(selected_type == "incendiary")
-		A = current_bullet
+		current_bullet
 		N = input(user, "Select the type of material for incendiary", "[src]") as null|anything in incendiary_list
 		if(N)
-			A.composition += new /obj/item/ammo_parts/incendiary(src, N)
+			current_bullet.composition += new /obj/item/ammo_parts/incendiary(current_bullet, N)
 			N = null
 
 
-	A.check_inside_parts()
+	current_bullet.check_inside_parts()
 
 
-	current_bullet = A
 	bullet_ready = 1
 	return
 

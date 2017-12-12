@@ -10,6 +10,7 @@
 	var/material/material
 	var/default_material
 	var/applies_material_colour = 1
+	var/cost = 50
 
 /obj/item/ammo_parts/proc/set_material(var/new_material)
 	material = get_material_by_name(new_material)
@@ -36,6 +37,7 @@
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "jacket"
 	default_material = "copper"
+	cost = 80
 
 /obj/item/ammo_parts/heart
 	name = "bullet heart"
@@ -43,6 +45,7 @@
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "heart"
 	default_material = "lead"
+	cost = 160
 
 /obj/item/ammo_parts/needle
 	name = "bullet needle"
@@ -50,6 +53,7 @@
 	icon = 'icons/obj/ammo.dmi'
 	icon_state = "needle"
 	default_material = "steel"
+	cost = 100
 
 /obj/item/ammo_parts/gunpowder
 	name = "gunpowder"
@@ -66,20 +70,6 @@
 	icon_state = "incendiary"
 	var/incendiary = 1.1
 	default_material = "phoron"
-
-
-/obj/item/ammo_parts/jacket/copper
-	name = "c bullet jacket"
-	desc = "c bullet jacket. Contact admin or developer if you see this"
-
-/obj/item/ammo_parts/heart/lead
-	name = "c bullet jacket"
-	desc = "c bullet jacket. Contact admin or developer if you see this"
-
-
-/obj/item/ammo_parts/needle/steel
-	name = "bullet needle"
-	desc = "bullet needle. Contact admin or developer if you see this"
 
 
 

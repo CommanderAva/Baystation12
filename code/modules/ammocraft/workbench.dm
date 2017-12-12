@@ -1,4 +1,4 @@
-/obj/machinery/ammo_workbench   //Thanks Hubble#2807 and BlueNexus#0489, huge ones and F-TangSteve#0439 and infinite ones for  GinjaNinja32 from Baystation12 discord for helping with this. It wouldn't work without these people.
+/obj/machinery/ammo_workbench   //Thanks Lohikar, Hubble#2807 and BlueNexus#0489, huge ones and F-TangSteve#0439 and infinite ones for  GinjaNinja32 from Baystation12 discord for helping with this. It wouldn't work without these people.
 	name = "ammunition workbench"
 	desc = "A workbench for making custom ammunition"
 	icon = 'icons/obj/machines/ammocraft.dmi'
@@ -8,8 +8,6 @@
 	idle_power_usage = 0
 	active_power_usage = 500
 	var/selected_material = null
-	var/list/workbench_recipes = null
-	var/list/ammo_recipes = null
 	var/list/stored_material = list("iron" = 0,
 									"copper" = 0,
 									"steel" = 0,
@@ -44,7 +42,7 @@
 	var/list/start_ask = list ("Replicate programmed bullet", "Design new bullet")
 	var/current_bullet = null
 	var/obj/item/projectile/bullet/custom/A = null
-
+	var/allow_work = 0
 /obj/machinery/ammo_workbench/New()
 
 	..()
@@ -83,13 +81,9 @@
 /obj/machinery/ammo_workbench/Destroy()
 	return ..()
 
-/obj/machinery/ammo_workbench/proc/update_recipe_list()
-	if(!ammo_recipes)
-		ammo_recipes = workbench_recipes
 
 /obj/machinery/ammo_workbench/interact(mob/user as mob)
 
-	update_recipe_list()
 /*
 /obj/machinery/ammo_workbench/attackby(var/obj/item/O as obj, mob/user as mob)
 	if(istype(O, /obj/item/ammo_casing/c9mm/custom) && current_bullet != 0)
@@ -105,7 +99,21 @@
 	else
 		return
 */
-/obj/machinery/ammo_workbench/proc/ask(mob/user as mob)
+/obj/machinery/ammo_workbench/proc/check_material()
+	for(var/obj/item/ammo_parts/V in A)
+		if (V.cost > src.stored_material.[V.material] && src.stored_material[V.material] > 0)
+			to_chat(usr, "<span class='notice'>Insufficient material to replicate.</span>")
+			update_use_power(1)
+			busy = 0
+			return
+	allow_work = 1
+
+/obj/machinery/ammo_workbench/proc/eat_material()
+	if(allow_work == 1)
+		for(var/obj/item/ammo_parts/V in A)
+			src.stored_material.[V.material] -= V.cost
+
+/obj/machinery/ammo_workbench/proc/ask()
 
 	if(bullet_ready == 1)
 		var/N = input("Use old design or build new?", "[src]") as null|anything in start_ask
@@ -113,6 +121,12 @@
 			var/result = N
 			N = null
 			if (result == "Replicate programmed bullet")
+				check_material()
+				eat_material()
+				busy = 1
+				update_use_power(2)
+				//Fancy autolathe animation.
+				//flick("autolathe_n", src)
 				var/obj/item/ammo_magazine/custom_box/T = new /obj/item/ammo_magazine/custom_box
 				T.stored_ammo = list( new /obj/item/ammo_casing/custom,
 									  new /obj/item/ammo_casing/custom,
@@ -134,11 +148,13 @@
 				for(var/obj/item/ammo_casing/custom/X in T.stored_ammo)
 					X.BB = new /obj/item/projectile/bullet/custom/
 					X.caliber = selected_caliber
-					for(var/obj/item/projectile/bullet/custom/Y in X.BB)
-						Y.damage = A.damage
-						Y.armor_penetration = A.armor_penetration
-						Y.incendiary = A.incendiary
-						Y.rad = A.rad
+					var/obj/item/projectile/bullet/custom/XBB = X.BB
+					XBB.bullet_type = src.selected_type
+					XBB.damage = A.damage
+					XBB.armor_penetration = A.armor_penetration
+					XBB.incendiary = A.incendiary
+					XBB.rad = A.rad
+				sleep(build_time)
 				T.forceMove(src.loc)
 				T = null
 
@@ -172,9 +188,9 @@
 	N = input("Select the type of material for charge", "[src]") as null|anything in charge_list
 	if(N)
 		A.composition += new /obj/item/ammo_parts/gunpowder(src, N)
+
+
 		N = null
-
-
 
 
 	N = input("Select the type of material for jacket", "[src]") as null|anything in stored_material
@@ -186,12 +202,15 @@
 		N = input("Select the type of material for heart", "[src]") as null|anything in stored_material
 		if(N)
 			A.composition += new /obj/item/ammo_parts/heart(src, N)
+
+
 			N = null
 
 	else if (A.type == "Sabot")
 		N = input("Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
 			A.composition += new /obj/item/ammo_parts/needle(src, N)
+
 			N = null
 
 
@@ -216,6 +235,95 @@
 
 
 /obj/machinery/ammo_workbench/attack_hand(mob/user)
+	if(busy)
+		to_chat(usr, "<span class='notice'>The workbench is busy. Please wait for completion of previous operation.</span>")
+		return
 	ask()
 	return
+
+/obj/machinery/ammo_workbench/attackby(var/obj/item/O as obj, var/mob/user as mob)
+
+	if(busy)
+		to_chat(user, "<span class='notice'>\The [src] is busy. Please wait for completion of previous operation.</span>")
+		return
+
+	if(default_deconstruction_screwdriver(user, O))
+		updateUsrDialog()
+		return
+	if(default_deconstruction_crowbar(user, O))
+		return
+	if(default_part_replacement(user, O))
+		return
+
+	if(stat)
+		return
+
+	if(panel_open)
+		//Don't eat multitools or wirecutters used on an open lathe.
+		if(istype(O, /obj/item/device/multitool) || istype(O, /obj/item/weapon/wirecutters))
+			attack_hand(user)
+			return
+
+	if(O.loc != user && !(istype(O,/obj/item/stack)))
+		return 0
+
+	if(is_robot_module(O))
+		return 0
+
+	//Resources are being loaded.
+	var/obj/item/eating = O
+	if(!eating.matter)
+		to_chat(user, "\The [eating] does not contain significant amounts of useful materials and cannot be accepted.")
+		return
+
+	var/filltype = 0       // Used to determine message.
+	var/total_used = 0     // Amount of material used.
+	var/mass_per_sheet = 0 // Amount of material constituting one sheet.
+
+	for(var/material in eating.matter)
+
+		if(isnull(stored_material[material]) || isnull(storage_capacity[material]))
+			continue
+
+		if(stored_material[material] >= storage_capacity[material])
+			continue
+
+		var/total_material = eating.matter[material]
+
+		//If it's a stack, we eat multiple sheets.
+		if(istype(eating,/obj/item/stack))
+			var/obj/item/stack/stack = eating
+			total_material *= stack.get_amount()
+
+		if(stored_material[material] + total_material > storage_capacity[material])
+			total_material = storage_capacity[material] - stored_material[material]
+			filltype = 1
+		else
+			filltype = 2
+
+		stored_material[material] += total_material
+		total_used += total_material
+		mass_per_sheet += eating.matter[material]
+
+	if(!filltype)
+		to_chat(user, "<span class='notice'>\The [src] is full. Please remove material from the autolathe in order to insert more.</span>")
+		return
+	else if(filltype == 1)
+		to_chat(user, "You fill \the [src] to capacity with \the [eating].")
+	else
+		to_chat(user, "You fill \the [src] with \the [eating].")
+
+	//flick("autolathe_o", src) // Plays metal insertion animation. Work out a good way to work out a fitting animation. ~Z
+
+	if(istype(eating,/obj/item/stack))
+		var/obj/item/stack/stack = eating
+		stack.use(max(1, round(total_used/mass_per_sheet))) // Always use at least 1 to prevent infinite materials.
+	else
+		user.remove_from_mob(O)
+		qdel(O)
+
+	updateUsrDialog()
+	return
+
+
 

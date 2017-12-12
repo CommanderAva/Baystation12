@@ -9,8 +9,8 @@
 	var/power = 0
 	var/bullet_type = ""
 	var/incendiary = 0
-	var/wc = 0.45
-	var/dc = 0.38
+	var/wc = 0.40
+	var/dc = 0.35
 
 /obj/item/projectile/bullet/custom/proc/check_inside_parts()
 	src.dens = 0

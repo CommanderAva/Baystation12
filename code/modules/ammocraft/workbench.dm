@@ -102,14 +102,17 @@
 		return
 */
 /obj/machinery/ammo_workbench/proc/check_material(mob/user)
+
+	var/list/required_materials = list()
 	for(var/obj/item/ammo_parts/V in A)
-		world << "part=[V] cost=[V.cost] mat=[V.material.name] stored=[stored_material[V.material.name]]"
-		if (V.cost > src.stored_material[V.material.name])
-			to_chat(user, "<span class='notice'>Insufficient material to replicate.</span>")
-			update_use_power(1)
-			busy = 0
+		required_materials[V.material.name] += V.cost
+	for(var/mat in required_materials)
+		if(stored_material[mat] < required_materials[mat])
+			var/material/material = get_material_by_name(mat)
+			to_chat(user, "<span class='notice'>Insufficient [material.display_name] to replicate.</span>")
 			allow_work = 0
 			return
+
 	allow_work = 1
 	return
 

@@ -41,7 +41,7 @@
 	var/build_time = 50
 	var/list/caliber_types = list("9mm")
 	var/list/ammo_types = list("FMJ", "HP", "AP", "Sabot", "Incendiary")
-	var/current_bullet = null
+	var/obj/item/projectile/bullet/custom/current_bullet = null
 	var/allow_work = 0
 /obj/machinery/ammo_workbench/New()
 
@@ -153,14 +153,12 @@
 				return
 			else if (result == "Design new bullet")
 				bullet_ready = 0
-				src.current_bullet = null
-				current_bullet = null
 			else
 				to_chat(user, "<span class='notice'>Insufficient material to replicate.</span>")
 				return
 	if(current_bullet)
 		qdel(current_bullet)
-	current_bullet = new /obj/item/projectile/bullet/custom/
+	current_bullet = new /obj/item/projectile/bullet/custom(src)
 
 	var/N = input(user, "Select the calibre", "[src]") as null|anything in caliber_types
 	if(N)
@@ -205,7 +203,6 @@
 
 
 	if(selected_type == "incendiary")
-		current_bullet
 		N = input(user, "Select the type of material for incendiary", "[src]") as null|anything in incendiary_list
 		if(N)
 			current_bullet.composition += new /obj/item/ammo_parts/incendiary(current_bullet, N)

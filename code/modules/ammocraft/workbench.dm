@@ -101,7 +101,7 @@
 */
 /obj/machinery/ammo_workbench/proc/check_material()
 	for(var/obj/item/ammo_parts/V in A)
-		if (V.cost > src.stored_material.[V.material] && src.stored_material[V.material] > 0)
+		if (V.cost > src.stored_material[V.material.name] && src.stored_material[V.material.name] > 0)
 			to_chat(usr, "<span class='notice'>Insufficient material to replicate.</span>")
 			update_use_power(1)
 			busy = 0
@@ -111,7 +111,7 @@
 /obj/machinery/ammo_workbench/proc/eat_material()
 	if(allow_work == 1)
 		for(var/obj/item/ammo_parts/V in A)
-			src.stored_material.[V.material] -= V.cost
+			src.stored_material.[V.material.name] -= V.cost
 
 /obj/machinery/ammo_workbench/proc/ask()
 
@@ -157,6 +157,7 @@
 				sleep(build_time)
 				T.forceMove(src.loc)
 				T = null
+				allow_work = 0
 
 
 

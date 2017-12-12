@@ -102,7 +102,7 @@
 	else
 		return
 */
-/obj/machinery/ammo_workbench/proc/check_material(mob/user as mob)
+/obj/machinery/ammo_workbench/proc/check_material(mob/user)
 	for(var/obj/item/ammo_parts/V in A)
 		if (V.cost > src.stored_material[V.material.name])
 			to_chat(user, "<span class='notice'>Insufficient material to replicate.</span>")
@@ -118,13 +118,11 @@
 	if(allow_work == 1)
 		for(var/obj/item/ammo_parts/V in A)
 			src.stored_material[V.material.name] -= V.cost
-		return
-	else
-		return
-/obj/machinery/ammo_workbench/proc/ask(mob/user as mob)
+
+/obj/machinery/ammo_workbench/proc/ask(mob/user)
 
 	if(bullet_ready == 1)
-		var/N = input("Use old design or build new?", "[src]") as null|anything in start_ask
+		var/N = input(user, "Use old design or build new?", "[src]") as null|anything in start_ask
 		if(N)
 			var/result = N
 			N = null
@@ -188,7 +186,7 @@
 	if(N)
 		selected_caliber = N
 		N = null
-	N = input("Select the type of ammunition", "[src]") as null|anything in ammo_types
+	N = input(user,"Select the type of ammunition", "[src]") as null|anything in ammo_types
 	if(N)
 		selected_type = N
 
@@ -197,7 +195,7 @@
 		N = null
 
 
-	N = input("Select the type of material for charge", "[src]") as null|anything in charge_list
+	N = input(user,"Select the type of material for charge", "[src]") as null|anything in charge_list
 	if(N)
 		A.composition += new /obj/item/ammo_parts/gunpowder(src, N)
 
@@ -205,13 +203,13 @@
 		N = null
 
 
-	N = input("Select the type of material for jacket", "[src]") as null|anything in stored_material
+	N = input(user,"Select the type of material for jacket", "[src]") as null|anything in stored_material
 	if(N)
 		A.composition += new /obj/item/ammo_parts/jacket(src, N)
 		N = null
 
 	if(A.type != "Sabot")
-		N = input("Select the type of material for heart", "[src]") as null|anything in stored_material
+		N = input(user,"Select the type of material for heart", "[src]") as null|anything in stored_material
 		if(N)
 			A.composition += new /obj/item/ammo_parts/heart(src, N)
 
@@ -219,7 +217,7 @@
 			N = null
 
 	else if (A.type == "Sabot")
-		N = input("Select the type of material for needle", "[src]") as null|anything in stored_material
+		N = input(user,"Select the type of material for needle", "[src]") as null|anything in stored_material
 		if(N)
 			A.composition += new /obj/item/ammo_parts/needle(src, N)
 
@@ -228,7 +226,7 @@
 
 	if(selected_type == "incendiary")
 		A = current_bullet
-		N = input("Select the type of material for incendiary", "[src]") as null|anything in incendiary_list
+		N = input(user,"Select the type of material for incendiary", "[src]") as null|anything in incendiary_list
 		if(N)
 			A.composition += new /obj/item/ammo_parts/incendiary(src, N)
 			N = null

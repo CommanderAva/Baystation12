@@ -110,9 +110,8 @@
 			busy = 0
 			allow_work = 0
 			return
-		else
-			allow_work = 1
-			return
+	allow_work = 1
+	return
 
 /obj/machinery/ammo_workbench/proc/eat_material()
 	if(allow_work == 1)

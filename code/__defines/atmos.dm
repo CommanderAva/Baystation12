@@ -15,11 +15,11 @@
 #define MOLES_N2STANDARD     (MOLES_CELLSTANDARD * N2STANDARD) // N2 standard value (79%)
 #define MOLES_O2ATMOS (MOLES_O2STANDARD*50)
 #define MOLES_N2ATMOS (MOLES_N2STANDARD*50)
-#define MOLES_LI3NTETRAS (MOLES_CELLSTANDARD * LI3NTETRAS) //Li3N standard value (17%)
-#define MOLES_N2TETRAS	 (MOLES_CELLSTANDARD * N2TETRAS) //N2 standard value (30%)
-#define MOLES_ARTETRAS	 (MOLES_CELLSTANDARD * ARTETRAS) //Ar standard value (11%)
-#define MOLES_O2TETRAS	 (MOLES_CELLSTANDARD * O2TETRAS) //O2 standard value (13%)
-#define MOLES_METETRAS	 (MOLES_CELLSTANDARD * METETRAS) //Me standard value (09%)
+#define MOLES_LI3NTETRAS (25*MOLES_CELLSTANDARD * LI3NTETRAS) //Li3N standard value (17%)
+#define MOLES_N2TETRAS	 (30*MOLES_CELLSTANDARD * N2TETRAS) //N2 standard value (30%)
+#define MOLES_ARTETRAS	 (15*MOLES_CELLSTANDARD * ARTETRAS) //Ar standard value (11%)
+#define MOLES_O2TETRAS	 (15*MOLES_CELLSTANDARD * O2TETRAS) //O2 standard value (13%)
+#define MOLES_METETRAS	 (30*MOLES_CELLSTANDARD * METETRAS) //Me standard value (09%)
 
 // These are for when a mob breathes poisonous air.
 #define MIN_TOXIN_DAMAGE 1

@@ -9,7 +9,7 @@
 						"argon" = MOLES_ARTETRAS,
 						"methane" = MOLES_METETRAS
 					  )
-	temperature = 57
+	temperature = 107
 
 /turf/unsimulated/planet/New()
     ..()
@@ -27,7 +27,7 @@
 						"argon" = MOLES_ARTETRAS,
 						"methane" = MOLES_METETRAS
 					  )
-	temperature = 57
+	temperature = 107
 
 /turf/unsimulated/planet/New()
     ..()

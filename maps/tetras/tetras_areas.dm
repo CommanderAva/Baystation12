@@ -1544,10 +1544,17 @@
 	icon_state = "dark"
 
 
-area/tetras/surface
+/area/tetras/surface
 	name = "Tetras surface"
 	icon_state = "dark"
 	base_turf = /turf/unsimulated/planet
+
+/area/tetras/surface/New()
+	..()
+	var/list/area_turfs = get_area_turfs(locate(/area/tetras/surface))
+	for(var/i = 1 to 150)
+		if(!area_turfs.len) break
+		new /obj/structure/tetras_crystal(pick_n_take(area_turfs))
 
 
 area/tetras/surface/test_area

@@ -20,7 +20,7 @@
 
 	var/oxygen_deprivation = 0
 	var/safe_exhaled_max = 10
-	var/safe_toxins_max = 0.2
+	var/safe_toxins_max = 0.15
 	var/SA_para_min = 1
 	var/SA_sleep_min = 5
 	var/breathing = 0
@@ -195,17 +195,19 @@
 			owner.adjustOxyLoss(oxyloss)
 			owner.co2_alert = alert
 
+	owner.phoron_alert = 0
 	for(var/poison in poison_type)
 		var/poison_amt = breath.gas[poison]
+
 		if(poison_amt > safe_toxins_max)
 			var/ratio = (poison_amt/safe_toxins_max) * 10
-			owner.reagents.add_reagent("toxin", Clamp(ratio, MIN_TOXIN_DAMAGE, MAX_TOXIN_DAMAGE))
+			owner.reagents.add_reagent(/datum/reagent/toxin, Clamp(ratio, MIN_TOXIN_DAMAGE, MAX_TOXIN_DAMAGE))
 			breath.adjust_gas(poison, -poison_amt/6, update = 0) //update after
 			owner.phoron_alert = 1
-			world << "debug"
+
 		else
 			owner.phoron_alert = 0
-			world << "debug foilage"
+
 
 	// Too much poison in the air.
 	/*

@@ -4,6 +4,7 @@
 	icon = 'icons/obj/machines/ammocraft.dmi'
 	icon_state = "workbench"
 	density = 1
+	anchored = 1
 	use_power = 1
 	idle_power_usage = 0
 	active_power_usage = 500

@@ -1561,3 +1561,21 @@ area/tetras/surface/test_area
 	name = "Tetras test area"
 	icon_state = "explored"
 	base_turf = /turf/unsimulated/planet
+
+
+
+area/tetras/outpost/
+	name = "Tetras outpost"
+	icon_state = "crew_quarters"
+
+area/tetras/outpost/cryosleep_dorm
+	name = "Outpost cryosleep dorm"
+	flags = AREA_RAD_SHIELDED
+	icon_state = "crew_quarters"
+	sound_env = MEDIUM_SOFTFLOOR
+
+area/tetras/outpost/safehouse_one
+	name = "Outpost safehouse"
+	flags = AREA_RAD_SHIELDED
+	icon_state = "crew_quarters"
+	sound_env = MEDIUM_SOFTFLOOR

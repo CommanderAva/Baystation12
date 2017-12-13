@@ -1,11 +1,9 @@
 # Tetras Star-7 Outpost
 
-[Website](http://baystation12.net/) - [Code](http://github.com/Baystation12/Baystation12/) - [IRC](irc://irc.sorcery.net/#codershuttle)
-
 ---
 
 ### LICENSE
-The code for Tetras Star 7 is licensed under the [GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl.html) as it is a fork of Baystation12 and which can be found in full in LICENSE-AGPL3.txt.
+The code for Tetras Star 7 is licensed under the [GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl.html) as it is a fork of [Baystation12](http://github.com/Baystation12/Baystation12/) and which can be found in full in LICENSE-AGPL3.txt.
 
 Code with a git authorship date prior to `1420675200 +0000` (2015/01/08 00:00) is licensed under the GNU General Public License version 3, which can be found in full in LICENSE-GPL3.txt.
 

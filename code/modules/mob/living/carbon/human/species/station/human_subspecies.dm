@@ -14,6 +14,7 @@
 	radiation_mod = 0.5
 	brute_mod =     0.85
 	slowdown =      1
+	list/poison_type = list("phoron","lithiumnitride", "argon", "methane")
 
 /datum/species/human/spacer
 	name = "Space-Adapted Human"
@@ -29,6 +30,7 @@
 	brute_mod = 1.1
 	burn_mod =  1.1
 	darksight = 6
+	list/poison_type = list("phoron","lithiumnitride", "argon", "methane")
 
 /datum/species/human/vatgrown
 	name = "Vat-Grown Human"
@@ -37,7 +39,7 @@
 	of bodies is a very real and rather ethically grey industry. Vat-grown humans tend to be paler than \
 	baseline, with no appendix and fewer inherited genetic disabilities, but a weakened metabolism."
 	icobase = 'icons/mob/human_races/subspecies/r_vatgrown.dmi'
-
+	list/poison_type = list("phoron","lithiumnitride", "argon")
 	toxins_mod =   1.1
 	has_organ = list(
 		BP_HEART =    /obj/item/organ/internal/heart,

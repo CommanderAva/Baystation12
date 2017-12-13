@@ -93,7 +93,7 @@
 		"Your scales bristle against the cold.")
 
 	breath_type = "chlorine"
-	poison_type = list("oxygen")
+	poison_type = list("oxygen","lithiumnitride")
 	siemens_coefficient = 0.9
 
 	genders = list(NEUTER)

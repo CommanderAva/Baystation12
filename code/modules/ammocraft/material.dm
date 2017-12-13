@@ -56,15 +56,27 @@
 
 
 /obj/item/stack/material/copper
-	name = "ammunition copper material"
+	name = "copper"
 	icon_state = "sheet-uranium"
-	default_type = "ammunition copper material"
+	default_type = "copper"
 
+
+/obj/item/stack/material/copper/fifty
+	name = "copper"
+	icon_state = "sheet-uranium"
+	default_type = "copper"
+	amount = 50
 
 /obj/item/stack/material/depleted_uranium
 	name = "depleted uranium"
 	icon_state = "sheet-uranium"
 	default_type = "depleted uranium"
+
+/obj/item/stack/material/depleted_uranium/fifty
+	name = "depleted uranium"
+	icon_state = "sheet-uranium"
+	default_type = "depleted uranium"
+	amount = 50
 
 
 /obj/item/stack/material/lead
@@ -72,11 +84,23 @@
 	icon_state = "sheet-uranium"
 	default_type = "lead"
 
+/obj/item/stack/material/lead/fifty
+	name = "lead"
+	icon_state = "sheet-uranium"
+	default_type = "lead"
+	amount = 50
+
 
 /obj/item/stack/material/gunpowder
 	name = "gunpowder"
 	icon_state = "sheet-uranium"
 	default_type = "gunpowder"
+
+/obj/item/stack/material/gunpowder/fifty
+	name = "gunpowder"
+	icon_state = "sheet-uranium"
+	default_type = "gunpowder"
+	amount = 50
 
 
 

@@ -9,3 +9,21 @@
 						"argon" = MOLES_ARTETRAS,
 						"methane" = MOLES_METETRAS
 					  )
+	temperature = 57
+
+/turf/unsimulated/planet/New()
+    ..()
+    icon_state = pick("planet", "planet3","planet3","planet3", "planet0","planet1","planet2","planet3","planet4")
+
+/turf/unsimulated/planet/return_air()
+	var/datum/gas_mixture/GM = new
+
+	GM.adjust_multi("lithiumnitride", MOLES_LI3NTETRAS,
+					"nitrogen", MOLES_N2TETRAS,
+					"oxygen", MOLES_O2TETRAS,
+					"argon", MOLES_ARTETRAS,
+					"methane", MOLES_METETRAS
+				    )
+
+	GM.temperature = 57
+	return GM

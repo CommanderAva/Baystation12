@@ -31,7 +31,7 @@
 	stomach_capacity = 12
 
 	breath_type = "nitrogen"
-	poison_type = "oxygen"
+	poison_type = list("oxygen","lithiumnitride", "argon", "methane")
 	siemens_coefficient = 0.2
 
 	flags = NO_SCAN

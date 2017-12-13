@@ -13,7 +13,7 @@
 	var/active_breathing = 1
 
 	var/breath_type
-	var/poison_type
+	var/list/poison_type = list()
 	var/exhale_type
 
 	var/min_breath_pressure
@@ -61,7 +61,7 @@
 /obj/item/organ/internal/lungs/proc/sync_breath_types()
 	min_breath_pressure = species.breath_pressure
 	breath_type = species.breath_type ? species.breath_type : "oxygen"
-	poison_type = species.poison_type ? species.poison_type : "phoron"
+	poison_type = species.poison_type ? species.poison_type.Copy() : list("phoron")
 	exhale_type = species.exhale_type ? species.exhale_type : "carbon_dioxide"
 
 /obj/item/organ/internal/lungs/Process()
@@ -139,11 +139,11 @@
 	var/failed_exhale = 0
 
 	var/inhaling = breath.gas[breath_type]
-	var/poison = breath.gas[poison_type]
+	//var/poison = breath.gas[poison_type]
 	var/exhaling = exhale_type ? breath.gas[exhale_type] : 0
 
 	var/inhale_pp = (inhaling/breath.total_moles)*breath_pressure
-	var/toxins_pp = (poison/breath.total_moles)*breath_pressure
+	//var/toxins_pp = (poison/breath.total_moles)*breath_pressure
 	var/exhaled_pp = (exhaling/breath.total_moles)*breath_pressure
 
 	var/inhale_efficiency = max(round(inhale_pp/safe_pressure_min, 0.001), 3)
@@ -195,7 +195,18 @@
 			owner.adjustOxyLoss(oxyloss)
 			owner.co2_alert = alert
 
+	for(var/poison in poison_type)
+		var/poison_amt = breath.gas[poison]
+		if(poison_amt > safe_toxins_max)
+			var/ratio = (poison_amt/safe_toxins_max) * 10
+			owner.reagents.add_reagent(/datum/reagent/toxin, Clamp(ratio, MIN_TOXIN_DAMAGE, MAX_TOXIN_DAMAGE))
+			breath.adjust_gas(poison, -poison_amt/6, update = 0) //update after
+			owner.phoron_alert = 1
+		else
+			owner.phoron_alert = 0
+
 	// Too much poison in the air.
+	/*
 	if(toxins_pp > safe_toxins_max)
 		var/ratio = (poison/safe_toxins_max) * 10
 		if(robotic >= ORGAN_ROBOT)
@@ -205,6 +216,7 @@
 		owner.phoron_alert = 1
 	else
 		owner.phoron_alert = 0
+	*/
 
 	// If there's some other shit in the air lets deal with it here.
 	if(breath.gas["sleeping_agent"])

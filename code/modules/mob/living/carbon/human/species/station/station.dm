@@ -14,7 +14,7 @@
 	min_age = 17
 	max_age = 100
 	gluttonous = GLUT_TINY
-
+	poison_type = list("phoron","lithiumnitride", "argon", "methane")
 	spawn_flags = SPECIES_CAN_JOIN
 	appearance_flags = HAS_HAIR_COLOR | HAS_SKIN_TONE | HAS_LIPS | HAS_UNDERWEAR | HAS_EYE_COLOR
 

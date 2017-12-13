@@ -148,6 +148,7 @@
 					BB.rad = current_bullet.rad
 					T.stored_ammo += C
 				sleep(build_time)
+				busy = 0
 				T.forceMove(src.loc)
 				allow_work = 0
 				return

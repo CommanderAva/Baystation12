@@ -7,6 +7,7 @@
 	var/b_hair = 0
 	var/h_style = "Bald"
 	var/toxins_alert = 0
+	var/poison_type = list("phoron","lithiumnitride", "argon", "methane")
 
 	//Facial hair colour and style
 	var/r_facial = 0

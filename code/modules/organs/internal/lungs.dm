@@ -61,7 +61,7 @@
 /obj/item/organ/internal/lungs/proc/sync_breath_types()
 	min_breath_pressure = species.breath_pressure
 	breath_type = species.breath_type ? species.breath_type : "oxygen"
-	poison_type = species.poison_type ? species.poison_type.Copy() : list("phoron")
+	poison_type = species.poison_type ? species.poison_type.Copy() : list("phoron","lithiumnitride", "argon", "methane")
 	exhale_type = species.exhale_type ? species.exhale_type : "carbon_dioxide"
 
 /obj/item/organ/internal/lungs/Process()
@@ -199,11 +199,13 @@
 		var/poison_amt = breath.gas[poison]
 		if(poison_amt > safe_toxins_max)
 			var/ratio = (poison_amt/safe_toxins_max) * 10
-			owner.reagents.add_reagent(/datum/reagent/toxin, Clamp(ratio, MIN_TOXIN_DAMAGE, MAX_TOXIN_DAMAGE))
+			owner.reagents.add_reagent("toxin", Clamp(ratio, MIN_TOXIN_DAMAGE, MAX_TOXIN_DAMAGE))
 			breath.adjust_gas(poison, -poison_amt/6, update = 0) //update after
 			owner.phoron_alert = 1
+			world << "debug"
 		else
 			owner.phoron_alert = 0
+			world << "debug foilage"
 
 	// Too much poison in the air.
 	/*

@@ -10,9 +10,13 @@
 	anchored = 1
 
 /obj/structure/tetras_crystal/New()
-    ..()
-    icon_state = pick("crystal", "crystal1", "crystal2")
-    glow()
+	..()
+	icon_state = pick("crystal", "crystal1", "crystal2")
+	if(icon_state == "crystal2")
+		brightness_on = 2
+	if(icon_state == "crystal1")
+		brightness_on = 3
+	glow()
 
 /obj/structure/tetras_crystal/proc/glow()
 	var/turf/pos = get_turf(src)

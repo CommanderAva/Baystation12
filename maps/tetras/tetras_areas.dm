@@ -1575,7 +1575,7 @@ area/tetras/outpost/cryosleep_dorm
 	sound_env = MEDIUM_SOFTFLOOR
 
 area/tetras/outpost/safehouse_one
-	name = "Outpost safehouse"
+	name = "Cryo Bunker"
 	flags = AREA_RAD_SHIELDED
 	icon_state = "crew_quarters"
 	sound_env = MEDIUM_SOFTFLOOR

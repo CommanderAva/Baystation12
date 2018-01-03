@@ -35,7 +35,7 @@ var/datum/antagonist/mafia/mafs
 	..()
 	mafs = src
 
-/datum/antagonist/mafia/create_global_objectives()
+/datum/antagonist/mafia/create_global_objectives(var/datum/mind/mafia)
 	if(!..())
 		return
 

@@ -48,7 +48,7 @@
 
 /datum/job/captain
 	title = "Governor"
-	supervisors = "the Tetras Republic Government and the Tetras Code of Military Justice, Avalanche supervisors"
+	supervisors = "the Tetras Republic Government and Avalanche supervisors"
 	minimal_player_age = 25
 	economic_modifier = 15
 	ideal_character_age = 50

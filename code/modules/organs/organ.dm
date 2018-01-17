@@ -28,6 +28,8 @@ var/list/organ_cache = list()
 
 	var/death_time
 
+	var/list/bionics = list() //list of installed bionics
+
 /obj/item/organ/Destroy()
 
 	owner = null

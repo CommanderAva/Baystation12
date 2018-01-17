@@ -5,7 +5,7 @@ var/datum/antagonist/mafia/mafs
 	role_text = "Godfather"
 	role_text_plural = "Mafia"
 	feedback_tag = "maf_objective"
-	antag_indicator = "hudheadmaf"
+	antag_indicator = "hudmaf"
 	welcome_text = "Money. Power. Blackjack and whores."
 	victory_text = "Mafia has completed their objectives!"
 	loss_text = "Crew has managed to root out the mafia!"
@@ -38,63 +38,29 @@ var/datum/antagonist/mafia/mafs
 /datum/antagonist/mafia/create_global_objectives(var/datum/mind/mafia)
 	if(!..())
 		return
-
-	if(istype(mafia.current, /mob/living/silicon))
-		var/datum/objective/assassinate/kill_objective = new
-		kill_objective.owner = mafia
-		kill_objective.find_target()
-		mafia.objectives += kill_objective
-
-		var/datum/objective/survive/survive_objective = new
-		survive_objective.owner = mafia
-		mafia.objectives += survive_objective
-
-		if(prob(10))
-			var/datum/objective/block/block_objective = new
-			block_objective.owner = mafia
-			mafia.objectives += block_objective
 	else
-		switch(rand(1,100))
-			if(1 to 33)
-				var/datum/objective/assassinate/kill_objective = new
-				kill_objective.owner = mafia
-				kill_objective.find_target()
-				mafia.objectives += kill_objective
-			if(34 to 50)
-				var/datum/objective/brig/brig_objective = new
-				brig_objective.owner = mafia
-				brig_objective.find_target()
-				mafia.objectives += brig_objective
-			if(51 to 66)
-				var/datum/objective/harm/harm_objective = new
-				harm_objective.owner = mafia
-				harm_objective.find_target()
-				mafia.objectives += harm_objective
-			else
-				var/datum/objective/steal/steal_objective = new
-				steal_objective.owner = mafia
-				steal_objective.find_target()
-				mafia.objectives += steal_objective
-		switch(rand(1,100))
-			if(1 to 100)
-				if (!(locate(/datum/objective/escape) in mafia.objectives))
-					var/datum/objective/escape/escape_objective = new
-					escape_objective.owner = mafia
-					mafia.objectives += escape_objective
-
-			else
-				if (!(locate(/datum/objective/hijack) in mafia.objectives))
-					var/datum/objective/hijack/hijack_objective = new
-					hijack_objective.owner = mafia
-					mafia.objectives += hijack_objective
-	return
-
-
-
-
-
-
-
+		for(var/i in 1 to 10)
+			switch(rand(1,100))
+				if(1 to 33)
+					var/datum/objective/assassinate/kill_objective = new
+					kill_objective.owner = mafia
+					kill_objective.find_target()
+					mafia.objectives += kill_objective
+				if(34 to 50)
+					var/datum/objective/brig/brig_objective = new
+					brig_objective.owner = mafia
+					brig_objective.find_target()
+					mafia.objectives += brig_objective
+				if(51 to 66)
+					var/datum/objective/harm/harm_objective = new
+					harm_objective.owner = mafia
+					harm_objective.find_target()
+					mafia.objectives += harm_objective
+				else
+					var/datum/objective/steal/steal_objective = new
+					steal_objective.owner = mafia
+					steal_objective.find_target()
+					mafia.objectives += steal_objective
 
 
 
@@ -103,14 +69,13 @@ var/datum/antagonist/mafia/mafs
 	set category = "Abilities"
 	if(!M.mind || !M.client)
 		return
-	convert_to_faction(M.mind, revs)
-
+	convert_to_faction(M.mind, mafs)
 
 /datum/game_mode/mafia
 	name = "Mafia"
 	config_tag = "mafia"
 	round_description = "Some crewmembers are members of mafioso family."
-	extended_round_description = "Mafiso, you're the family ruled by your Godfather. Protect him and do his bidding."
+	extended_round_description = "Mafiso, you're in the family ruled by your Godfather. Protect him and do his bidding."
 	required_players = 6
 	required_enemies = 0
 	auto_recall_shuttle = 0

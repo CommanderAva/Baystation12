@@ -109,9 +109,9 @@ var/const/NO_EMAG_ACT = -50
 	var/icon/side
 	var/gun_licence = "No"
 	var/insurance = "No"
-	var/1gun = "\[UNSET\]"
-	var/2gun = "\[UNSET\]"
-	var/3gun = "\[UNSET\]"
+	var/onegun = "\[UNSET\]"
+	var/twogun = "\[UNSET\]"
+	var/threegun = "\[UNSET\]"
 
 
 	//alt titles are handled a bit weirdly in order to unobtrusively integrate into existing ID system
@@ -203,9 +203,9 @@ var/const/NO_EMAG_ACT = -50
 	dat += text("Blood Type: []<BR>\n", blood_type)
 	dat += text("DNA Hash: []<BR><BR>\n", dna_hash)
 	dat += text("Gun licence: []<BR><BR>\n", gun_licence)
-	dat += text("First gun ownership: []<BR><BR>\n", 1gun)
-	dat += text("Second gun ownership: []<BR><BR>\n", 2gun)
-	dat += text("Third gun ownership: []<BR><BR>\n", 3gun)
+	dat += text("First gun ownership: []<BR>\n", onegun)
+	dat += text("Second gun ownership: []<BR>\n", twogun)
+	dat += text("Third gun ownership: []<BR>\n", threegun)
 	if(front && side)
 		dat +="<td align = center valign = top>Photo:<br><img src=front.png height=80 width=80 border=4><img src=side.png height=80 width=80 border=4></td>"
 	dat += "</tr></table>"

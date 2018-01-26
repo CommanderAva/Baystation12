@@ -86,7 +86,6 @@ avoid code duplication. This includes items that may sometimes act as a standard
 		playsound(loc, hitsound, 50, 1, -1)
 
 	var/power = force
-	power * user.mob.enchanced_force
 	if(HULK in user.mutations)
 		power *= 2
 	return target.hit_with_weapon(src, user, power, hit_zone)

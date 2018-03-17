@@ -5,7 +5,7 @@
 #include "bearcat-2.dmm"
 
 /obj/effect/overmap/ship/bearcat
-	name = "FTV Bearcat"
+	name = "EV Smelij"
 	color = "#00ffff"
 	start_x = 4
 	start_y = 4

@@ -40,7 +40,7 @@
 	var/bullet_ready = 0
 	var/mat_efficiency = 1
 	var/build_time = 50
-	var/list/caliber_types = list("9mm")
+	var/list/caliber_types = list("9mm", ".45 ACP", "7.62x25", "7.62x39","7.62x54", "5.56x45")
 	var/list/ammo_types = list("FMJ", "HP", "AP", "Sabot", "Incendiary")
 	var/obj/item/projectile/bullet/custom/current_bullet = null
 	var/allow_work = 0

@@ -220,6 +220,16 @@
 					id_card.access -= access_type
 					if(!access_allowed)
 						id_card.access += access_type
+		if("gun_licence")
+			if(computer && can_run(user, 1))
+				var/list/gun_licence_allow = list("Allowed",
+												"Denied")
+				var/N
+				N = input(user, "Allow or deny gun licence?", "[src]") as null|anything in gun_licence_allow
+				if(N)
+					id_card.gun_licence = N
+					N = null
+
 	if(id_card)
 		id_card.name = text("[id_card.registered_name]'s ID Card ([id_card.assignment])")
 

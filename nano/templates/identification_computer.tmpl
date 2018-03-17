@@ -28,6 +28,16 @@
 </div>
 <hr>
 
+<div class='item'>
+  <div class='itemLabel'>
+	Gun Licence:
+  </div>
+  <div class='itemContent'>
+	{{:helper.link(data.id_name, 'gun_licence"', {'action' : 'gun_licence"'})}}
+  </div>
+</div>
+<hr>
+
 {{if data.authenticated}}
   {{if data.has_id}}
 	<div class='item'>
@@ -51,7 +61,6 @@
 		{{:helper.link(data.id_account_number, 'pencil', {'action' : 'edit', 'account' : 1})}}
 	  </div>
 	</div>
-	
 
 	<div class='item'>
 	  <div class='itemLabel'>

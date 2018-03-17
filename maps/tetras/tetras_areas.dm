@@ -1276,6 +1276,11 @@
  	icon_state = "atmos"
  	sound_env = LARGE_ENCLOSED
 
+/area/engineering/atmos_maints
+ 	name = "\improper Atmospherics maintenace"
+ 	icon_state = "atmos"
+ 	sound_env = LARGE_ENCLOSED
+
 // Medical
 
 /area/medical/biostorage
@@ -1579,3 +1584,18 @@ area/tetras/outpost/safehouse_one
 	flags = AREA_RAD_SHIELDED
 	icon_state = "crew_quarters"
 	sound_env = MEDIUM_SOFTFLOOR
+
+area/tetras/outpost/m_corr_east
+	name = "Main corridor east"
+
+	icon_state = "hallP"
+
+area/tetras/outpost/m_corr_west
+	name = "Main corridor west"
+
+	icon_state = "hallP"
+
+area/tetras/outpost/m_corr_north
+	name = "Main corridor west"
+
+	icon_state = "hallP"

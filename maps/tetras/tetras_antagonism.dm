@@ -16,3 +16,6 @@
 
 /datum/antagonist/traitor
 	blacklisted_jobs = list(/datum/job/merchant)
+
+/datum/antagonist/mafia
+	blacklisted_jobs = list(/datum/job/ai, /datum/job/cyborg, /datum/job/merchant)

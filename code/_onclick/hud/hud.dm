@@ -10,6 +10,8 @@ GLOBAL_DATUM_INIT(global_hud, /datum/global_hud, new())
 	var/obj/screen/thermal
 	var/obj/screen/meson
 	var/obj/screen/science
+	var/obj/screen/sovnvg
+	var/obj/screen/natonvg
 
 /datum/global_hud/proc/setup_overlay(var/icon_state)
 	var/obj/screen/screen = new /obj/screen()
@@ -22,6 +24,8 @@ GLOBAL_DATUM_INIT(global_hud, /datum/global_hud, new())
 
 /datum/global_hud/New()
 	nvg = setup_overlay("nvg_hud")
+	sovnvg = setup_overlay("sovnvg_hud")
+	natonvg = setup_overlay("natonvg_hud")
 	thermal = setup_overlay("thermal_hud")
 	meson = setup_overlay("meson_hud")
 	science = setup_overlay("science_hud")

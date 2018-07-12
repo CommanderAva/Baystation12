@@ -4,7 +4,7 @@
 	path = "torch"
 	flags = MAP_HAS_BRANCH | MAP_HAS_RANK
 
-	lobby_icon = 'maps/torch/icons/lobby.dmi'
+//	lobby_icon = 'maps/torch/icons/lobby.dmi'
 
 	station_levels = list(1,2,3,4,5)
 	contact_levels = list(1,2,3,4,5)
@@ -14,7 +14,7 @@
 	accessible_z_levels = list("1"=1,"2"=1,"3"=1,"4"=1,"5"=1,"6"=30,"7"=10,"8"=10)
 	overmap_size = 40
 	overmap_event_areas = 15
-	base_turf_by_z = list("9" = /turf/simulated/floor/asteroid)
+
 	usable_email_tlds = list("torch.ec.scg", "torch.fleet.mil", "torch.marine.mil", "freemail.nt")
 
 	allowed_spawns = list("Cryogenic Storage", "Cyborg Storage")

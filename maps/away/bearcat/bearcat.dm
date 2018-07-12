@@ -1,5 +1,5 @@
 #include "bearcat_areas.dm"
-
+/*
 /obj/effect/overmap/ship/bearcat
 	name = "light freighter"
 	color = "#00FFFF"
@@ -123,3 +123,4 @@
 			qdel(eyegore)
 	var/obj/item/weapon/cell/super/C = new()
 	H.put_in_any_hand_if_possible(C)
+*/

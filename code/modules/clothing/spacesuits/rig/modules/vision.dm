@@ -18,6 +18,16 @@
 /datum/rig_vision/nvg/New()
 	glasses = new /obj/item/clothing/glasses/night
 
+/datum/rig_vision/sovnvg
+	mode = "night vision"
+/datum/rig_vision/nvg/New()
+	glasses = new /obj/item/clothing/glasses/night/sov
+
+/datum/rig_vision/natonvg
+	mode = "night vision"
+/datum/rig_vision/nvg/New()
+	glasses = new /obj/item/clothing/glasses/night/nato
+
 /datum/rig_vision/thermal
 	mode = "thermal scanner"
 /datum/rig_vision/thermal/New()

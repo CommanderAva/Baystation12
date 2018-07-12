@@ -89,6 +89,18 @@
 	see_invisible = SEE_INVISIBLE_NOLIGHTING
 	off_state = "denight"
 
+obj/item/clothing/glasses/night/sov
+
+obj/item/clothing/glasses/night/sov/New()
+	..()
+	overlay = GLOB.global_hud.sovnvg
+
+obj/item/clothing/glasses/night/nato
+
+obj/item/clothing/glasses/night/nato/New()
+	..()
+	overlay = GLOB.global_hud.natonvg
+
 /obj/item/clothing/glasses/night/New()
 	..()
 	overlay = GLOB.global_hud.nvg

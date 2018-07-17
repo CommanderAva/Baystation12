@@ -28,9 +28,9 @@
 	..()
 
 	var/mob/M = thrower
-	if(isGlass && istype(M) && M.a_intent == I_HURT)
+	if(isGlass && istype(M) && M.a_intent != I_HELP)
 		var/throw_dist = get_dist(throw_source, loc)
-		if(speed >= throw_speed && smash_check(throw_dist)) //not as reliable as smashing directly
+		if(speed > throw_speed || smash_check(throw_dist)) //not as reliable as smashing directly
 			if(reagents)
 				hit_atom.visible_message("<span class='notice'>The contents of \the [src] splash all over [hit_atom]!</span>")
 				reagents.splash(hit_atom, reagents.total_volume)
@@ -40,17 +40,13 @@
 	if(!isGlass || !smash_duration)
 		return 0
 
-	var/list/chance_table = list(95, 95, 90, 85, 75, 55, 35) //starting from distance 0
+	var/list/chance_table = list(95, 95, 90, 85, 75, 60, 40, 15) //starting from distance 0
 	var/idx = max(distance + 1, 1) //since list indices start at 1
 	if(idx > chance_table.len)
 		return 0
 	return prob(chance_table[idx])
 
 /obj/item/weapon/reagent_containers/food/drinks/bottle/proc/smash(var/newloc, atom/against = null)
-	if(ismob(loc))
-		var/mob/M = loc
-		M.drop_from_inventory(src)
-
 	//Creates a shattering noise and replaces the bottle with a broken_bottle
 	var/obj/item/weapon/broken_bottle/B = new /obj/item/weapon/broken_bottle(newloc)
 	if(prob(33))
@@ -94,14 +90,14 @@
 		to_chat(user, "<span class='notice'>You stuff [R] into [src].</span>")
 		rag = R
 		rag.forceMove(src)
-		flags &= ~OPENCONTAINER
+		atom_flags &= ~ATOM_FLAG_OPEN_CONTAINER
 		update_icon()
 
 /obj/item/weapon/reagent_containers/food/drinks/bottle/proc/remove_rag(mob/user)
 	if(!rag) return
 	user.put_in_hands(rag)
 	rag = null
-	flags |= (initial(flags) & OPENCONTAINER)
+	atom_flags |= ATOM_FLAG_OPEN_CONTAINER
 	update_icon()
 
 /obj/item/weapon/reagent_containers/food/drinks/bottle/open(mob/user)
@@ -113,7 +109,7 @@
 	if(rag)
 		var/underlay_image = image(icon='icons/obj/drinks.dmi', icon_state=rag.on_fire? "[rag_underlay]_lit" : rag_underlay)
 		underlays += underlay_image
-		set_light(rag.light_range, rag.light_power, rag.light_color)
+		set_light(rag.light_max_bright, 0.1, rag.light_outer_range, 2, rag.light_color)
 	else
 		set_light(0)
 
@@ -201,7 +197,7 @@
 
 /obj/item/weapon/reagent_containers/food/drinks/bottle/vodka
 	name = "Tunguska Triple Distilled"
-	desc = "Aah, vodka. Prime choice of drink AND fuel by Russians worldwide."
+	desc = "Aah, vodka. Prime choice of drink AND fuel by Terrans around the galaxy."
 	icon_state = "vodkabottle"
 	center_of_mass = "x=17;y=3"
 	New()
@@ -325,6 +321,15 @@
 		..()
 		reagents.add_reagent(/datum/reagent/ethanol/bluecuracao, 100)
 
+/obj/item/weapon/reagent_containers/food/drinks/bottle/herbal
+	name = "Liqueur d'Herbe"
+	desc = "A bottle of the seventh-finest herbal liquor sold under a generic name in the galaxy. The back label has a load of guff about the monks who traditionally made this particular variety."
+	icon_state = "herbal"
+	center_of_mass = "x=16;y=6"
+	New()
+		..()
+		reagents.add_reagent(/datum/reagent/ethanol/herbal, 100)
+
 /obj/item/weapon/reagent_containers/food/drinks/bottle/grenadine
 	name = "Briar Rose Grenadine Syrup"
 	desc = "Sweet and tangy, a bar syrup used to add color or flavor to drinks."
@@ -369,6 +374,34 @@
 	New()
 		..()
 		reagents.add_reagent(/datum/reagent/ethanol/pwine, 100)
+
+//////////////////////////PREMIUM ALCOHOL ///////////////////////
+/obj/item/weapon/reagent_containers/food/drinks/bottle/premiumvodka
+	name = "Four Stripes Quadruple Distilled"
+	desc = "Premium distilled vodka imported directly from the Terran Colonial Confederation."
+	icon_state = "premiumvodka"
+	center_of_mass = "x=17;y=3"
+
+/obj/item/weapon/reagent_containers/food/drinks/bottle/premiumvodka/New()
+	..()
+	reagents.add_reagent(/datum/reagent/ethanol/vodka/premium, 100)
+	var/namepick = pick("Four Stripes","Gilgamesh","Novaya Zemlya","Terran","STS-35")
+	var/typepick = pick("Absolut","Gold","Quadruple Distilled","Platinum","Standard")
+	name = "[namepick] [typepick]"
+
+/obj/item/weapon/reagent_containers/food/drinks/bottle/premiumwine
+	name = "Uve De Blanc"
+	desc = "You feel pretentious just looking at it."
+	icon_state = "premiumwine"
+	center_of_mass = "x=16;y=4"
+
+/obj/item/weapon/reagent_containers/food/drinks/bottle/premiumwine/New()
+	..()
+	reagents.add_reagent(/datum/reagent/ethanol/wine/premium, 100)
+	var/namepick = pick("Calumont","Sciacchemont","Recioto","Torcalota")
+	var/agedyear = rand(2350,2550)
+	name = "Chateau [namepick] De Blanc"
+	desc += " This bottle is marked as [agedyear] Vintage."
 
 //////////////////////////JUICES AND STUFF ///////////////////////
 
@@ -420,7 +453,7 @@
 /obj/item/weapon/reagent_containers/food/drinks/bottle/small
 	volume = 50
 	smash_duration = 1
-	flags = 0 //starts closed
+	atom_flags = 0 //starts closed
 	rag_underlay = "rag_small"
 
 /obj/item/weapon/reagent_containers/food/drinks/bottle/small/beer
@@ -441,3 +474,15 @@
 /obj/item/weapon/reagent_containers/food/drinks/bottle/small/ale/New()
 	. = ..()
 	reagents.add_reagent(/datum/reagent/ethanol/ale, 30)
+
+//Probably not the right place for it, but no idea where else to put it without making a brand new DM and slogging through making vars from scratch.
+
+/obj/item/weapon/reagent_containers/food/drinks/bottle/oiljug
+	name = "oil jug"
+	desc = "A plastic jug of engine oil. Not for human consumption."
+	icon_state = "oil"
+	isGlass = 0
+
+/obj/item/weapon/reagent_containers/food/drinks/bottle/oiljug/New()
+	. = ..()
+	reagents.add_reagent(/datum/reagent/lube/oil, 100)

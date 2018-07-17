@@ -91,7 +91,7 @@
 	log_and_message_admins("has activated the service '[service_label]'", user)
 
 	if(service_duration)
-		schedule_task_with_source_in(service_duration, src, /obj/item/device/uplink_service/proc/deactivate)
+		addtimer(CALLBACK(src,/obj/item/device/uplink_service/proc/deactivate), service_duration)
 	else
 		deactivate()
 
@@ -193,47 +193,47 @@
 /obj/item/device/uplink_service/fake_crew_announcement
 	service_label = "Crew Arrival Announcement and Records"
 
-/obj/item/device/uplink_service/fake_crew_announcement/enable(var/mob/user = usr)
-	var/obj/item/weapon/card/id/I = user.GetIdCard()
-	var/datum/computer_file/crew_record/random_record
+#define COPY_VALUE(KEY) new_record.set_##KEY(random_record.get_##KEY())
 
+/obj/item/device/uplink_service/fake_crew_announcement/enable(var/mob/user = usr)
+	var/datum/computer_file/report/crew_record/random_record
+	var/obj/item/weapon/card/id/I = user.GetIdCard()
 	if(GLOB.all_crew_records.len)
 		random_record = pick(GLOB.all_crew_records)
-
-	var/datum/computer_file/crew_record/new_record = CreateModularRecord(user)
+	var/datum/computer_file/report/crew_record/new_record = CreateModularRecord(user)
 	if(I)
-		new_record.SetAge(I.age)
-		new_record.SetRank(I.assignment)
-		new_record.SetName(I.registered_name)
-		new_record.SetSex(I.sex)
-	else
-		var/mob/living/carbon/human/H
-		if(istype(user,/mob/living/carbon/human))
-			H = user
-			new_record.SetAge(H.age)
-		else
-			new_record.SetAge(initial(H.age))
-		var/assignment = GetAssignment(user)
-		new_record.SetRank(assignment)
-		new_record.SetName(user.real_name)
-		new_record.SetSex(capitalize(user.gender))
-	new_record.SetSpecies(user.get_species())
-
+		new_record.set_name(I.registered_name)
+		new_record.set_sex(I.sex)
+		new_record.set_age(I.age)
+		new_record.set_job(I.assignment)
+		new_record.set_fingerprint(I.fingerprint_hash)
+		new_record.set_bloodtype(I.blood_type)
+		new_record.set_dna(I.dna_hash)
+		if(I.military_branch)
+			new_record.set_branch(I.military_branch.name)
+			if(I.military_rank)
+				new_record.set_rank(I.military_rank.name)
 	if(random_record)
-		new_record.SetCitizenship(random_record.GetCitizenship())
-		new_record.SetFaction(random_record.GetFaction())
-		new_record.SetFingerprint(random_record.GetFingerprint())
-		new_record.SetHomeSystem(random_record.GetHomeSystem())
-		new_record.SetReligion(random_record.GetReligion())
-		new_record.SetBloodtype(random_record.GetBloodtype())
-		new_record.SetDna(random_record.GetDna())
+		COPY_VALUE(citizenship)
+		COPY_VALUE(faction)
+		COPY_VALUE(religion)
+		COPY_VALUE(homeSystem)
+		COPY_VALUE(fingerprint)
+		COPY_VALUE(dna)
+		COPY_VALUE(bloodtype)
+	var/datum/job/job = job_master.GetJob(new_record.get_job())
+	if(job)
+		var/skills = list()
+		for(var/decl/hierarchy/skill/S in GLOB.skills)
+			var/level = job.min_skill[S.type]
+			if(prob(10))
+				level = min(rand(1,3), job.max_skill[S.type])
+			if(level > SKILL_NONE)
+				skills += "[S.name], [S.levels[level]]"
+		new_record.set_skillset(jointext(skills,"\n"))
 
-	if(I)
-		new_record.SetFingerprint(I.fingerprint_hash)
-		new_record.SetBloodtype(I.blood_type)
-		new_record.SetDna(I.dna_hash)
-
-	var/datum/job/job = job_master.GetJob(new_record.GetRank())
 	if(istype(job) && job.announced)
-		AnnounceArrivalSimple(new_record.GetName(), new_record.GetRank(), get_announcement_frequency(job))
+		AnnounceArrivalSimple(new_record.get_name(), new_record.get_job(), get_announcement_frequency(job))
 	. = ..()
+
+#undef COPY_VALUE

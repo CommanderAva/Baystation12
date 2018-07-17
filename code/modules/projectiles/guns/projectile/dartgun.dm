@@ -117,7 +117,8 @@
 	if(beakers.len >= max_beakers)
 		to_chat(user, "<span class='warning'>[src] already has [max_beakers] beakers in it - another one isn't going to fit!</span>")
 		return
-	user.drop_from_inventory(B, src)
+	if(!user.unEquip(B, src))
+		return
 	beakers |= B
 	user.visible_message("\The [user] inserts \a [B] into [src].", "<span class='notice'>You slot [B] into [src].</span>")
 
@@ -173,26 +174,23 @@
 	popup.set_content(jointext(dat,null))
 	popup.open()
 
-/obj/item/weapon/gun/projectile/dartgun/Topic(href, href_list)
-	if(..()) return 1
-
-	if(!Adjacent(usr) || usr.incapacitated())
-		return
-
-	src.add_fingerprint(usr)
-
+/obj/item/weapon/gun/projectile/dartgun/OnTopic(user, href_list)
 	if(href_list["stop_mix"])
 		var/index = text2num(href_list["stop_mix"])
 		mixing -= beakers[index]
+		. = TOPIC_REFRESH
 	else if (href_list["mix"])
 		var/index = text2num(href_list["mix"])
 		mixing |= beakers[index]
+		. = TOPIC_REFRESH
 	else if (href_list["eject"])
 		var/index = text2num(href_list["eject"])
 		if(beakers[index])
 			remove_beaker(beakers[index], usr)
+		. = TOPIC_REFRESH
 	else if (href_list["eject_cart"])
 		unload_ammo(usr)
+		. = TOPIC_REFRESH
 
 	Interact(usr)
 

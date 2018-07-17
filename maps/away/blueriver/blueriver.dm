@@ -5,7 +5,7 @@
 	desc = "Sensor array detects an arctic planet with a small vessle on the planet's surface. Scans further indicate strange energy levels below the planet's surface."
 	in_space = 0
 	icon_state = "globe"
-	generic_waypoints = list(
+	initial_generic_waypoints = list(
 		"nav_blueriv_1",
 		"nav_blueriv_2",
 		"nav_blueriv_3",
@@ -125,7 +125,7 @@
 /turf/simulated/floor/away/blueriver/alienfloor/Initialize()
 	.=..()
 
-	set_light(l_range = 5, l_power = 2, l_color = "#0066FF")
+	set_light(0.7, 1, 5, l_color = "#0066ff")
 
 /turf/unsimulated/wall/away/blueriver/livingwall
 	name = "alien wall"
@@ -156,7 +156,7 @@
 	.=..()
 
 	icon_state = "bluespacecrystal[rand(1,3)]"
-	set_light(l_range = 5, l_power = 2, l_color = "#0066FF")
+	set_light(0.7, 1, 5, l_color = "#0066ff")
 
-/turf/unsimulated/wall/supermatter/no_spread/process()
+/turf/unsimulated/wall/supermatter/no_spread/Process()
 	return PROCESS_KILL

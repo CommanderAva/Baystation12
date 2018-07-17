@@ -1,5 +1,4 @@
 /obj/item/weapon/card/id/syndicate
-	name = "agent card"
 	icon_state = "syndicate"
 	assignment = "Agent"
 	origin_tech = list(TECH_ILLEGAL = 3)
@@ -62,7 +61,7 @@
 	data["electronic_warfare"] = electronic_warfare
 	data["entries"] = entries
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "agent_id_card.tmpl", "Agent id", 600, 400)
 		ui.set_initial_data(data)
@@ -119,7 +118,6 @@
 				if(!isnull(new_job) && CanUseTopic(user, state))
 					src.assignment = new_job
 					to_chat(user, "<span class='notice'>Occupation changed to '[new_job]'.</span>")
-					update_name()
 					. = 1
 			if("Blood Type")
 				var/default = blood_type
@@ -158,7 +156,6 @@
 				var/new_name = sanitizeName(input(user,"What name would you like to put on this card?","Agent Card Name", registered_name) as null|text, allow_numbers=TRUE)
 				if(!isnull(new_name) && CanUseTopic(user, state))
 					src.registered_name = new_name
-					update_name()
 					to_chat(user, "<span class='notice'>Name changed to '[new_name]'.</span>")
 					. = 1
 			if("Photo")
@@ -181,7 +178,7 @@
 					electronic_warfare = initial(electronic_warfare)
 					fingerprint_hash = initial(fingerprint_hash)
 					icon_state = initial(icon_state)
-					name = initial(name)
+					SetName(initial(name))
 					registered_name = initial(registered_name)
 					unset_registered_user()
 					sex = initial(sex)
@@ -203,7 +200,7 @@
 					. = 1
 
 	// Always update the UI, or buttons will spin indefinitely
-	GLOB.nanomanager.update_uis(src)
+	SSnano.update_uis(src)
 
 /var/global/list/id_card_states
 /proc/id_card_states()

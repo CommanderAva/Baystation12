@@ -3,6 +3,7 @@
 	filedesc = "ID card modification program"
 	nanomodule_path = /datum/nano_module/program/card_mod
 	program_icon_state = "id"
+	program_key_state = "id_key"
 	program_menu_icon = "key"
 	extended_desc = "Program for programming crew ID cards."
 	required_access = access_change_ids
@@ -26,7 +27,7 @@
 		data["have_id_slot"] = !!program.computer.card_slot
 		data["have_printer"] = !!program.computer.nano_printer
 		data["authenticated"] = program.can_run(user)
-		if(!program.computer.card_slot)
+		if(!program.computer.card_slot || !program.computer.card_slot.can_write)
 			mod_mode = 0 //We can't modify IDs when there is no card reader
 	else
 		data["have_id_slot"] = 0
@@ -39,6 +40,8 @@
 		var/obj/item/weapon/card/id/id_card = program.computer.card_slot.stored_card
 		data["has_id"] = !!id_card
 		data["id_account_number"] = id_card ? id_card.associated_account_number : null
+		data["id_email_login"] = id_card ? id_card.associated_email_login["login"] : null
+		data["id_email_password"] = id_card ? stars(id_card.associated_email_login["password"], 0) : null
 		data["id_rank"] = id_card && id_card.assignment ? id_card.assignment : "Unassigned"
 		data["id_owner"] = id_card && id_card.registered_name ? id_card.registered_name : "-----"
 		data["id_name"] = id_card ? id_card.name : "-----"
@@ -84,7 +87,7 @@
 					"accesses" = accesses)))
 			data["regions"] = regions
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "identification_computer.tmpl", name, 600, 700, state = state)
 		ui.auto_update_layout = 1
@@ -138,6 +141,8 @@
 									<hr>
 									<u>Assignment:</u> [id_card.assignment]<br>
 									<u>Account Number:</u> #[id_card.associated_account_number]<br>
+									<u>Email account:</u> [id_card.associated_email_login["login"]]
+									<u>Email password:</u> [stars(id_card.associated_email_login["password"], 0)]
 									<u>Blood Type:</u> [id_card.blood_type]<br><br>
 									<u>Access:</u><br>
 								"}
@@ -163,8 +168,11 @@
 					else
 						computer.visible_message("<span class='notice'>\The [computer] prints out paper.</span>")
 		if("eject")
-			if(computer && computer.card_slot)
-				computer.proc_eject_id(user)
+			if(computer)
+				if(computer.card_slot && computer.card_slot.stored_card)
+					computer.proc_eject_id(user)
+				else
+					computer.attackby(user.get_active_hand(), user)
 		if("terminate")
 			if(computer && can_run(user, 1))
 				id_card.assignment = "Terminated"
@@ -181,6 +189,12 @@
 				else if(href_list["account"])
 					var/account_num = text2num(input("Enter account number.", "Account", id_card.associated_account_number))
 					id_card.associated_account_number = account_num
+				else if(href_list["elogin"])
+					var/email_login = input("Enter email login.", "Email login", id_card.associated_email_login["login"])
+					id_card.associated_email_login["login"] = email_login
+				else if(href_list["epswd"])
+					var/email_password = input("Enter email password.", "Email password")
+					id_card.associated_email_login["password"] = email_password
 		if("assign")
 			if(computer && can_run(user, 1) && id_card)
 				var/t1 = href_list["assign_target"]
@@ -220,20 +234,10 @@
 					id_card.access -= access_type
 					if(!access_allowed)
 						id_card.access += access_type
-		if("gun_licence")
-			if(computer && can_run(user, 1))
-				var/list/gun_licence_allow = list("Allowed",
-												"Denied")
-				var/N
-				N = input(user, "Allow or deny gun licence?", "[src]") as null|anything in gun_licence_allow
-				if(N)
-					id_card.gun_licence = N
-					N = null
-
 	if(id_card)
-		id_card.name = text("[id_card.registered_name]'s ID Card ([id_card.assignment])")
+		id_card.SetName(text("[id_card.registered_name]'s ID Card ([id_card.assignment])"))
 
-	GLOB.nanomanager.update_uis(NM)
+	SSnano.update_uis(NM)
 	return 1
 
 /datum/computer_file/program/card_mod/proc/remove_nt_access(var/obj/item/weapon/card/id/id_card)

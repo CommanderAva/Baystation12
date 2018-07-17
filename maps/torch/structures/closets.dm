@@ -18,13 +18,13 @@
 		/obj/item/device/depth_scanner,
 		/obj/item/device/core_sampler,
 		/obj/item/device/gps,
-		/obj/item/device/beacon_locator,
+		/obj/item/weapon/pinpointer/radio,
 		/obj/item/device/radio/beacon,
 		/obj/item/clothing/glasses/meson,
 		/obj/item/clothing/glasses/science,
 		/obj/item/weapon/pickaxe,
 		/obj/item/device/measuring_tape,
-		/obj/item/weapon/pickaxe/hand,
+		/obj/item/weapon/pickaxe/xeno/hand,
 		/obj/item/weapon/storage/bag/fossils,
 		/obj/item/weapon/hand_labeler,
 		/obj/item/taperoll/research,
@@ -38,7 +38,7 @@
 
 /obj/structure/closet/wardrobe/ptgear/WillContain()
 	return list(
-		/obj/item/clothing/under/pt/expeditionary = 4,
+		/obj/item/clothing/under/solgov/pt/expeditionary = 4,
 		/obj/item/clothing/shoes/white = 2,
 		/obj/item/clothing/shoes/black = 2)
 
@@ -51,7 +51,6 @@
 /obj/random/torchcloset/spawn_choices()
 	return list(/obj/structure/closet,
 				/obj/structure/closet/firecloset,
-				/obj/structure/closet/firecloset/full,
 				/obj/structure/closet/emcloset,
 				/obj/structure/closet/jcloset_torch,
 				/obj/structure/closet/athletic_mixed,

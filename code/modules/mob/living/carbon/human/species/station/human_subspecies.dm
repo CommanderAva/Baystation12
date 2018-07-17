@@ -6,7 +6,8 @@
 	eyes beneath a prominent brow in order to shield them from the glare of a dangerously \
 	bright, alien sun. This comes at the cost of mobility, flexibility, and increased \
 	oxygen requirements to support their robust metabolism."
-	icobase = 'icons/mob/human_races/subspecies/r_gravworlder.dmi'
+	icobase =     'icons/mob/human_races/species/human/subspecies/gravworlder_body.dmi'
+	preview_icon= 'icons/mob/human_races/species/human/subspecies/gravworlder_preview.dmi'
 	health_hud_intensity = 3
 
 	flash_mod =     0.9
@@ -14,7 +15,8 @@
 	radiation_mod = 0.5
 	brute_mod =     0.85
 	slowdown =      1
-	list/poison_type = list("phoron","lithiumnitride", "argon", "methane")
+
+	appearance_flags = HAS_HAIR_COLOR | HAS_SKIN_TONE_GRAV | HAS_LIPS | HAS_UNDERWEAR | HAS_EYE_COLOR
 
 /datum/species/human/spacer
 	name = "Space-Adapted Human"
@@ -22,15 +24,19 @@
 	blurb = "Lithe and frail, these sickly folk were engineered for work in environments that \
 	lack both light and atmosphere. As such, they're quite resistant to asphyxiation as well as \
 	toxins, but they suffer from weakened bone structure and a marked vulnerability to bright lights."
-	icobase = 'icons/mob/human_races/subspecies/r_spacer.dmi'
+	icobase =     'icons/mob/human_races/species/human/subspecies/spacer_body.dmi'
+	preview_icon= 'icons/mob/human_races/species/human/subspecies/spacer_preview.dmi'
 
 	oxy_mod =   0.8
 	toxins_mod =   0.9
 	flash_mod = 1.2
 	brute_mod = 1.1
 	burn_mod =  1.1
-	darksight = 6
-	list/poison_type = list("phoron","lithiumnitride", "argon", "methane")
+	darksight_range = 6
+	darksight_tint = DARKTINT_MODERATE
+
+
+	appearance_flags = HAS_HAIR_COLOR | HAS_SKIN_TONE_SPCR | HAS_LIPS | HAS_UNDERWEAR | HAS_EYE_COLOR
 
 /datum/species/human/vatgrown
 	name = "Vat-Grown Human"
@@ -38,8 +44,9 @@
 	blurb = "With cloning on the forefront of human scientific advancement, cheap mass production \
 	of bodies is a very real and rather ethically grey industry. Vat-grown humans tend to be paler than \
 	baseline, with no appendix and fewer inherited genetic disabilities, but a weakened metabolism."
-	icobase = 'icons/mob/human_races/subspecies/r_vatgrown.dmi'
-	list/poison_type = list("phoron","lithiumnitride", "argon")
+	icobase =     'icons/mob/human_races/species/human/subspecies/vatgrown_body.dmi'
+	preview_icon= 'icons/mob/human_races/species/human/subspecies/vatgrown_preview.dmi'
+
 	toxins_mod =   1.1
 	has_organ = list(
 		BP_HEART =    /obj/item/organ/internal/heart,

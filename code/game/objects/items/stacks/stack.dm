@@ -26,7 +26,7 @@
 	..()
 	if (!stacktype)
 		stacktype = type
-	if (amount)
+	if (amount >= 1)
 		src.amount = amount
 
 /obj/item/stack/Destroy()
@@ -184,8 +184,6 @@
 	if(!uses_charge)
 		amount -= used
 		if (amount <= 0)
-			if(usr)
-				usr.remove_from_mob(src)
 			qdel(src) //should be safe to qdel immediately since if someone is still using this stack it will persist for a little while longer
 		return 1
 	else
@@ -239,10 +237,10 @@
 	return 0
 
 //creates a new stack with the specified amount
-/obj/item/stack/proc/split(var/tamount)
+/obj/item/stack/proc/split(var/tamount, var/force=FALSE)
 	if (!amount)
 		return null
-	if(uses_charge)
+	if(uses_charge && !force)
 		return null
 
 	var/transfer = max(min(tamount, src.amount, initial(max_amount)), 0)

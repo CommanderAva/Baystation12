@@ -313,9 +313,8 @@
 	user << browse(dat, "window=piano;size=700x300")
 	onclose(user, "piano")
 
-/obj/structure/device/piano/Topic(href, href_list)
-
-	if(!in_range(src, usr) || issilicon(usr) || !anchored || !usr.canmove || usr.restrained())
+/obj/structure/device/piano/Topic(href, href_list, state = GLOB.physical_state)
+	if((. = ..()))
 		usr << browse(null, "window=piano;size=700x300")
 		onclose(usr, "piano")
 		return
@@ -418,7 +417,7 @@
 	return
 
 /obj/structure/device/piano/attackby(obj/item/O as obj, mob/user as mob)
-	if (istype(O, /obj/item/weapon/wrench))
+	if(isWrench(O))
 		if (anchored)
 			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
 			to_chat(user, "<span class='notice'>You begin to loosen \the [src]'s casters...</span>")

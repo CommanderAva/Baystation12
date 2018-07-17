@@ -1,14 +1,14 @@
-/datum/species/shadow
+/datum/species/starlight/shadow
 	name = "Shadow"
 	name_plural = "shadows"
 
-	icobase = 'icons/mob/human_races/r_shadow.dmi'
-	deform = 'icons/mob/human_races/r_shadow.dmi'
+	icobase = 'icons/mob/human_races/species/shadow/body.dmi'
+	deform = 'icons/mob/human_races/species/shadow/body.dmi'
 
-	language = "Sol Common" //todo?
+	language = LANGUAGE_GALCOM
 	unarmed_types = list(/datum/unarmed_attack/claws/strong, /datum/unarmed_attack/bite/sharp)
-	darksight = 8
-	has_organ = list()
+	darksight_range = 8
+	darksight_tint = DARKTINT_GOOD
 	siemens_coefficient = 0
 
 	blood_color = "#cccccc"
@@ -17,18 +17,11 @@
 	remains_type = /obj/effect/decal/cleanable/ash
 	death_message = "dissolves into ash..."
 
-	flags = NO_SCAN | NO_SLIP | NO_POISON | NO_EMBED
-	spawn_flags = SPECIES_IS_RESTRICTED
+	species_flags = SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_SLIP | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_EMBED
+	secondary_langs = list(LANGUAGE_CULT,LANGUAGE_OCCULT)
 
-	genders = list(NEUTER)
-
-/datum/species/shadow/handle_death(var/mob/living/carbon/human/H)
-	spawn(1)
-		new /obj/effect/decal/cleanable/ash(H.loc)
-		qdel(H)
-
-/datum/species/shadow/handle_environment_special(var/mob/living/carbon/human/H)
-	if(H.in_stasis || H.stat == DEAD || H.isSynthetic())
+/datum/species/starlight/shadow/handle_environment_special(var/mob/living/carbon/human/H)
+	if(H.InStasis() || H.stat == DEAD || H.isSynthetic())
 		return
 	var/light_amount = 0
 	if(isturf(H.loc))

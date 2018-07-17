@@ -11,7 +11,7 @@
 	opacity = 0
 	density = 0
 	anchored = 0.0
-	flags = CONDUCT
+	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT|SLOT_HOLSTER
 	force = 10.0
 	throwforce = 10.0
@@ -70,7 +70,6 @@
 			to_chat(user, "<span class='notice'>The RCD can't hold that many additional matter-units.</span>")
 			return
 		stored_matter += cartridge.remaining
-		user.drop_from_inventory(W)
 		qdel(W)
 		playsound(src.loc, 'sound/machines/click.ogg', 50, 1)
 		to_chat(user, "<span class='notice'>The RCD now holds [stored_matter]/[max_stored_matter] matter-units.</span>")

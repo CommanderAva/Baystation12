@@ -292,9 +292,8 @@
 	user << browse(dat, "window=violin;size=700x300")
 	onclose(user, "violin")
 
-/obj/item/device/violin/Topic(href, href_list)
-
-	if(!in_range(src, usr) || issilicon(usr) || !isliving(usr) || !usr.canmove || usr.restrained())
+/obj/item/device/violin/Topic(href, href_list, state = GLOB.physical_state)
+	if((. = ..()))
 		usr << browse(null, "window=violin;size=700x300")
 		onclose(usr, "violin")
 		return
@@ -391,7 +390,6 @@
 				song.lines = lines
 				song.tempo = tempo
 
-	add_fingerprint(usr)
 	for(var/mob/M in viewers(1, loc))
 		if((M.client && M.machine == src))
 			attack_self(M)

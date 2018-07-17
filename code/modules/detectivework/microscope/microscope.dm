@@ -18,11 +18,10 @@
 
 	if(istype(W, /obj/item/weapon/forensics/swab)|| istype(W, /obj/item/weapon/sample/fibers) || istype(W, /obj/item/weapon/sample/print))
 		to_chat(user, "<span class='notice'>You insert \the [W] into the microscope.</span>")
-		user.unEquip(W)
-		W.forceMove(src)
+		if(!user.unEquip(W, src))
+			return
 		sample = W
 		update_icon()
-		return
 
 /obj/machinery/microscope/attack_hand(mob/user)
 
@@ -32,8 +31,12 @@
 
 	to_chat(user, "<span class='notice'>The microscope whirrs as you examine \the [sample].</span>")
 
-	if(!do_after(user, 25, src) || !sample)
+	if(!user.do_skilled(25, SKILL_FORENSICS, src) || !sample)
 		to_chat(user, "<span class='notice'>You stop examining \the [sample].</span>")
+		return
+
+	if(!user.skill_check(SKILL_FORENSICS, SKILL_ADEPT))
+		to_chat(user, "<span class='warning'>You can't figure out what it means...</span>")
 		return
 
 	to_chat(user, "<span class='notice'>Printing findings now...</span>")
@@ -45,7 +48,7 @@
 	if(istype(sample, /obj/item/weapon/forensics/swab))
 		var/obj/item/weapon/forensics/swab/swab = sample
 
-		report.name = "GSR report #[++report_num]: [swab.name]"
+		report.SetName("GSR report #[++report_num]: [swab.name]")
 		report.info = "<b>Scanned item:</b><br>[swab.name]<br><br>"
 
 		if(swab.gsr)
@@ -55,7 +58,7 @@
 
 	else if(istype(sample, /obj/item/weapon/sample/fibers))
 		var/obj/item/weapon/sample/fibers/fibers = sample
-		report.name = "Fiber report #[++report_num]: [fibers.name]"
+		report.SetName("Fiber report #[++report_num]: [fibers.name]")
 		report.info = "<b>Scanned item:</b><br>[fibers.name]<br><br>"
 		if(fibers.evidence)
 			report.info = "Molecular analysis on provided sample has determined the presence of unique fiber strings.<br><br>"
@@ -64,7 +67,7 @@
 		else
 			report.info += "No fibers found."
 	else if(istype(sample, /obj/item/weapon/sample/print))
-		report.name = "Fingerprint report #[report_num]: [sample.name]"
+		report.SetName("Fingerprint report #[report_num]: [sample.name]")
 		report.info = "<b>Fingerprint analysis report #[report_num]</b>: [sample.name]<br>"
 		var/obj/item/weapon/sample/print/card = sample
 		if(card.evidence && card.evidence.len)

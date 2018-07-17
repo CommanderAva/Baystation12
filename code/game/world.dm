@@ -80,8 +80,6 @@
 	if(byond_version < RECOMMENDED_VERSION)
 		world.log << "Your server's byond version does not meet the recommended requirements for this server. Please update BYOND"
 
-	config.post_load()
-
 	if(config && config.server_name != null && config.server_suffix && world.port > 0)
 		// dumb and hardcoded but I don't care~
 		config.server_name += " #[(world.port % 1000) / 100]"
@@ -110,9 +108,8 @@
 	populate_material_list()
 
 	if(config.generate_map)
-		if(GLOB.using_map.perform_map_generation())
-			GLOB.using_map.refresh_mining_turfs()
-	GLOB.using_map.build_exoplanets()
+		GLOB.using_map.perform_map_generation()
+
 
 	// Create robolimbs for chargen.
 	populate_robolimb_list()
@@ -123,15 +120,6 @@
 	processScheduler.deferSetupFor(/datum/controller/process/ticker)
 	processScheduler.setup()
 	Master.Initialize(10, FALSE)
-
-#ifdef UNIT_TEST
-	spawn(1)
-		initialize_unit_tests()
-#endif
-
-	spawn(3000)		//so we aren't adding to the round-start lag
-		if(config.ToRban)
-			ToRban_autoupdate()
 
 #undef RECOMMENDED_VERSION
 
@@ -171,35 +159,27 @@ var/world_topic_spam_protect_time = world.timeofday
 		s["roundduration"] = roundduration2text()
 		s["map"] = GLOB.using_map.full_name
 
-		if(input["status"] == "2")
-			var/list/players = list()
-			var/list/admins = list()
+		var/active = 0
+		var/list/players = list()
+		var/list/admins = list()
+		var/legacy = input["status"] != "2"
+		for(var/client/C in GLOB.clients)
+			if(C.holder)
+				if(C.is_stealthed())
+					continue	//so stealthmins aren't revealed by the hub
+				admins[C.key] = C.holder.rank
+			if(legacy)
+				s["player[players.len]"] = C.key
+			players += C.key
+			if(istype(C.mob, /mob/living))
+				active++
 
-			for(var/client/C in GLOB.clients)
-				if(C.holder)
-					if(C.is_stealthed())
-						continue
-					admins[C.key] = C.holder.rank
-				players += C.key
-
-			s["players"] = players.len
+		s["players"] = players.len
+		s["admins"] = admins.len
+		if(!legacy)
 			s["playerlist"] = list2params(players)
-			s["admins"] = admins.len
 			s["adminlist"] = list2params(admins)
-		else
-			var/n = 0
-			var/admins = 0
-
-			for(var/client/C in GLOB.clients)
-				if(C.holder)
-					if(C.is_stealthed())
-						continue	//so stealthmins aren't revealed by the hub
-					admins++
-				s["player[n]"] = C.key
-				n++
-
-			s["players"] = n
-			s["admins"] = admins
+			s["active_players"] = active
 
 		return list2params(s)
 
@@ -211,8 +191,8 @@ var/world_topic_spam_protect_time = world.timeofday
 			var/list/dept_list = nano_crew_manifest[dept]
 			if(dept_list.len > 0)
 				positions[dept] = list()
-				for(var/datum/computer_file/crew_record/person in dept_list)
-					positions[dept][person.GetName()] = person.GetPosition()
+				for(var/list/person in dept_list)
+					positions[dept][person["name"]] = person["rank"]
 
 		for(var/k in positions)
 			positions[k] = list2params(positions[k]) // converts positions["heads"] = list("Bob"="Captain", "Bill"="CMO") into positions["heads"] = "Bob=Captain&Bill=CMO"
@@ -599,9 +579,9 @@ var/world_topic_spam_protect_time = world.timeofday
 
 	s += "<b>[station_name()]</b>";
 	s += " ("
-	s += "<a href=\"http://\">" //Change this to wherever you want the hub to link to.
+	s += "<a href=\"https://forums.baystation12.net/\">" //Change this to wherever you want the hub to link to.
 //	s += "[game_version]"
-	s += "Default"  //Replace this with something else. Or ever better, delete it and uncomment the game version.
+	s += "Forums"  //Replace this with something else. Or ever better, delete it and uncomment the game version.
 	s += "</a>"
 	s += ")"
 

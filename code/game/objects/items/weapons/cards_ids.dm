@@ -18,6 +18,7 @@
 	w_class = ITEM_SIZE_TINY
 	slot_flags = SLOT_EARS
 	var/associated_account_number = 0
+	var/list/associated_email_login = list("login" = "", "password" = "")
 
 	var/list/files = list(  )
 
@@ -36,9 +37,9 @@
 	set src in usr
 
 	if (t)
-		src.name = text("data disk- '[]'", t)
+		src.SetName(text("data disk- '[]'", t))
 	else
-		src.name = "data disk"
+		src.SetName("data disk")
 	src.add_fingerprint(usr)
 	return
 
@@ -83,7 +84,6 @@ var/const/NO_EMAG_ACT = -50
 
 	if(uses<1)
 		user.visible_message("<span class='warning'>\The [src] fizzles and sparks - it seems it's been used once too often, and is now spent.</span>")
-		user.drop_item()
 		var/obj/item/weapon/card/emag_broken/junk = new(user.loc)
 		junk.add_fingerprint(user)
 		qdel(src)
@@ -107,12 +107,6 @@ var/const/NO_EMAG_ACT = -50
 	var/sex = "\[UNSET\]"
 	var/icon/front
 	var/icon/side
-	var/gun_licence = "No"
-	var/insurance = "No"
-	var/onegun = "\[UNSET\]"
-	var/twogun = "\[UNSET\]"
-	var/threegun = "\[UNSET\]"
-
 
 	//alt titles are handled a bit weirdly in order to unobtrusively integrate into existing ID system
 	var/assignment = null	//can be alt title or the actual job
@@ -133,13 +127,21 @@ var/const/NO_EMAG_ACT = -50
 			assignment = rank
 			access |= j.get_access()
 
+/obj/item/weapon/card/id/CanUseTopic(var/user)
+	if(user in view(get_turf(src)))
+		return STATUS_INTERACTIVE
+
+/obj/item/weapon/card/id/OnTopic(var/mob/user, var/list/href_list)
+	if(href_list["look_at_id"])
+		if(istype(user))
+			user.examinate(src)
+			return TOPIC_HANDLED
+
 /obj/item/weapon/card/id/examine(mob/user)
-	set src in oview(1)
-	if(in_range(usr, src))
-		show(usr)
-		to_chat(usr, desc)
-	else
-		to_chat(usr, "<span class='warning'>It is too far away.</span>")
+	..()
+	to_chat(user, "It says '[get_display_name()]'.")
+	if(in_range(user, src))
+		show(user)
 
 /obj/item/weapon/card/id/proc/prevent_tracking()
 	return 0
@@ -154,12 +156,12 @@ var/const/NO_EMAG_ACT = -50
 	popup.open()
 	return
 
-/obj/item/weapon/card/id/proc/update_name()
-	name = "[registered_name]'s ID Card"
+/obj/item/weapon/card/id/proc/get_display_name()
+	. = registered_name
 	if(military_rank && military_rank.name_short)
-		name = military_rank.name_short + " " + name
+		. = military_rank.name_short + " " + .
 	if(assignment)
-		name = name + " ([assignment])"
+		. += ", [assignment]"
 
 /obj/item/weapon/card/id/proc/set_id_photo(var/mob/M)
 	front = getFlatIcon(M, SOUTH, always_use_defdir = 1)
@@ -175,7 +177,6 @@ var/const/NO_EMAG_ACT = -50
 		id_card.blood_type		= dna.b_type
 		id_card.dna_hash		= dna.unique_enzymes
 		id_card.fingerprint_hash= md5(dna.uni_identity)
-	id_card.update_name()
 
 /mob/living/carbon/human/set_id_info(var/obj/item/weapon/card/id/id_card)
 	..()
@@ -202,10 +203,6 @@ var/const/NO_EMAG_ACT = -50
 	dat += text("Fingerprint: []</A><BR>\n", fingerprint_hash)
 	dat += text("Blood Type: []<BR>\n", blood_type)
 	dat += text("DNA Hash: []<BR><BR>\n", dna_hash)
-	dat += text("Gun licence: []<BR><BR>\n", gun_licence)
-	dat += text("First gun ownership: []<BR>\n", onegun)
-	dat += text("Second gun ownership: []<BR>\n", twogun)
-	dat += text("Third gun ownership: []<BR>\n", threegun)
 	if(front && side)
 		dat +="<td align = center valign = top>Photo:<br><img src=front.png height=80 width=80 border=4><img src=side.png height=80 width=80 border=4></td>"
 	dat += "</tr></table>"

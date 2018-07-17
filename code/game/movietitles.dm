@@ -1,5 +1,5 @@
-#define CREDIT_ROLL_SPEED 125
-#define CREDIT_SPAWN_SPEED 10
+#define CREDIT_ROLL_SPEED 185
+#define CREDIT_SPAWN_SPEED 20
 #define CREDIT_ANIMATE_HEIGHT (14 * world.icon_size)
 #define CREDIT_EASE_DURATION 22
 
@@ -11,6 +11,9 @@ client
 /client/proc/RollCredits()
 	set waitfor = FALSE
 
+	if(get_preference_value(/datum/client_preference/show_credits) != GLOB.PREF_YES)
+		return
+
 	if(!GLOB.end_titles)
 		GLOB.end_titles = generate_titles()
 
@@ -20,10 +23,10 @@ client
 		mob.overlay_fullscreen("fishbed",/obj/screen/fullscreen/fishbed)
 		mob.overlay_fullscreen("fadeout",/obj/screen/fullscreen/fadeout)
 
-		if(mob.is_preference_enabled(/datum/client_preference/play_lobby_music))
-			sound_to(mob, sound(null, channel = 1))
-			sound_to(mob, sound('sound/music/THUNDERDOME.ogg', wait = 0, volume = 40, channel = 1))
-
+		if(mob.get_preference_value(/datum/client_preference/play_lobby_music) == GLOB.PREF_YES)
+			sound_to(mob, sound(null, channel = GLOB.lobby_sound_channel))
+			sound_to(mob, sound('sound/music/THUNDERDOME.ogg', wait = 0, volume = 40, channel = GLOB.lobby_sound_channel))
+	sleep(50)
 	var/list/_credits = credits
 	verbs += /client/proc/ClearCredits
 	for(var/I in GLOB.end_titles)
@@ -45,7 +48,7 @@ client
 	QDEL_NULL_LIST(credits)
 	mob.clear_fullscreen("fishbed")
 	mob.clear_fullscreen("fadeout")
-	sound_to(mob, sound(null, channel = 1))
+	sound_to(mob, sound(null, channel = GLOB.lobby_sound_channel))
 
 /obj/screen/credit
 	icon_state = "blank"
@@ -101,10 +104,12 @@ client
 	possible_titles += "[pick("SPACE", "SEXY", "DRAGON", "WARLOCK", "LAUNDRY", "GUN", "ADVERTISING", "DOG", "CARBON MONOXIDE", "NINJA", "WIZARD", "SOCRATIC", "JUVENILE DELIQUENCY", "POLITICALLY MOTIVATED", "RADTACULAR SICKNASTY")] [pick("QUEST", "FORCE", "ADVENTURE")]"
 	possible_titles += "[pick("THE DAY [uppertext(GLOB.using_map.station_short)] STOOD STILL", "HUNT FOR THE GREEN WEENIE", "ALIEN VS VENDOMAT", "SPACE TRACK")]"
 	titles += "<center><h1>EPISODE [rand(1,1000)]<br>[pick(possible_titles)]<h1></h1></h1></center>"
-	for(var/mob/living/carbon/human/H in world)
+	for(var/mob/living/carbon/human/H in GLOB.living_mob_list_|GLOB.dead_mob_list_)
 		if(findtext(H.real_name,"(mannequin)"))
 			continue
 		if(H.isMonkey() && findtext(H.real_name,"[lowertext(H.species.name)]")) //no monki
+			continue
+		if(H.timeofdeath && H.timeofdeath < 5 MINUTES) //don't mention these losers (prespawned corpses mostly)
 			continue
 		if(!cast.len && !chunksize)
 			chunk += "CAST:"
@@ -112,9 +117,9 @@ client
 		if(GetAssignment(H) != "Unassigned")
 			job = ", [uppertext(GetAssignment(H))]"
 		var/used_name = H.real_name
-		var/datum/computer_file/crew_record/R = get_crewmember_record(H.real_name)
-		if(R && R.GetRank())
-			var/datum/mil_rank/rank = mil_branches.get_rank(R.GetBranch(), R.GetRank())
+		var/datum/computer_file/report/crew_record/R = get_crewmember_record(H.real_name)
+		if(R && R.get_rank())
+			var/datum/mil_rank/rank = mil_branches.get_rank(R.get_branch(), R.get_rank())
 			if(rank.name_short)
 				used_name = "[rank.name_short] [used_name]"
 		if(prob(90))
@@ -139,6 +144,8 @@ client
 	var/list/corpses = list()
 	var/list/monkies = list()
 	for(var/mob/living/carbon/human/H in GLOB.dead_mob_list_)
+		if(H.timeofdeath < 5 MINUTES) //no prespawned corpses
+			continue
 		if(H.isMonkey() && findtext(H.real_name,"[lowertext(H.species.name)]"))
 			monkies[H.species.name] += 1
 		else if(H.real_name)

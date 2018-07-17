@@ -15,7 +15,8 @@ var/global/datum/controller/occupations/job_master
 	var/list/unassigned = list()
 		//Debug info
 	var/list/job_debug = list()
-
+		//Cache of icons for job info window
+	var/list/job_icons = list()
 
 	proc/SetupOccupations(var/setup_titles = 0)
 		occupations = list()
@@ -31,6 +32,7 @@ var/global/datum/controller/occupations/job_master
 			occupations += job
 			occupations_by_type[job.type] = job
 			occupations_by_title[job.title] = job
+			job.current_positions = 0
 			for(var/alt_title in job.alt_titles)
 				occupations_by_title[alt_title] = job
 			if(!setup_titles) continue
@@ -52,13 +54,16 @@ var/global/datum/controller/occupations/job_master
 				GLOB.supply_positions |= job.title
 			if(job.department_flag & SRV)
 				GLOB.service_positions |= job.title
-			if(job.department_flag & CRG)
-				GLOB.cargo_positions |= job.title
 			if(job.department_flag & CIV)
 				GLOB.civilian_positions |= job.title
 			if(job.department_flag & MSC)
 				GLOB.nonhuman_positions |= job.title
 
+		if(!GLOB.skills.len)
+			decls_repository.get_decl(/decl/hierarchy/skill)
+		if(!GLOB.skills.len)
+			log_error("<span class='warning'>Error setting up job skill requirements, no skill datums found!</span>")
+			return 0
 		return 1
 
 
@@ -358,46 +363,62 @@ var/global/datum/controller/occupations/job_master
 
 		if(job)
 
-			//Equip custom gear loadout.
-			var/list/custom_equip_slots = list() //If more than one item takes the same slot, all after the first one spawn in storage.
-			var/list/custom_equip_leftovers = list()
+			// Transfers the skill settings for the job to the mob
+			H.skillset.obtain_from_client(job, H.client)
+
+			//Equip job items.
+			job.setup_account(H)
+
+			// EMAIL GENERATION
+			if(rank != "Robot" && rank != "AI")		//These guys get their emails later.
+				var/domain
+				var/desired_name
+				if(H.char_branch && H.char_branch.email_domain)
+					domain = H.char_branch.email_domain
+				else
+					domain = "freemail.nt"
+				desired_name = H.real_name
+				ntnet_global.create_email(H, desired_name, domain)
+			// END EMAIL GENERATION
+
+			job.equip(H, H.mind ? H.mind.role_alt_title : "", H.char_branch, H.char_rank)
+			job.apply_fingerprints(H)
+
+			// Equip custom gear loadout, replacing any job items
+			var/list/loadout_taken_slots = list()
 			if(H.client.prefs.Gear() && job.loadout_allowed)
 				for(var/thing in H.client.prefs.Gear())
 					var/datum/gear/G = gear_datums[thing]
 					if(G)
-						var/permitted
-						if(G.allowed_roles)
-							for(var/job_type in G.allowed_roles)
-								if(job.type == job_type)
-									permitted = 1
+						var/permitted = 0
+						if(G.allowed_branches)
+							if(H.char_branch.type in G.allowed_branches)
+								permitted = 1
 						else
 							permitted = 1
+		
+						if(permitted)
+							if(G.allowed_roles)
+								if(job.type in G.allowed_roles)
+									permitted = 1
+								else
+									permitted = 0
+							else
+								permitted = 1
 
 						if(G.whitelisted && (!(H.species.name in G.whitelisted)))
 							permitted = 0
 
 						if(!permitted)
-							to_chat(H, "<span class='warning'>Your current species, job or whitelist status does not permit you to spawn with [thing]!</span>")
+							to_chat(H, "<span class='warning'>Your current species, job, branch or whitelist status does not permit you to spawn with [thing]!</span>")
 							continue
 
-						if(G.slot && !(G.slot in custom_equip_slots))
-							// This is a miserable way to fix the loadout overwrite bug, but the alternative requires
-							// adding an arg to a bunch of different procs. Will look into it after this merge. ~ Z
-							var/metadata = H.client.prefs.Gear()[G.display_name]
-							if(G.slot == slot_wear_mask || G.slot == slot_wear_suit || G.slot == slot_head)
-								custom_equip_leftovers += thing
-							else if(H.equip_to_slot_or_del(G.spawn_item(H, metadata), G.slot))
-								to_chat(H, "<span class='notice'>Equipping you with \the [thing]!</span>")
-								custom_equip_slots.Add(G.slot)
-							else
-								custom_equip_leftovers.Add(thing)
+						if(!G.slot || G.slot == slot_tie || (G.slot in loadout_taken_slots) || !G.spawn_on_mob(H, H.client.prefs.Gear()[G.display_name]))
+							spawn_in_storage.Add(G)
 						else
-							spawn_in_storage += thing
-			//Equip job items.
-			job.setup_account(H)
-			job.equip(H, H.mind ? H.mind.role_alt_title : "", H.char_branch)
-			job.apply_fingerprints(H)
+							loadout_taken_slots.Add(G.slot)
 
+			// do accessories last so they don't attach to a suit that will be replaced
 			if(H.char_rank && H.char_rank.accessory)
 				for(var/accessory_path in H.char_rank.accessory)
 					var/list/accessory_data = H.char_rank.accessory[accessory_path]
@@ -410,18 +431,7 @@ var/global/datum/controller/occupations/job_master
 					else
 						for(var/i in 1 to (isnull(accessory_data)? 1 : accessory_data))
 							H.equip_to_slot_or_del(new accessory_path(src), slot_tie)
-			//If some custom items could not be equipped before, try again now.
-			for(var/thing in custom_equip_leftovers)
-				var/datum/gear/G = gear_datums[thing]
-				if(G.slot in custom_equip_slots)
-					spawn_in_storage += thing
-				else
-					var/metadata = H.client.prefs.Gear()[G.display_name]
-					if(H.equip_to_slot_or_del(G.spawn_item(H, metadata), G.slot))
-						to_chat(H, "<span class='notice'>Equipping you with \the [thing]!</span>")
-						custom_equip_slots.Add(G.slot)
-					else
-						spawn_in_storage += thing
+
 		else
 			to_chat(H, "Your job is [rank] and the game just can't handle it! Please report this bug to an administrator.")
 
@@ -459,7 +469,7 @@ var/global/datum/controller/occupations/job_master
 			alt_title = H.mind.role_alt_title
 
 			switch(rank)
-				if("Cyborg")
+				if("Robot")
 					return H.Robotize()
 				if("AI")
 					return H
@@ -467,24 +477,9 @@ var/global/datum/controller/occupations/job_master
 					var/sound/announce_sound = (ticker.current_state <= GAME_STATE_SETTING_UP)? null : sound('sound/misc/boatswain.ogg', volume=20)
 					captain_announcement.Announce("All hands, Captain [H.real_name] on deck!", new_sound=announce_sound)
 
-			//Deferred item spawning.
-			for(var/thing in spawn_in_storage)
-				var/datum/gear/G = gear_datums[thing]
-				var/metadata = H.client.prefs.Gear()[G.display_name]
-				var/item = G.spawn_item(H, metadata)
-
-				var/atom/placed_in = H.equip_to_storage(item)
-				if(placed_in)
-					to_chat(H, "<span class='notice'>Placing \the [item] in your [placed_in.name]!</span>")
-					continue
-				if(H.equip_to_appropriate_slot(item))
-					to_chat(H, "<span class='notice'>Placing \the [item] in your inventory!</span>")
-					continue
-				if(H.put_in_hands(item))
-					to_chat(H, "<span class='notice'>Placing \the [item] in your hands!</span>")
-					continue
-				to_chat(H, "<span class='danger'>Failed to locate a storage object on your mob, either you spawned with no arms and no backpack or this is a bug.</span>")
-				qdel(item)
+		// put any loadout items that couldn't spawn into storage or on the ground
+		for(var/datum/gear/G in spawn_in_storage)
+			G.spawn_in_storage_or_drop(H, H.client.prefs.Gear()[G.display_name])
 
 		if(istype(H)) //give humans wheelchairs, if they need them.
 			var/obj/item/organ/external/l_foot = H.get_organ(BP_L_FOOT)
@@ -492,7 +487,7 @@ var/global/datum/controller/occupations/job_master
 			if(!l_foot || !r_foot)
 				var/obj/structure/bed/chair/wheelchair/W = new /obj/structure/bed/chair/wheelchair(H.loc)
 				H.buckled = W
-				H.update_canmove()
+				H.UpdateLyingBuckledAndVerbStatus()
 				W.set_dir(H.dir)
 				W.buckled_mob = H
 				W.add_fingerprint(H)
@@ -506,33 +501,6 @@ var/global/datum/controller/occupations/job_master
 
 		if(job.req_admin_notify)
 			to_chat(H, "<b>You are playing a job that is important for Game Progression. If you have to disconnect, please notify the admins via adminhelp.</b>")
-
-
-		// EMAIL GENERATION
-		var/domain
-		if(H.char_branch && H.char_branch.email_domain)
-			domain = H.char_branch.email_domain
-		else
-			domain = "freemail.nt"
-		var/sanitized_name = sanitize(replacetext(replacetext(lowertext(H.real_name), " ", "."), "'", ""))
-		var/complete_login = "[sanitized_name]@[domain]"
-
-		// It is VERY unlikely that we'll have two players, in the same round, with the same name and branch, but still, this is here.
-		// If such conflict is encountered, a random number will be appended to the email address. If this fails too, no email account will be created.
-		if(ntnet_global.does_email_exist(complete_login))
-			complete_login = "[sanitized_name][random_id(/datum/computer_file/data/email_account/, 100, 999)]@[domain]"
-
-		// If even fallback login generation failed, just don't give them an email. The chance of this happening is astronomically low.
-		if(ntnet_global.does_email_exist(complete_login))
-			to_chat(H, "You were not assigned an email address.")
-			H.mind.store_memory("You were not assigned an email address.")
-		else
-			var/datum/computer_file/data/email_account/EA = new/datum/computer_file/data/email_account()
-			EA.password = GenerateKey()
-			EA.login = 	complete_login
-			to_chat(H, "Your email account address is <b>[EA.login]</b> and the password is <b>[EA.password]</b>. This information has also been placed into your notes.")
-			H.mind.store_memory("Your email account address is [EA.login] and the password is [EA.password].")
-		// END EMAIL GENERATION
 
 		//Gives glasses to the vision impaired
 		if(H.disabilities & NEARSIGHTED)
@@ -575,7 +543,7 @@ var/global/datum/controller/occupations/job_master
 				if(!J)	continue
 				J.total_positions = text2num(value)
 				J.spawn_positions = text2num(value)
-				if(name == "AI" || name == "Cyborg")//I dont like this here but it will do for now
+				if(name == "AI" || name == "Robot")//I dont like this here but it will do for now
 					J.total_positions = 0
 
 		return 1

@@ -11,7 +11,7 @@
 	use_power = 1
 	idle_power_usage = 5
 	active_power_usage = 100
-	flags = NOREACT
+	atom_flags = ATOM_FLAG_NO_REACT
 	var/global/max_n_of_items = 999 // Sorry but the BYOND infinite loop detector doesn't look things over 1000.
 	var/icon_on = "smartfridge"
 	var/icon_off = "smartfridge-off"
@@ -124,6 +124,17 @@
 	if(istype(O,/obj/item/weapon/reagent_containers/glass) || istype(O,/obj/item/weapon/reagent_containers/food/drinks) || istype(O,/obj/item/weapon/reagent_containers/food/condiment))
 		return 1
 
+/obj/machinery/smartfridge/foods
+	name = "\improper Hot Foods Display"
+	desc = "A heated storage unit for piping hot meals."
+	icon_state = "smartfridge_food"
+	icon_on = "smartfridge_food"
+	icon_off = "smartfridge_food-off"
+
+/obj/machinery/smartfridge/foods/accept_check(var/obj/item/O as obj)
+	if(istype(O,/obj/item/weapon/reagent_containers/food/snacks) || istype(O,/obj/item/weapon/material/kitchen/utensil))
+		return 1
+
 /obj/machinery/smartfridge/drying_rack
 	name = "\improper Drying Rack"
 	desc = "A machine for drying plants."
@@ -163,8 +174,8 @@
 			if(S.dry || !I.get_specific_product(get_turf(src), S)) continue
 			if(S.dried_type == S.type)
 				S.dry = 1
-				S.name = "dried [S.name]"
-				S.color = "#aaaaaa"
+				S.SetName("dried [S.name]")
+				S.color = "#a38463"
 				stock_item(S)
 			else
 				var/D = S.dried_type
@@ -191,16 +202,16 @@
 ********************/
 
 /obj/machinery/smartfridge/attackby(var/obj/item/O as obj, var/mob/user as mob)
-	if(istype(O, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(O))
 		panel_open = !panel_open
 		user.visible_message("[user] [panel_open ? "opens" : "closes"] the maintenance panel of \the [src].", "You [panel_open ? "open" : "close"] the maintenance panel of \the [src].")
 		overlays.Cut()
 		if(panel_open)
 			overlays += image(icon, icon_panel)
-		GLOB.nanomanager.update_uis(src)
+		SSnano.update_uis(src)
 		return
 
-	if(istype(O, /obj/item/device/multitool)||istype(O, /obj/item/weapon/wirecutters))
+	if(isMultitool(O) || isWirecutter(O))
 		if(panel_open)
 			attack_hand(user)
 		return
@@ -210,7 +221,7 @@
 		return
 
 	if(accept_check(O))
-		if(!user.remove_from_mob(O))
+		if(!user.unEquip(O))
 			return
 		stock_item(O)
 		user.visible_message("<span class='notice'>\The [user] has added \the [O] to \the [src].</span>", "<span class='notice'>You add \the [O] to \the [src].</span>")
@@ -219,7 +230,7 @@
 		var/obj/item/weapon/storage/bag/P = O
 		var/plants_loaded = 0
 		for(var/obj/G in P.contents)
-			if(P.remove_from_storage(G, src) && accept_check(G))
+			if(accept_check(G) && P.remove_from_storage(G, src))
 				plants_loaded++
 				stock_item(G)
 
@@ -251,7 +262,7 @@
 
 /obj/machinery/smartfridge/proc/stock(var/datum/stored_items/I, var/obj/item/O)
 	I.add_product(O)
-	GLOB.nanomanager.update_uis(src)
+	SSnano.update_uis(src)
 
 /obj/machinery/smartfridge/attack_ai(mob/user as mob)
 	attack_hand(user)
@@ -286,7 +297,7 @@
 	if(items.len > 0)
 		data["contents"] = items
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if(!ui)
 		ui = new(user, src, ui_key, "smartfridge.tmpl", src.name, 400, 500)
 		ui.set_initial_data(data)
@@ -296,9 +307,7 @@
 	if(..()) return 0
 
 	var/mob/user = usr
-	var/datum/nanoui/ui = GLOB.nanomanager.get_open_ui(user, src, "main")
-
-	src.add_fingerprint(user)
+	var/datum/nanoui/ui = SSnano.get_open_ui(user, src, "main")
 
 	if(href_list["close"])
 		user.unset_machine()

@@ -23,7 +23,8 @@
 	possible_transfer_amounts = "5"
 	volume = 10
 	can_be_placed_into = null
-	flags = OPENCONTAINER | NOBLUDGEON
+	item_flags = ITEM_FLAG_NO_BLUDGEON
+	atom_flags = ATOM_FLAG_OPEN_CONTAINER
 	unacidable = 0
 
 	var/on_fire = 0
@@ -38,9 +39,8 @@
 	. = ..()
 
 /obj/item/weapon/reagent_containers/glass/rag/attack_self(mob/user as mob)
-	if(on_fire)
+	if(on_fire && user.unEquip(src))
 		user.visible_message("<span class='warning'>\The [user] stamps out [src].</span>", "<span class='warning'>You stamp out [src].</span>")
-		user.unEquip(src)
 		extinguish()
 	else
 		remove_contents(user)
@@ -60,11 +60,11 @@
 
 /obj/item/weapon/reagent_containers/glass/rag/proc/update_name()
 	if(on_fire)
-		name = "burning [initial(name)]"
+		SetName("burning [initial(name)]")
 	else if(reagents.total_volume)
-		name = "damp [initial(name)]"
+		SetName("damp [initial(name)]")
 	else
-		name = "dry [initial(name)]"
+		SetName("dry [initial(name)]")
 
 /obj/item/weapon/reagent_containers/glass/rag/update_icon()
 	if(on_fire)
@@ -99,9 +99,13 @@
 		user.visible_message("\The [user] starts to wipe down [A] with [src]!")
 		reagents.splash(A, 1) //get a small amount of liquid on the thing we're wiping.
 		update_name()
-		if(do_after(user,30, progress = 0))
+		if(do_after(user,30, progress = 1))
 			user.visible_message("\The [user] finishes wiping off the [A]!")
-			A.clean_blood()
+			if(isturf(A))
+				var/turf/T = A
+				T.clean(src, user)
+			else
+				A.clean_blood()
 
 /obj/item/weapon/reagent_containers/glass/rag/attack(atom/target as obj|turf|area, mob/user as mob , flag)
 	if(isliving(target))
@@ -178,7 +182,7 @@
 		return
 
 	START_PROCESSING(SSobj, src)
-	set_light(2, null, "#e38f46")
+	set_light(0.5, 0.1, 2, 2, "#e38f46")
 	on_fire = 1
 	update_name()
 	update_icon()

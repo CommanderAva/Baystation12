@@ -3,6 +3,7 @@
 	filedesc = "NTOS File Manager"
 	extended_desc = "This program allows management of files."
 	program_icon_state = "generic"
+	program_key_state = "generic_key"
 	program_menu_icon = "folder-collapsed"
 	size = 8
 	requires_ntnet = 0
@@ -11,6 +12,7 @@
 	nanomodule_path = /datum/nano_module/program/computer_filemanager/
 	var/open_file
 	var/error
+	usage_flags = PROGRAM_ALL
 
 /datum/computer_file/program/filemanager/Topic(href, href_list)
 	if(..())
@@ -144,7 +146,7 @@
 		var/datum/computer_file/C = F.clone(0)
 		HDD.store_file(C)
 	if(.)
-		GLOB.nanomanager.update_uis(NM)
+		SSnano.update_uis(NM)
 
 /datum/nano_module/program/computer_filemanager
 	name = "NTOS File Manager"
@@ -198,7 +200,7 @@
 					)))
 				data["usbfiles"] = usbfiles
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "file_manager.tmpl", "NTOS File Manager", 575, 700, state = state)
 		ui.auto_update_layout = 1

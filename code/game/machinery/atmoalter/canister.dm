@@ -4,7 +4,7 @@
 	icon_state = "yellow"
 	density = 1
 	var/health = 100.0
-	flags = CONDUCT
+	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	w_class = ITEM_SIZE_GARGANTUAN
 
 	var/valve_open = 0
@@ -51,10 +51,9 @@
 
 /obj/machinery/portable_atmospherics/canister/hydrogen
 	name = "\improper Canister: \[Hydrogen\]"
-	icon_state = "red"
-	canister_color = "red"
+	icon_state = "purple"
+	canister_color = "purple"
 	can_label = 0
-
 
 /obj/machinery/portable_atmospherics/canister/phoron
 	name = "\improper Canister \[Phoron\]"
@@ -106,6 +105,9 @@
 /obj/machinery/portable_atmospherics/canister/empty/sleeping_agent
 	icon_state = "redws"
 	canister_type = /obj/machinery/portable_atmospherics/canister/sleeping_agent
+/obj/machinery/portable_atmospherics/canister/empty/hydrogen
+	icon_state = "purple"
+	canister_type = /obj/machinery/portable_atmospherics/canister/hydrogen
 
 
 
@@ -118,7 +120,7 @@
 	if(connected_port)
 		update_flag |= 2
 
-	var/tank_pressure = air_contents.return_pressure()
+	var/tank_pressure = return_pressure()
 	if(tank_pressure < 10)
 		update_flag |= 4
 	else if(tank_pressure < ONE_ATMOSPHERE)
@@ -250,10 +252,9 @@ update_flag
 	..()
 
 /obj/machinery/portable_atmospherics/canister/attackby(var/obj/item/weapon/W as obj, var/mob/user as mob)
-	if(!istype(W, /obj/item/weapon/wrench) && !istype(W, /obj/item/weapon/tank) && !istype(W, /obj/item/device/analyzer) && !istype(W, /obj/item/device/pda))
+	if(!isWrench(W) && !istype(W, /obj/item/weapon/tank) && !istype(W, /obj/item/device/analyzer) && !istype(W, /obj/item/modular_computer/pda))
 		visible_message("<span class='warning'>\The [user] hits \the [src] with \a [W]!</span>")
 		src.health -= W.force
-		src.add_fingerprint(user)
 		healthcheck()
 
 	if(istype(user, /mob/living/silicon/robot) && istype(W, /obj/item/weapon/tank/jetpack))
@@ -271,7 +272,7 @@ update_flag
 
 	..()
 
-	GLOB.nanomanager.update_uis(src) // Update all NanoUIs attached to src
+	SSnano.update_uis(src) // Update all NanoUIs attached to src
 
 /obj/machinery/portable_atmospherics/canister/attack_ai(var/mob/user as mob)
 	ui_interact(user)
@@ -295,44 +296,41 @@ update_flag
 	if (holding)
 		data["holdingTank"] = list("name" = holding.name, "tankPressure" = round(holding.air_contents.return_pressure()))
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "canister.tmpl", "Canister", 480, 400)
 		ui.set_initial_data(data)
 		ui.open()
 		ui.set_auto_update(1)
 
-/obj/machinery/portable_atmospherics/canister/Topic(href, href_list)
-
-	if(..())
-		return 1
-	else if(href_list["toggle"])
+/obj/machinery/portable_atmospherics/canister/OnTopic(var/mob/user, href_list, state)
+	if(href_list["toggle"])
 		if (valve_open)
 			if (holding)
-				release_log += "Valve was <b>closed</b> by [usr] ([usr.ckey]), stopping the transfer into the [holding]<br>"
+				release_log += "Valve was <b>closed</b> by [user] ([user.ckey]), stopping the transfer into the [holding]<br>"
 			else
-				release_log += "Valve was <b>closed</b> by [usr] ([usr.ckey]), stopping the transfer into the <font color='red'><b>air</b></font><br>"
+				release_log += "Valve was <b>closed</b> by [user] ([user.ckey]), stopping the transfer into the <font color='red'><b>air</b></font><br>"
 		else
 			if (holding)
-				release_log += "Valve was <b>opened</b> by [usr] ([usr.ckey]), starting the transfer into the [holding]<br>"
+				release_log += "Valve was <b>opened</b> by [user] ([user.ckey]), starting the transfer into the [holding]<br>"
 			else
-				release_log += "Valve was <b>opened</b> by [usr] ([usr.ckey]), starting the transfer into the <font color='red'><b>air</b></font><br>"
+				release_log += "Valve was <b>opened</b> by [user] ([user.ckey]), starting the transfer into the <font color='red'><b>air</b></font><br>"
 				log_open()
 		valve_open = !valve_open
-		. = 1
+		. = TOPIC_REFRESH
 
 	else if (href_list["remove_tank"])
 		if(!holding)
-			return 0
+			return TOPIC_HANDLED
 		if (valve_open)
 			valve_open = 0
-			release_log += "Valve was <b>closed</b> by [usr] ([usr.ckey]), stopping the transfer into the [holding]<br>"
+			release_log += "Valve was <b>closed</b> by [user] ([user.ckey]), stopping the transfer into the [holding]<br>"
 		if(istype(holding, /obj/item/weapon/tank))
-			holding.manipulated_by = usr.real_name
-		holding.forceMove(get_turf(src))
+			holding.manipulated_by = user.real_name
+		holding.dropInto(loc)
 		holding = null
 		update_icon()
-		. = 1
+		. = TOPIC_REFRESH
 
 	else if (href_list["pressure_adj"])
 		var/diff = text2num(href_list["pressure_adj"])
@@ -340,7 +338,7 @@ update_flag
 			release_pressure = min(10*ONE_ATMOSPHERE, release_pressure+diff)
 		else
 			release_pressure = max(ONE_ATMOSPHERE/10, release_pressure+diff)
-		. = 1
+		. = TOPIC_REFRESH
 
 	else if (href_list["relabel"])
 		if (!can_label)
@@ -351,16 +349,17 @@ update_flag
 			"\[O2\]" = "blue", \
 			"\[Phoron\]" = "orange", \
 			"\[CO2\]" = "black", \
+			"\[H2\]" = "purple", \
 			"\[Air\]" = "grey", \
 			"\[CAUTION\]" = "yellow", \
 		)
-		var/label = input("Choose canister label", "Gas canister") as null|anything in colors
-		if (label)
+		var/label = input(user, "Choose canister label", "Gas canister") as null|anything in colors
+		if (label && CanUseTopic(user, state))
 			canister_color = colors[label]
 			icon_state = colors[label]
-			name = "\improper Canister: [label]"
+			SetName("\improper Canister: [label]")
 		update_icon()
-		. = 1
+		. = TOPIC_REFRESH
 
 /obj/machinery/portable_atmospherics/canister/CanUseTopic()
 	if(destroyed)
@@ -460,3 +459,43 @@ update_flag
 	src.air_contents.adjust_gas("phoron", MolesForPressure())
 	src.update_icon()
 	return 1
+
+/obj/machinery/portable_atmospherics/canister/hydrogen/engine_setup/New()
+	..()
+	src.air_contents.adjust_gas("hydrogen", MolesForPressure())
+	src.update_icon()
+
+// Spawn debug tanks.
+/obj/machinery/portable_atmospherics/canister/helium
+	name = "\improper Canister \[He\]"
+	icon_state = "black"
+	canister_color = "black"
+	can_label = 0
+
+/obj/machinery/portable_atmospherics/canister/helium/New()
+	..()
+	air_contents.adjust_gas("helium", MolesForPressure())
+	update_icon()
+
+/obj/machinery/portable_atmospherics/canister/methyl_bromide
+	name = "\improper Canister \[CH3Br\]"
+	icon_state = "black"
+	canister_color = "black"
+	can_label = 0
+
+/obj/machinery/portable_atmospherics/canister/methyl_bromide/New()
+	..()
+	air_contents.adjust_gas("methyl_bromide", MolesForPressure())
+	update_icon()
+
+/obj/machinery/portable_atmospherics/canister/chlorine
+	name = "\improper Canister \[Cl\]"
+	icon_state = "black"
+	canister_color = "black"
+	can_label = 0
+
+/obj/machinery/portable_atmospherics/canister/chlorine/New()
+	..()
+	air_contents.adjust_gas("chlorine", MolesForPressure())
+	update_icon()
+// End debug tanks.

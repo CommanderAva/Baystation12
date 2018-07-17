@@ -39,7 +39,7 @@
 	var/spawn_object = null
 
 /obj/random/single/spawn_choices()
-	return list(ispath(spawn_object) ? spawn_object : text2path(spawn_object))
+	return list(spawn_object)
 
 /obj/random/tool
 	name = "random tool"
@@ -117,7 +117,7 @@
 /obj/random/tech_supply/spawn_choices()
 	return list(/obj/random/powercell = 3,
 				/obj/random/technology_scanner = 2,
-				/obj/item/weapon/packageWrap = 1,
+				/obj/item/stack/package_wrap/twenty_five = 1,
 				/obj/item/weapon/hand_labeler = 1,
 				/obj/random/bomb_supply = 2,
 				/obj/item/weapon/extinguisher = 1,
@@ -170,7 +170,12 @@
 				/obj/item/bodybag/cryobag = 1,
 				/obj/item/weapon/reagent_containers/hypospray/autoinjector = 3,
 				/obj/item/weapon/storage/pill_bottle/kelotane = 2,
-				/obj/item/weapon/storage/pill_bottle/antitox = 2)
+				/obj/item/weapon/storage/pill_bottle/antitox = 2,
+				/obj/item/weapon/storage/med_pouch/trauma = 2,
+				/obj/item/weapon/storage/med_pouch/burn = 2,
+				/obj/item/weapon/storage/med_pouch/toxin = 2,
+				/obj/item/weapon/storage/med_pouch/radiation = 2,
+				/obj/item/weapon/storage/med_pouch/oxyloss = 2)
 
 /obj/random/firstaid
 	name = "Random First Aid Kit"
@@ -180,8 +185,10 @@
 
 /obj/random/firstaid/spawn_choices()
 	return list(/obj/item/weapon/storage/firstaid/regular = 4,
+				/obj/item/weapon/storage/firstaid/trauma = 3,
 				/obj/item/weapon/storage/firstaid/toxin = 3,
 				/obj/item/weapon/storage/firstaid/o2 = 3,
+				/obj/item/weapon/storage/firstaid/stab = 2,
 				/obj/item/weapon/storage/firstaid/adv = 2,
 				/obj/item/weapon/storage/firstaid/combat = 1,
 				/obj/item/weapon/storage/firstaid/empty = 2,
@@ -268,6 +275,7 @@
 				/obj/item/weapon/gun/projectile/automatic/c20r = 2,
 				/obj/item/weapon/gun/projectile/automatic/sts35 = 2,
 				/obj/item/weapon/gun/projectile/automatic/z8 = 2,
+				/obj/item/weapon/gun/projectile/beretta = 4,
 				/obj/item/weapon/gun/projectile/colt = 4,
 				/obj/item/weapon/gun/projectile/sec = 4,
 				/obj/item/weapon/gun/projectile/sec/wood = 3,
@@ -291,6 +299,7 @@
 /obj/random/handgun/spawn_choices()
 	return list(/obj/item/weapon/gun/projectile/sec = 3,
 				/obj/item/weapon/gun/energy/gun = 2,
+				/obj/item/weapon/gun/projectile/beretta = 2,
 				/obj/item/weapon/gun/projectile/colt = 2,
 				/obj/item/weapon/gun/projectile/pistol = 2,
 				/obj/item/weapon/gun/energy/retro = 1,
@@ -424,7 +433,6 @@ obj/random/closet //A couple of random closets to spice up maint
 obj/random/closet/spawn_choices()
 	return list(/obj/structure/closet,
 				/obj/structure/closet/firecloset,
-				/obj/structure/closet/firecloset/full,
 				/obj/structure/closet/emcloset,
 				/obj/structure/closet/jcloset,
 				/obj/structure/closet/athletic_mixed,
@@ -601,11 +609,13 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/weapon/handcuffs,
 				/obj/item/weapon/camera_assembly,
 				/obj/item/device/camera,
-				/obj/item/device/pda,
+				/obj/item/modular_computer/pda,
 				/obj/item/weapon/card/emag_broken,
 				/obj/item/device/radio/headset,
-				/obj/item/device/flashlight/glowstick/yellow,
-				/obj/item/device/flashlight/glowstick/orange)
+				/obj/item/device/flashlight/flare/glowstick/yellow,
+				/obj/item/device/flashlight/flare/glowstick/orange,
+				/obj/item/weapon/grenade/light,
+				/obj/item/device/oxycandle)
 
 /obj/random/smokes
 	name = "random smokeable"
@@ -706,8 +716,8 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/weapon/storage/belt/utility/full = 2,
 				/obj/item/weapon/storage/belt/medical/emt = 2,
 				/obj/item/weapon/storage/belt/medical = 2,
-				/obj/item/weapon/storage/belt/security = 2,
-				/obj/item/weapon/storage/belt/security/tactical = 1)
+				/obj/item/weapon/storage/belt/holster/security = 2,
+				/obj/item/weapon/storage/belt/holster/security/tactical = 1)
 
 /obj/random/shoes
 	name = "random footwear"
@@ -798,33 +808,6 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/clothing/head/ushanka = 3,
 				/obj/item/clothing/head/welding = 2)
 
-/obj/random/solgov
-	name = "random solgov equipment"
-	desc = "This is a random piece of solgov equipment or clothing."
-	icon = 'icons/obj/clothing/hats.dmi'
-	icon_state = "helmet_sol"
-
-/obj/random/solgov/spawn_choices()
-	return list(/obj/item/clothing/head/utility/fleet = 4,
-				/obj/item/clothing/head/utility/marine = 4,
-				/obj/item/clothing/head/utility/marine/tan = 3,
-				/obj/item/clothing/head/utility/marine/urban = 3,
-				/obj/item/clothing/head/soft/sol/expedition = 2,
-				/obj/item/clothing/head/soft/sol/fleet = 4,
-				/obj/item/clothing/head/helmet/solgov = 1,
-				/obj/item/clothing/suit/armor/vest/solgov = 2,
-				/obj/item/clothing/suit/storage/vest/solgov = 1,
-				/obj/item/clothing/suit/storage/service/expeditionary = 4,
-				/obj/item/clothing/under/utility/marine/tan = 2,
-				/obj/item/clothing/under/utility/marine/urban = 2,
-				/obj/item/clothing/under/utility/marine = 3,
-				/obj/item/clothing/under/utility = 5,
-				/obj/item/clothing/under/utility/fleet = 3,
-				/obj/item/clothing/under/pt/expeditionary = 4,
-				/obj/item/clothing/under/pt/marine = 2,
-				/obj/item/clothing/under/pt/fleet = 4,
-				/obj/item/clothing/accessory/armband/bluegold = 3)
-
 /obj/random/suit
 	name = "random suit"
 	desc = "This is a random piece of outerwear."
@@ -859,7 +842,6 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/clothing/under/syndicate/combat = 1,
 				/obj/item/clothing/under/hazard = 4,
 				/obj/item/clothing/under/sterile = 4,
-				/obj/item/clothing/under/pt = 1,
 				/obj/item/clothing/under/casual_pants/camo = 2,
 				/obj/item/clothing/under/frontier = 2,
 				/obj/item/clothing/under/harness = 2,
@@ -881,10 +863,10 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/clothing/accessory/storage/brown_vest = 2,
 				/obj/item/clothing/accessory/storage/white_vest = 2,
 				/obj/item/clothing/accessory/storage/bandolier = 1,
-				/obj/item/clothing/accessory/holster/thigh = 1,
-				/obj/item/clothing/accessory/holster/hip = 1,
-				/obj/item/clothing/accessory/holster/waist = 1,
-				/obj/item/clothing/accessory/holster/armpit = 1,
+				/obj/item/clothing/accessory/storage/holster/thigh = 1,
+				/obj/item/clothing/accessory/storage/holster/hip = 1,
+				/obj/item/clothing/accessory/storage/holster/waist = 1,
+				/obj/item/clothing/accessory/storage/holster/armpit = 1,
 				/obj/item/clothing/accessory/kneepads = 3,
 				/obj/item/clothing/accessory/stethoscope = 2)
 
@@ -901,27 +883,6 @@ obj/random/obstruction/spawn_choices()
 				/obj/item/weapon/spacecash/bundle/c50 = 2,
 				/obj/item/weapon/spacecash/bundle/c100 = 2,
 				/obj/item/weapon/spacecash/bundle/c1000 = 1)
-
-/obj/random/maintenance/solgov //can be used for loot on non-torch maps, so not a torch item
-	name = "random maintenance item"
-	desc = "This is a random maintenance item."
-	icon = 'icons/obj/items.dmi'
-	icon_state = "gift1"
-
-/obj/random/maintenance/solgov/spawn_choices()
-	return list(/obj/random/junk = 4,
-				/obj/random/trash = 4,
-				/obj/random/maintenance/solgov/clean = 5)
-
-/obj/random/maintenance/solgov/clean
-	name = "random maintenance item"
-	desc = "This is a random maintenance item."
-	icon = 'icons/obj/items.dmi'
-	icon_state = "gift2"
-
-/obj/random/maintenance/solgov/clean/spawn_choices()
-	return list(/obj/random/solgov = 3,
-				/obj/random/maintenance/clean = 800)
 
 /obj/random/maintenance //Clutter and loot for maintenance and away missions
 	name = "random maintenance item"
@@ -1096,7 +1057,8 @@ something, make sure it's not in one of the other lists.*/
 obj/random/hostile/spawn_choices()
 	return list(/mob/living/simple_animal/hostile/viscerator,
 				/mob/living/simple_animal/hostile/carp,
-				/mob/living/simple_animal/hostile/carp/pike)
+				/mob/living/simple_animal/hostile/carp/pike,
+				/mob/living/simple_animal/hostile/vagrant/swarm)
 
 /*
 	Selects one spawn point out of a group of points with the same ID and asks it to generate its items

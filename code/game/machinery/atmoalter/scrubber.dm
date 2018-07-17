@@ -64,7 +64,7 @@
 
 	var/power_draw = -1
 
-	if(on && cell && cell.charge)
+	if(on && ( powered() || (cell && cell.charge) ) )
 		var/datum/gas_mixture/environment
 		if(holding)
 			environment = holding.air_contents
@@ -80,13 +80,16 @@
 		last_power_draw = 0
 	else
 		power_draw = max(power_draw, power_losses)
-		cell.use(power_draw * CELLRATE)
+		if(!powered())
+			cell.use(power_draw * CELLRATE)
+		else
+			use_power(power_draw)
 		last_power_draw = power_draw
 
 		update_connected_network()
 
 		//ran out of charge
-		if (!cell.charge)
+		if (!cell.charge && !powered())
 			power_change()
 			update_icon()
 
@@ -120,7 +123,7 @@
 	if (holding)
 		data["holdingTank"] = list("name" = holding.name, "tankPressure" = round(holding.air_contents.return_pressure() > 0 ? holding.air_contents.return_pressure() : 0))
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "portscrubber.tmpl", "Portable Scrubber", 480, 400, state = GLOB.physical_state)
 		ui.set_initial_data(data)
@@ -128,23 +131,22 @@
 		ui.set_auto_update(1)
 
 
-/obj/machinery/portable_atmospherics/powered/scrubber/Topic(href, href_list)
-	if(..())
-		return 1
-
+/obj/machinery/portable_atmospherics/powered/scrubber/OnTopic(user, href_list)
 	if(href_list["power"])
 		on = !on
-		. = 1
+		. = TOPIC_REFRESH
 	if (href_list["remove_tank"])
 		if(holding)
 			holding.dropInto(loc)
 			holding = null
-		. = 1
+		. = TOPIC_REFRESH
 	if (href_list["volume_adj"])
 		var/diff = text2num(href_list["volume_adj"])
 		volume_rate = Clamp(volume_rate+diff, minrate, maxrate)
-		. = 1
-	update_icon()
+		. = TOPIC_REFRESH
+
+	if(.)
+		update_icon()
 
 
 //Huge scrubber
@@ -211,7 +213,7 @@
 		update_connected_network()
 
 /obj/machinery/portable_atmospherics/powered/scrubber/huge/attackby(var/obj/item/I as obj, var/mob/user as mob)
-	if(istype(I, /obj/item/weapon/wrench))
+	if(isWrench(I))
 		if(on)
 			to_chat(user, "<span class='warning'>Turn \the [src] off first!</span>")
 			return
@@ -225,7 +227,7 @@
 	//doesn't use power cells
 	if(istype(I, /obj/item/weapon/cell))
 		return
-	if (istype(I, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(I))
 		return
 
 	//doesn't hold tanks
@@ -239,7 +241,7 @@
 	name = "Stationary Air Scrubber"
 
 /obj/machinery/portable_atmospherics/powered/scrubber/huge/stationary/attackby(var/obj/item/I as obj, var/mob/user as mob)
-	if(istype(I, /obj/item/weapon/wrench))
+	if(isWrench(I))
 		to_chat(user, "<span class='warning'>The bolts are too tight for you to unscrew!</span>")
 		return
 

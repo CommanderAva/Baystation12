@@ -262,13 +262,13 @@ obj/machinery/access_button/update_icon()
 
 obj/machinery/access_button/attackby(obj/item/I as obj, mob/user as mob)
 	//Swiping ID on the access button
-	if (istype(I, /obj/item/weapon/card/id) || istype(I, /obj/item/device/pda))
+	if (istype(I, /obj/item/weapon/card/id) || istype(I, /obj/item/modular_computer))
 		attack_hand(user)
 		return
 	..()
 
 obj/machinery/access_button/attack_hand(mob/user)
-	add_fingerprint(usr)
+	..()
 	if(!allowed(user))
 		to_chat(user, "<span class='warning'>Access Denied</span>")
 

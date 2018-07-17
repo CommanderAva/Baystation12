@@ -25,6 +25,12 @@
 	dummy_terminals.Cut()
 	return ..()
 
+/obj/machinery/embedded_controller/radio/airlock/CanUseTopic(var/mob/user)
+	if(!allowed(user))
+		return min(STATUS_UPDATE, ..())
+	else
+		return ..()
+
 //Advanced airlock controller for when you want a more versatile airlock controller - useful for turning simple access control rooms into airlocks
 /obj/machinery/embedded_controller/radio/airlock/advanced_airlock_controller
 	name = "Advanced Airlock Controller"
@@ -41,7 +47,7 @@
 		"secure" = program.memory["secure"]
 	)
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 
 	if (!ui)
 		ui = new(user, src, ui_key, "advanced_airlock_console.tmpl", name, 470, 290, state = state)
@@ -57,7 +63,6 @@
 		return
 
 	usr.set_machine(src)
-	src.add_fingerprint(usr)
 
 	var/clean = 0
 	switch(href_list["command"])	//anti-HTML-hacking checks
@@ -97,7 +102,7 @@
 		"processing" = program.memory["processing"],
 	)
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 
 	if (!ui)
 		ui = new(user, src, ui_key, "simple_airlock_console.tmpl", name, 470, 290, state = state)
@@ -113,7 +118,6 @@
 		return
 
 	usr.set_machine(src)
-	src.add_fingerprint(usr)
 
 	var/clean = 0
 	switch(href_list["command"])	//anti-HTML-hacking checks
@@ -161,7 +165,7 @@
 		"processing" = program.memory["processing"]
 	)
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 
 	if (!ui)
 		ui = new(user, src, ui_key, "door_access_console.tmpl", name, 330, 220, state = state)
@@ -177,7 +181,6 @@
 		return
 
 	usr.set_machine(src)
-	src.add_fingerprint(usr)
 
 	var/clean = 0
 	switch(href_list["command"])	//anti-HTML-hacking checks

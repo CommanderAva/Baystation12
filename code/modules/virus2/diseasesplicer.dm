@@ -13,18 +13,16 @@
 	var/scanning = 0
 
 /obj/machinery/computer/diseasesplicer/attackby(var/obj/I as obj, var/mob/user as mob)
-	if(istype(I, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(I))
 		return ..(I,user)
 
 	if(istype(I,/obj/item/weapon/virusdish))
-		var/mob/living/carbon/c = user
 		if (dish)
 			to_chat(user, "\The [src] is already loaded.")
 			return
-
+		if(!user.unEquip(I, src))
+			return
 		dish = I
-		c.drop_item()
-		I.loc = src
 
 	if(istype(I,/obj/item/weapon/diseasedisk))
 		to_chat(user, "You upload the contents of the disk onto the buffer.")
@@ -80,7 +78,7 @@
 	else
 		data["info"] = "No dish loaded."
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "disease_splicer.tmpl", src.name, 400, 600)
 		ui.set_initial_data(data)
@@ -94,12 +92,12 @@
 		scanning -= 1
 		if(!scanning)
 			ping("\The [src] pings, \"Analysis complete.\"")
-			GLOB.nanomanager.update_uis(src)
+			SSnano.update_uis(src)
 	if(splicing)
 		splicing -= 1
 		if(!splicing)
 			ping("\The [src] pings, \"Splicing operation complete.\"")
-			GLOB.nanomanager.update_uis(src)
+			SSnano.update_uis(src)
 	if(burning)
 		burning -= 1
 		if(!burning)
@@ -107,34 +105,30 @@
 			d.analysed = analysed
 			if(analysed)
 				if (memorybank)
-					d.name = "[memorybank.name] GNA disk (Stage: [memorybank.stage])"
+					d.SetName("[memorybank.name] GNA disk (Stage: [memorybank.stage])")
 					d.effect = memorybank
 				else if (species_buffer)
-					d.name = "[jointext(species_buffer, ", ")] GNA disk"
+					d.SetName("[jointext(species_buffer, ", ")] GNA disk")
 					d.species = species_buffer
 			else
 				if (memorybank)
-					d.name = "Unknown GNA disk (Stage: [memorybank.stage])"
+					d.SetName("Unknown GNA disk (Stage: [memorybank.stage])")
 					d.effect = memorybank
 				else if (species_buffer)
-					d.name = "Unknown Species GNA disk"
+					d.SetName("Unknown Species GNA disk")
 					d.species = species_buffer
 
 			ping("\The [src] pings, \"Backup disk saved.\"")
-			GLOB.nanomanager.update_uis(src)
+			SSnano.update_uis(src)
 
-/obj/machinery/computer/diseasesplicer/Topic(href, href_list)
-	if(..()) return 1
+	if((scanning || splicing || burning) && dish && dish.virus2)
+		infect_nearby(dish.virus2, 40, SKILL_PROF)
 
-	var/mob/user = usr
-	var/datum/nanoui/ui = GLOB.nanomanager.get_open_ui(user, src, "main")
-
-	src.add_fingerprint(user)
-
+/obj/machinery/computer/diseasesplicer/OnTopic(mob/user, href_list)
+	operator_skill = user.get_skill_value(core_skill)
 	if (href_list["close"])
-		user.unset_machine()
-		ui.close()
-		return 0
+		SSnano.close_user_uis(user, src, "main")
+		return TOPIC_HANDLED
 
 	if (href_list["grab"])
 		if (dish)
@@ -143,7 +137,7 @@
 			analysed = dish.analysed
 			dish = null
 			scanning = 10
-		return 1
+		return TOPIC_REFRESH
 
 	if (href_list["affected_species"])
 		if (dish)
@@ -152,13 +146,13 @@
 			analysed = dish.analysed
 			dish = null
 			scanning = 10
-		return 1
+		return TOPIC_REFRESH
 
 	if(href_list["eject"])
 		if (dish)
-			dish.loc = src.loc
+			dish.dropInto(loc)
 			dish = null
-		return 1
+		return TOPIC_REFRESH
 
 	if(href_list["splice"])
 		if(dish)
@@ -185,14 +179,12 @@
 				dish.virus2.affected_species = species_buffer
 
 			else
-				return
+				return TOPIC_HANDLED
 
 			splicing = 10
 			dish.virus2.uniqueID = rand(0,10000)
-		return 1
+		return TOPIC_REFRESH
 
 	if(href_list["disk"])
 		burning = 10
-		return 1
-
-	return 0
+		return TOPIC_REFRESH

@@ -15,6 +15,7 @@
 	var/unbreakable
 	var/force_divisor = 0.5
 	var/thrown_force_divisor = 0.5
+	var/attack_cooldown_modifier
 	var/default_material = DEFAULT_WALL_MATERIAL
 	var/material/material
 	var/drops_debris = 1
@@ -44,6 +45,7 @@
 		force = material.get_blunt_damage()
 	force = round(force*force_divisor)
 	throwforce = round(material.get_blunt_damage()*thrown_force_divisor)
+	attack_cooldown = material.get_attack_cooldown() + attack_cooldown_modifier
 	//spawn(1)
 //		log_debug("[src] has force [force] and throwforce [throwforce] when made from default material [material.name]")
 
@@ -53,16 +55,16 @@
 	if(!material)
 		qdel(src)
 	else
-		name = "[material.display_name] [initial(name)]"
+		SetName("[material.display_name] [initial(name)]")
 		health = round(material.integrity/10)
 		if(applies_material_colour)
 			color = material.icon_colour
 		if(material.products_need_process())
 			START_PROCESSING(SSobj, src)
 		if(material.conductive)
-			flags |= CONDUCT
+			obj_flags |= OBJ_FLAG_CONDUCTIBLE
 		else
-			flags &= (~CONDUCT)
+			obj_flags &= (~OBJ_FLAG_CONDUCTIBLE)
 		update_force()
 
 /obj/item/weapon/material/Destroy()
@@ -86,11 +88,9 @@
 /obj/item/weapon/material/proc/shatter(var/consumed)
 	var/turf/T = get_turf(src)
 	T.visible_message("<span class='danger'>\The [src] [material.destruction_desc]!</span>")
-	if(istype(loc, /mob/living))
-		var/mob/living/M = loc
-		M.drop_from_inventory(src)
 	playsound(src, "shatter", 70, 1)
-	if(!consumed && drops_debris) material.place_shard(T)
+	if(!consumed && drops_debris)
+		material.place_shard(T)
 	qdel(src)
 /*
 Commenting this out pending rebalancing of radiation based on small objects.

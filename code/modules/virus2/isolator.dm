@@ -29,18 +29,15 @@
 
 /obj/machinery/disease2/isolator/attackby(var/obj/O as obj, var/mob/user)
 	if(!istype(O,/obj/item/weapon/reagent_containers/syringe)) return
-	var/obj/item/weapon/reagent_containers/syringe/S = O
-
 	if(sample)
 		to_chat(user, "\The [src] is already loaded.")
 		return
-
-	sample = S
-	user.drop_item()
-	S.loc = src
+	if(!user.unEquip(O, src))
+		return
+	sample = O
 
 	user.visible_message("[user] adds \a [O] to \the [src]!", "You add \a [O] to \the [src]!")
-	GLOB.nanomanager.update_uis(src)
+	SSnano.update_uis(src)
 	update_icon()
 
 	src.attack_hand(user)
@@ -101,7 +98,7 @@
 					"name" = entry.fields["name"], \
 					"description" = replacetext(desc, "\n", ""))
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "pathogenic_isolator.tmpl", src.name, 400, 500)
 		ui.set_initial_data(data)
@@ -110,6 +107,8 @@
 /obj/machinery/disease2/isolator/Process()
 	if (isolating > 0)
 		isolating -= 1
+		if(virus2)
+			infect_nearby(virus2)
 		if (isolating == 0)
 			if (virus2)
 				var/obj/item/weapon/virusdish/d = new /obj/item/weapon/virusdish(src.loc)
@@ -117,56 +116,49 @@
 				virus2 = null
 				ping("\The [src] pings, \"Viral strain isolated.\"")
 
-			GLOB.nanomanager.update_uis(src)
+			SSnano.update_uis(src)
 			update_icon()
 
-/obj/machinery/disease2/isolator/Topic(href, href_list)
-	if (..()) return 1
-
-	var/mob/user = usr
-	var/datum/nanoui/ui = GLOB.nanomanager.get_open_ui(user, src, "main")
-
-	src.add_fingerprint(user)
-
+/obj/machinery/disease2/isolator/OnTopic(mob/user, href_list)
 	if (href_list["close"])
-		user.unset_machine()
-		ui.close()
-		return 0
+		SSnano.close_user_uis(user, src, "main")
+		return TOPIC_HANDLED
 
 	if (href_list[HOME])
 		state = HOME
-		return 1
+		return TOPIC_REFRESH
 
 	if (href_list[LIST])
 		state = LIST
-		return 1
+		return TOPIC_REFRESH
 
 	if (href_list[ENTRY])
 		if (istype(locate(href_list["view"]), /datum/computer_file/data/virus_record))
 			entry = locate(href_list["view"])
 
 		state = ENTRY
-		return 1
+		return TOPIC_REFRESH
 
 	if (href_list["print"])
 		print(user)
-		return 1
+		return TOPIC_REFRESH
 
-	if(!sample) return 1
+	if(!sample) return TOPIC_HANDLED
 
 	if (href_list["isolate"])
+		operator_skill = user.get_skill_value(core_skill)
 		var/datum/disease2/disease/V = locate(href_list["isolate"])
 		if (V)
 			virus2 = V
 			isolating = 20
 			update_icon()
-		return 1
+		return TOPIC_REFRESH
 
 	if (href_list["eject"])
-		sample.loc = src.loc
+		sample.dropInto(loc)
 		sample = null
 		update_icon()
-		return 1
+		return TOPIC_REFRESH
 
 /obj/machinery/disease2/isolator/proc/print(var/mob/user)
 	var/obj/item/weapon/paper/P = new /obj/item/weapon/paper(loc)
@@ -174,7 +166,7 @@
 	switch (state)
 		if (HOME)
 			if (!sample) return
-			P.name = "paper - Patient Diagnostic Report"
+			P.SetName("paper - Patient Diagnostic Report")
 			P.info = {"
 				[virology_letterhead("Patient Diagnostic Report")]
 				<center><small><font color='red'><b>CONFIDENTIAL MEDICAL REPORT</b></font></small></center><br>
@@ -206,7 +198,7 @@
 "}
 
 		if (LIST)
-			P.name = "paper - Virus List"
+			P.SetName("paper - Virus List")
 			P.info = {"
 				[virology_letterhead("Virus List")]
 "}
@@ -224,7 +216,7 @@
 "}
 
 		if (ENTRY)
-			P.name = "paper - Viral Profile"
+			P.SetName("paper - Viral Profile")
 			P.info = {"
 				[virology_letterhead("Viral Profile")]
 				[entry.fields["description"]]

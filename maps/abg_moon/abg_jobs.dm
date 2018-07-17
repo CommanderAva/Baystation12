@@ -1,60 +1,94 @@
-/datum/map/overmap_example
-/*
-	allowed_jobs = list(/datum/job/ussr_captain, /datum/job/soviet_crew, /datum/job/soviet_doctor, /datum/job/soviet_marine, /datum/job/usmc_captain, /datum/job/usmc_marine, /datum/job/usmc_medic)
-	species_to_job_whitelist = list(
-		/datum/species/vox = list(/datum/job/assistant)
-	)
+/datum/map/abg
+	allowed_jobs = list(/datum/job/serbian_kapitan, /datum/job/serbian_sergeant, /datum/job/serbian_soldier, /datum/job/serbian_doctor,
+	/datum/job/usmc_sergeant, /datum/job/usmc_captain, /datum/job/usmc_marine, /datum/job/usmc_medic)
+	species_to_job_whitelist = list()
 
-/datum/job/ussr_kapitan
-	supervisors = "the SSSR Kosmichesky Kod and soviet admirality"
-	outfit_type = /decl/hierarchy/outfit/job/abg/kapitan
-	minimal_player_age = 25
-	ideal_character_age = 40
+/datum/map/abg/setup_map()
+	..()
+	for(var/job_type in GLOB.using_map.allowed_jobs)
+		var/datum/job/job = decls_repository.get_decl(job_type)
+		// Most species are restricted from SCG security and command roles
+		if((job.department_flag & (COM)) && job.allowed_branches.len)
+			for(var/species_name in list(SPECIES_IPC, SPECIES_TAJARA, SPECIES_SKRELL, SPECIES_UNATHI))
+				var/datum/species/S = all_species[species_name]
+				var/species_blacklist = species_to_job_blacklist[S.type]
+				if(!species_blacklist)
+					species_blacklist = list()
+					species_to_job_blacklist[S.type] = species_blacklist
+				species_blacklist |= job.type
+
+/datum/job/serbian_kapitan
+	title = "Srbski Komandant"
+	total_positions = 1
+	spawn_positions = 1
+	supervisors = "the USSR Kosmichesky Kod and serbian admirality"
+	outfit_type = /decl/hierarchy/mil_uniform/serb
+	minimal_player_age = 22
+	ideal_character_age = 30
 	allowed_branches = list(
-		/datum/mil_branch/soviets
+		/datum/mil_branch/serbs
 	)
 	allowed_ranks = list(
-		/datum/mil_rank/sov/kapitan
+		/datum/mil_rank/ssa/k1
 	)
+
+	min_skill = list()
+
+
+/datum/job/serbian_kapitan/get_description_blurb()
+	return "You are the Commanding Officer of Serbian Space Forces during this operation. Be resilent and lead your men in a proper way to defend this installation."
+
+/datum/job/serbian_sergeant
+	title = "Vodnik"
+	total_positions = 5
+	spawn_positions = 5
+	supervisors = "Komandant"
+	outfit_type = /decl/hierarchy/mil_uniform/serb
+	minimal_player_age = 22
+	ideal_character_age = 30
+	allowed_branches = list(
+		/datum/mil_branch/serbs
+	)
+	allowed_ranks = list(
+		/datum/mil_rank/ssa/k1
+	)
+
+	min_skill = list()
+
+/datum/job/serbian_doctor
+
+/datum/job/serbian_soldier
+
+/datum/job/usmc_captain
+	title = "USMC Commander"
+	total_positions = 1
+	spawn_positions = 1
+	supervisors = "the NATO Space Marine Code and NATO General Command"
+	outfit_type = /decl/hierarchy/mil_uniform/serb
+	minimal_player_age = 24
+	ideal_character_age = 30
+	allowed_branches = list(
+		/datum/mil_branch/marine
+	)
+	allowed_ranks = list(
+		/datum/mil_rank/us/k1
+	)
+
+	min_skill = list()
+
+
+/datum/job/usmc_captain/get_description_blurb()
+	return "You are the Commanding Officer of USMC forces during this operation. Make sure to capture the installation without loosing to much men."
+
+
+/datum/job/usmc_marine
+
+/datum/job/usmc_medic
+
+/datum/job/usmc_sergeant
 /*
-/datum/job/captain/equip(var/mob/living/carbon/human/H)
-	. = ..()
-	if(H.client)
-		H.client.verbs += /client/proc/rename_ship
-		H.client.verbs += /client/proc/rename_company
 
-/client/proc/rename_ship()
-	set name = "Rename Ship"
-	set category = "Captain's Powers"
 
-	var/ship = sanitize(input(src, "What is your ship called? Don't add the vessel prefix, the FTV one will be attached automatically.", "Ship name", GLOB.using_map.station_short), MAX_NAME_LEN)
-	if(!ship)
-		return
-	GLOB.using_map.station_short = ship
-	GLOB.using_map.station_name = "FTV [ship]"
-	var/obj/effect/overmap/ship/bearcat/B = locate() in world
-	if(B)
-		B.SetName(GLOB.using_map.station_name)
-	command_announcement.Announce("Attention all hands on [GLOB.using_map.station_name]! Thank you for your attention.", "Ship re-christened")
-	verbs -= /client/proc/rename_ship
-
-/client/proc/rename_company()
-	set name = "Rename Company"
-	set category = "Captain's Powers"
-	var/company = sanitize(input(src, "What should your enterprise be called?", "Company name", GLOB.using_map.company_name), MAX_NAME_LEN)
-	if(!company)
-		return
-	var/company_s = sanitize(input(src, "What's the short name for it?", "Company name", GLOB.using_map.company_short), MAX_NAME_LEN)
-	if(company != GLOB.using_map.company_name)
-		if (company)
-			GLOB.using_map.company_name = company
-		if(company_s)
-			GLOB.using_map.company_short = company_s
-		command_announcement.Announce("Congratulations to all employees of [capitalize(GLOB.using_map.company_name)] on the new name. Their rebranding has changed the [GLOB.using_map.company_short] market value by [0.01*rand(-10,10)]%.", "Company name change approved")
-	verbs -= /client/proc/rename_company
-*/
-/datum/job/captain/get_access()
-	return get_all_station_access()
 
 /datum/job/chief_engineer
 	title = "Chief Engineer"

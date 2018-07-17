@@ -162,8 +162,8 @@
 		if(cell)
 			to_chat(user, "The drill already has a cell installed.")
 		else
-			user.drop_item()
-			O.loc = src
+			if(!user.unEquip(O, src))
+				return
 			cell = O
 			component_parts += O
 			to_chat(user, "You install \the [O].")
@@ -316,7 +316,7 @@
 	if(default_deconstruction_crowbar(user, W))
 		return
 
-	if(istype(W,/obj/item/weapon/wrench))
+	if(isWrench(W))
 
 		if(istype(get_turf(src), /turf/space))
 			to_chat(user, "<span class='notice'>You can't anchor something to empty space. Idiot.</span>")
@@ -376,3 +376,8 @@
 
 	src.set_dir(turn(src.dir, 90))
 	return 1
+
+/obj/machinery/mining/brace/default_deconstruction_crowbar(var/mob/user, var/obj/item/weapon/crowbar/C)
+	if(connected)
+		disconnect()
+	..()

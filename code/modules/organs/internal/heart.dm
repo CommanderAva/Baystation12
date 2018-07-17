@@ -12,6 +12,9 @@
 	max_damage = 45
 	var/open
 
+/obj/item/organ/internal/heart/open
+	open = 1
+
 /obj/item/organ/internal/heart/die()
 	if(dead_icon)
 		icon_state = dead_icon
@@ -27,29 +30,22 @@
 		if(pulse)
 			handle_heartbeat()
 			if(pulse == PULSE_2FAST && prob(1))
-				take_damage(0.5)
+				take_internal_damage(0.5)
 			if(pulse == PULSE_THREADY && prob(5))
-				take_damage(0.5)
+				take_internal_damage(0.5)
 		handle_blood()
 	..()
 
 /obj/item/organ/internal/heart/proc/handle_pulse()
-	if(owner.stat == DEAD || robotic >= ORGAN_ROBOT)
+	if(robotic >= ORGAN_ROBOT)
 		pulse = PULSE_NONE	//that's it, you're dead (or your metal heart is), nothing can influence your pulse
 		return
-	var/should_stop = prob(80) && owner.get_blood_circulation() < BLOOD_VOLUME_SURVIVE //cardiovascular shock, not enough liquid to pump
-	should_stop = should_stop || prob(max(0, owner.getBrainLoss() - owner.maxHealth * 0.75)) //brain failing to work heart properly
-	should_stop = should_stop || (prob(10) && owner.shock_stage >= 120) //traumatic shock
-	should_stop = should_stop || (prob(10) && pulse == PULSE_THREADY) //erratic heart patterns, usually caused by oxyloss
-	if(should_stop) // The heart has stopped due to going into traumatic or cardiovascular shock.
-		if(pulse != PULSE_NONE)
-			to_chat(owner, "<span class='danger'>Your heart has stopped!</span>")
-		pulse = PULSE_NONE
-		return
 
-	pulse = PULSE_NORM
 	var/pulse_mod = owner.chem_effects[CE_PULSE]
+
 	if(owner.shock_stage > 30)
+		pulse_mod++
+	if(owner.shock_stage > 80)
 		pulse_mod++
 
 	var/oxy = owner.get_blood_oxygenation()
@@ -57,16 +53,27 @@
 		pulse_mod++
 	if(oxy < BLOOD_VOLUME_BAD) //MOAR
 		pulse_mod++
-	if(oxy <= BLOOD_VOLUME_SURVIVE && !owner.chem_effects[CE_STABLE])	//I SAID MOAR OXYGEN
-		pulse = PULSE_THREADY	
-		return
 
 	if(owner.status_flags & FAKEDEATH || owner.chem_effects[CE_NOPULSE])
-		pulse = PULSE_NONE		//pretend that we're dead. unlike actual death, can be inflienced by meds
-		pulse = Clamp(pulse + pulse_mod, PULSE_NONE, PULSE_2FAST)
+		pulse = Clamp(PULSE_NONE + pulse_mod, PULSE_NONE, PULSE_2FAST) //pretend that we're dead. unlike actual death, can be inflienced by meds
 		return
-	
-	pulse = Clamp(pulse + pulse_mod, PULSE_SLOW, PULSE_2FAST)
+
+	//If heart is stopped, it isn't going to restart itself randomly.
+	if(pulse == PULSE_NONE)
+		return
+	else //and if it's beating, let's see if it should
+		var/should_stop = prob(80) && owner.get_blood_circulation() < BLOOD_VOLUME_SURVIVE //cardiovascular shock, not enough liquid to pump
+		should_stop = should_stop || prob(max(0, owner.getBrainLoss() - owner.maxHealth * 0.75)) //brain failing to work heart properly
+		should_stop = should_stop || (prob(5) && pulse == PULSE_THREADY) //erratic heart patterns, usually caused by oxyloss
+		if(should_stop) // The heart has stopped due to going into traumatic or cardiovascular shock.
+			to_chat(owner, "<span class='danger'>Your heart has stopped!</span>")
+			pulse = PULSE_NONE
+			return
+	if(pulse && oxy <= BLOOD_VOLUME_SURVIVE && !owner.chem_effects[CE_STABLE])	//I SAID MOAR OXYGEN
+		pulse = PULSE_THREADY
+		return
+
+	pulse = Clamp(PULSE_NORM + pulse_mod, PULSE_SLOW, PULSE_2FAST)
 	if(pulse != PULSE_NORM && owner.chem_effects[CE_STABLE])
 		if(pulse > PULSE_NORM)
 			pulse--
@@ -92,7 +99,7 @@
 		return
 
 	//Dead or cryosleep people do not pump the blood.
-	if(!owner || owner.in_stasis || owner.stat == DEAD || owner.bodytemperature < 170)
+	if(!owner || owner.InStasis() || owner.stat == DEAD || owner.bodytemperature < 170)
 		return
 
 	if(pulse != PULSE_NONE || robotic >= ORGAN_ROBOT)
@@ -125,7 +132,7 @@
 							blood_max += W.damage / 40
 
 			if(temp.status & ORGAN_ARTERY_CUT)
-				var/bleed_amount = Floor((owner.vessel.total_volume / (temp.applied_pressure ? 400 : 250))*temp.arterial_bleed_severity)
+				var/bleed_amount = Floor((owner.vessel.total_volume / (temp.applied_pressure || !open_wound ? 400 : 250))*temp.arterial_bleed_severity)
 				if(bleed_amount)
 					if(open_wound)
 						blood_max += bleed_amount
@@ -162,3 +169,29 @@
 		return FALSE
 
 	return pulse > PULSE_NONE || robotic == ORGAN_ROBOT || (owner.status_flags & FAKEDEATH)
+
+/obj/item/organ/internal/heart/listen()
+	if(robotic == ORGAN_ROBOT && is_working())
+		if(is_bruised())
+			return "sputtering pump"
+		else
+			return "steady whirr of the pump"
+
+	if(!pulse || (owner.status_flags & FAKEDEATH))
+		return "no pulse"
+
+	var/pulsesound = "normal"
+	if(is_bruised())
+		pulsesound = "irregular"
+
+	switch(pulse)
+		if(PULSE_SLOW)
+			pulsesound = "slow"
+		if(PULSE_FAST)
+			pulsesound = "fast"
+		if(PULSE_2FAST)
+			pulsesound = "very fast"
+		if(PULSE_THREADY)
+			pulsesound = "extremely fast and faint"
+
+	. = "[pulsesound] pulse"

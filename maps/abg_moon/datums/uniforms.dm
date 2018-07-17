@@ -29,10 +29,25 @@
 	var/dress_gloves = null
 	var/dress_extra = null
 
-/decl/hierarchy/mil_uniform/sundowner
-	name = "Head of Security outfit"
-	hierarchy_type = /decl/hierarchy/mil_uniform/sundowner
-	branch = /datum/mil_branch/sundowner
+//decl/hierarchy/mil_uniform/sundowner
+//	name = "Head of Security outfit"
+//	hierarchy_type = /decl/hierarchy/mil_uniform/sundowner
+//	branch = /datum/mil_branch/sundowner
+
+/decl/hierarchy/mil_uniform/serb
+	name = "Master SSA outfit"
+	hierarchy_type = /decl/hierarchy/mil_uniform/serb
+	branch = /datum/mil_branch/serbs
+
+	utility_under = null
+	utility_shoes = null
+	utility_hat = /obj/item/clothing/head/helmet/serb/panzer
+	utility_extra = list()
+
+/decl/hierarchy/mil_uniform/usmc
+	name = "Master USMC outfit"
+	hierarchy_type = /decl/hierarchy/mil_uniform/usmc
+	branch = /datum/mil_branch/marine
 /*
 /decl/hierarchy/mil_uniform/ec
 	name = "Master EC outfit"

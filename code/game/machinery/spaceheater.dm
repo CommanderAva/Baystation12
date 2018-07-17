@@ -11,7 +11,7 @@
 	var/set_temperature = T0C + 20	//K
 	var/active = 0
 	var/heating_power = 40 KILOWATTS
-	flags = OBJ_CLIMBABLE
+	atom_flags = ATOM_FLAG_CLIMBABLE
 	clicksound = "switch"
 
 
@@ -61,19 +61,15 @@
 				return
 			else
 				// insert cell
-				var/obj/item/weapon/cell/C = usr.get_active_hand()
-				if(istype(C))
-					user.drop_item()
-					cell = C
-					C.forceMove(src)
-					C.add_fingerprint(usr)
-
-					user.visible_message("<span class='notice'>[user] inserts a power cell into [src].</span>", "<span class='notice'>You insert the power cell into [src].</span>")
-					power_change()
+				if(!user.unEquip(I, src))
+					return
+				cell = I
+				user.visible_message("<span class='notice'>[user] inserts a power cell into [src].</span>", "<span class='notice'>You insert the power cell into [src].</span>")
+				power_change()
 		else
 			to_chat(user, "The hatch must be open to insert a power cell.")
 			return
-	else if(istype(I, /obj/item/weapon/screwdriver))
+	else if(isScrewdriver(I))
 		panel_open = !panel_open
 		user.visible_message("<span class='notice'>[user] [panel_open ? "opens" : "closes"] the hatch on the [src].</span>", "<span class='notice'>You [panel_open ? "open" : "close"] the hatch on the [src].</span>")
 		update_icon(1)
@@ -85,7 +81,7 @@
 	return
 
 /obj/machinery/space_heater/attack_hand(mob/user as mob)
-	src.add_fingerprint(user)
+	..()
 	interact(user)
 
 /obj/machinery/space_heater/interact(mob/user as mob)
@@ -146,9 +142,9 @@
 			if(panel_open && !cell)
 				var/obj/item/weapon/cell/C = usr.get_active_hand()
 				if(istype(C))
-					usr.drop_item()
+					if(!usr.unEquip(C, src))
+						return
 					cell = C
-					C.forceMove(src)
 					C.add_fingerprint(usr)
 					power_change()
 					usr.visible_message("<span class='notice'>[usr] inserts \the [C] into \the [src].</span>", "<span class='notice'>You insert \the [C] into \the [src].</span>")

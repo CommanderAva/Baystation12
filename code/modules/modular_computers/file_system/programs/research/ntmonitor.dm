@@ -2,6 +2,7 @@
 	filename = "ntmonitor"
 	filedesc = "NTNet Diagnostics and Monitoring"
 	program_icon_state = "comm_monitor"
+	program_key_state = "generic_key"
 	program_menu_icon = "wrench"
 	extended_desc = "This program monitors the local NTNet network, provides access to logging systems, and allows for configuration changes"
 	size = 12
@@ -34,7 +35,7 @@
 
 	data["banned_nids"] = list(ntnet_global.banned_nids)
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "ntnet_monitor.tmpl", "NTNet Diagnostics and Monitoring Tool", 575, 700, state = state)
 		if(host.update_layout())

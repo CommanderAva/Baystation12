@@ -31,7 +31,6 @@
 		if(istype(S,reward))
 			to_chat(user, "\The [src] can do no more for you.")
 			return
-	user.drop_from_inventory(src)
 	var/a = new reward()
 	if(ispath(reward,/spell))
 		H.add_spell(a)
@@ -80,7 +79,7 @@
 		return
 
 	var/obj/O = new /obj(T)
-	O.set_light(range, -10, "#ffffff")
+	O.set_light(-10, 0.1, 10, 2, "#ffffff")
 
 	spawn(duration)
 		qdel(O)

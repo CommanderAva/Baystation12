@@ -4,6 +4,11 @@
 	path = "abg"
 	flags = MAP_HAS_BRANCH | MAP_HAS_RANK
 
+	lobby_tracks = list(/music_track/crni_bombarder)
+
+	allowed_spawns = list("Serbian Forces Barracks", "USMC FOB")
+	default_spawn = "Serbian Forces Barracks"
+
 //	lobby_icon = 'maps/abg_moon/icons/lobby.dmi'
 
 	station_levels = list(1,2,3)

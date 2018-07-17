@@ -30,10 +30,12 @@ atom/var/var/fingerprintslast = null
 	src.fingerprintshidden += "\[[time_stamp()]\] Real name: [M.real_name], Key: [M.key]"
 	return 1
 
-/atom/proc/add_fingerprint(mob/M, ignoregloves)
+/atom/proc/add_fingerprint(mob/M, ignoregloves, obj/item/tool)
 	if(isnull(M)) return
 	if(isAI(M)) return
 	if(!M || !M.key)
+		return
+	if(istype(tool) && (tool.item_flags & ITEM_FLAG_NO_PRINT))
 		return
 
 	add_hiddenprint(M)
@@ -55,21 +57,25 @@ atom/var/var/fingerprintslast = null
 	if(!ignoregloves && ishuman(M))
 		var/mob/living/carbon/human/H = M
 		if (H.gloves && H.gloves.body_parts_covered & HANDS && H.gloves != src)
-			H.gloves.add_fingerprint(M)
-			if(!istype(H.gloves, /obj/item/clothing/gloves/latex))
-				return 0
+			if(istype(H.gloves, /obj/item/clothing/gloves)) //Don't add prints if you are wearing gloves.
+				var/obj/item/clothing/gloves/G = H.gloves
+				if(!G.clipped) //Fingerless gloves leave prints.
+					return 0
 			else if(prob(75))
 				return 0
-
+			H.gloves.add_fingerprint(M)
+	var/additional_chance = 0
+	if(!M.skill_check(SKILL_FORENSICS, SKILL_BASIC))
+		additional_chance = 10
 	// Add the fingerprints
-	add_partial_print(full_print)
+	add_partial_print(full_print, additional_chance)
 	return 1
 
-/atom/proc/add_partial_print(full_print)
+/atom/proc/add_partial_print(full_print, bonus)
 	if(!fingerprints[full_print])
-		fingerprints[full_print] = stars(full_print, rand(0, 20))	//Initial touch, not leaving much evidence the first time.
+		fingerprints[full_print] = stars(full_print, rand(0 + bonus, 20 + bonus))	//Initial touch, not leaving much evidence the first time.
 	else
-		switch(stringpercent(fingerprints[full_print]))		//tells us how many stars are in the current prints.
+		switch(max(stringpercent(fingerprints[full_print]) - bonus,0))		//tells us how many stars are in the current prints.
 			if(28 to 32)
 				if(prob(1))
 					fingerprints[full_print] = full_print 		// You rolled a one buddy.
@@ -127,21 +133,24 @@ atom/proc/add_fibers(mob/living/carbon/human/M)
 	var/fibertext
 	var/item_multiplier = istype(src,/obj/item)?1.2:1
 	var/suit_coverage = 0
-	if(M.wear_suit)
-		fibertext = "Material from \a [M.wear_suit]."
-		if(prob(10*item_multiplier) && !(fibertext in suit_fibers))
-			suit_fibers += fibertext
-		suit_coverage = M.wear_suit.body_parts_covered
+	if(istype(M.wear_suit, /obj/item/clothing))
+		var/obj/item/clothing/C = M.wear_suit
+		fibertext = C.get_fibers()
+		if(fibertext && prob(10*item_multiplier))
+			suit_fibers |= fibertext
+		suit_coverage = C.body_parts_covered
 
-	if(M.w_uniform && (M.w_uniform.body_parts_covered & ~suit_coverage))
-		fibertext = "Fibers from \a [M.w_uniform]."
-		if(prob(15*item_multiplier) && !(fibertext in suit_fibers))
-			suit_fibers += fibertext
+	if(istype(M.w_uniform, /obj/item/clothing) && (M.w_uniform.body_parts_covered & ~suit_coverage))
+		var/obj/item/clothing/C = M.w_uniform
+		fibertext = C.get_fibers()
+		if(fibertext && prob(15*item_multiplier))
+			suit_fibers |= fibertext
 
-	if(M.gloves && (M.gloves.body_parts_covered & ~suit_coverage))
-		fibertext = "Material from a pair of [M.gloves.name]."
-		if(prob(20*item_multiplier) && !(fibertext in suit_fibers))
-			suit_fibers += fibertext
+	if(istype(M.gloves, /obj/item/clothing) && (M.gloves.body_parts_covered & ~suit_coverage))
+		var/obj/item/clothing/C = M.gloves
+		fibertext = C.get_fibers()
+		if(fibertext && prob(20*item_multiplier))
+			suit_fibers |= fibertext
 
 /mob/proc/get_full_print()
 	return FALSE
@@ -167,6 +176,8 @@ atom/proc/add_fibers(mob/living/carbon/human/M)
 		return H.get_fingerprint()
 
 /obj/item/organ/external/hand/get_fingerprint()
+	if(robotic >= ORGAN_ROBOT)
+		return null
 	if(dna && !is_stump())
 		return md5(dna.uni_identity)
 

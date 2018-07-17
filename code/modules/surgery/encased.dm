@@ -18,7 +18,7 @@
 		return 0
 
 	var/obj/item/organ/external/affected = target.get_organ(target_zone)
-	return affected && !(affected.robotic >= ORGAN_ROBOT) && affected.encased && affected.open() >= SURGERY_RETRACTED
+	return affected && !(affected.robotic >= ORGAN_ROBOT) && affected.encased && affected.how_open() >= SURGERY_RETRACTED
 
 //////////////////////////////////////////////////////////////////
 //	ribcage sawing surgery step
@@ -38,7 +38,7 @@
 	if (!hasorgans(target))
 		return
 	var/obj/item/organ/external/affected = target.get_organ(target_zone)
-	return ..() && affected && affected.open() == SURGERY_RETRACTED
+	return ..() && affected && affected.how_open() == SURGERY_RETRACTED
 
 /datum/surgery_step/open_encased/saw/begin_step(mob/user, mob/living/carbon/human/target, target_zone, obj/item/tool)
 
@@ -70,5 +70,5 @@
 	user.visible_message("<span class='warning'>[user]'s hand slips, cracking [target]'s [affected.encased] with \the [tool]!</span>" , \
 	"<span class='warning'>Your hand slips, cracking [target]'s [affected.encased] with \the [tool]!</span>" )
 
-	affected.take_damage(15, 0, (DAM_SHARP|DAM_EDGE), used_weapon = tool)
+	affected.take_external_damage(15, 0, (DAM_SHARP|DAM_EDGE), used_weapon = tool)
 	affected.fracture()

@@ -5,6 +5,9 @@
 	#include "abg_loadouts.dm"
 	#include "abg_jobs.dm"
 	#include "abg_areas.dm"
+	#include "abg_ranks.dm"
+	#include "abg_lobby.dm"
+	#include "abg_unsorted.dm"
 /*
 	#include "tetras_announcements.dm"
 	#include "tetras_areas.dm"
@@ -18,7 +21,7 @@
 	#include "tetras_gamemodes.dm"
 	#include "tetras_antagonism.dm"
 */
-//	#include "datums/uniforms.dm"
+	#include "datums/uniforms.dm"
 //	#include "datums/uniforms_expedition.dm"
 //	#include "datums/uniforms_fleet.dm"
 //	#include "datums/uniforms_marine.dm"
@@ -36,15 +39,7 @@
 	#include "loadout/~defines.dm"
 */
 
-
-	#include "../../code/modules/lobby_music/chasing_time.dm"
-	#include "../../code/modules/lobby_music/absconditus.dm"
-	#include "../../code/modules/lobby_music/clouds_of_fire.dm"
-	#include "../../code/modules/lobby_music/endless_space.dm"
-	#include "../../code/modules/lobby_music/dilbert.dm"
-	#include "../../code/modules/lobby_music/space_oddity.dm"
-	#include "../../code/modules/lobby_music/Torch.dm"
-	#include "../../code/modules/lobby_music/title1.dm"
+	#include "../../code/datums/music_tracks/crni_bombarder.dm"
 
 	#define using_map_DATUM /datum/map/abg
 

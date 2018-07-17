@@ -18,7 +18,7 @@
 /mob/living/carbon/human/dummy/mannequin/fully_replace_character_name(new_name)
 	..("[new_name] (mannequin)", FALSE)
 
-/mob/living/carbon/human/dummy/mannequin/instantiate_hud()
+/mob/living/carbon/human/dummy/mannequin/InitializeHud()
 	return	// Mannequins don't get HUDs
 
 /mob/living/carbon/human/skrell/New(var/new_loc)
@@ -42,12 +42,6 @@
 
 /mob/living/carbon/human/machine/New(var/new_loc)
 	..(new_loc, SPECIES_IPC)
-
-/mob/living/carbon/human/bogani/New(var/new_loc)
-	..(new_loc, SPECIES_BOGANI)
-
-/mob/living/carbon/human/egyno/New(var/new_loc)
-	..(new_loc, SPECIES_EGYNO)
 
 /mob/living/carbon/human/nabber/New(var/new_loc)
 	pulling_punches = 1

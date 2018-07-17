@@ -19,9 +19,6 @@
 	var/shuttletarget = null
 	var/enroute = 0
 
-	var/damtype = BRUTE
-	var/defense = "melee" //what armor protects against its attacks
-
 /mob/living/simple_animal/hostile/proc/FindTarget()
 	if(!faction) //No faction, no reason to attack anybody.
 		return null
@@ -45,6 +42,10 @@
 				continue
 			else
 				if(!L.stat)
+					if (ishuman(L))
+						var/mob/living/carbon/human/H = L
+						if (H.is_cloaked())
+							continue
 					stance = HOSTILE_STANCE_ATTACK
 					T = L
 					break
@@ -83,6 +84,11 @@
 	if(!(target_mob in ListTargets(10)))
 		LostTarget()
 		return 0
+	if (ishuman(target_mob))
+		var/mob/living/carbon/human/H = target_mob
+		if (H.is_cloaked())
+			LoseTarget()
+			return 0
 	if(next_move >= world.time)
 		return 0
 	if(get_dist(src, target_mob) <= 1)	//Attacking
@@ -95,7 +101,7 @@
 		return
 	if(isliving(target_mob))
 		var/mob/living/L = target_mob
-		L.attack_generic(src,rand(melee_damage_lower,melee_damage_upper),attacktext,damtype,defense)
+		L.attack_generic(src,rand(melee_damage_lower,melee_damage_upper),attacktext,environment_smash,damtype,defense)
 		return L
 	if(istype(target_mob,/obj/mecha))
 		var/obj/mecha/M = target_mob

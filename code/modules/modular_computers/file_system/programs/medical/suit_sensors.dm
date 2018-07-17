@@ -3,6 +3,7 @@
 	filedesc = "Suit Sensors Monitoring"
 	nanomodule_path = /datum/nano_module/crew_monitor
 	program_icon_state = "crew"
+	program_key_state = "med_key"
 	program_menu_icon = "heart"
 	extended_desc = "This program connects to life signs monitoring system to provide basic information on crew health."
 	required_access = access_medical
@@ -36,7 +37,7 @@
 	for(var/z_level in GLOB.using_map.map_levels)
 		data["crewmembers"] += crew_repository.health_data(z_level)
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if(!ui)
 		ui = new(user, src, ui_key, "crew_monitor.tmpl", "Crew Monitoring Computer", 900, 800, state = state)
 

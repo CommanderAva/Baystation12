@@ -6,8 +6,6 @@
 	var/g_hair = 0
 	var/b_hair = 0
 	var/h_style = "Bald"
-	var/toxins_alert = 0
-	var/poison_type = list("phoron","lithiumnitride", "argon", "methane")
 
 	//Facial hair colour and style
 	var/r_facial = 0
@@ -20,7 +18,8 @@
 	var/g_eyes = 0
 	var/b_eyes = 0
 
-	var/s_tone = 0	//Skin tone
+	var/s_tone = 0  //Skin tone
+	var/s_base = "" //Skin base
 
 	//Skin colour
 	var/r_skin = 0
@@ -38,7 +37,7 @@
 
 	var/list/worn_underwear = list()
 
-	var/backbag = 2		//Which backpack type the player has chosen. Nothing, Satchel or Backpack.
+	var/datum/backpack_setup/backpack_setup
 
 	// General information
 	var/home_system = ""
@@ -60,9 +59,6 @@
 	var/obj/item/r_store = null
 	var/obj/item/l_store = null
 	var/obj/item/s_store = null
-
-	var/used_skillpoints = 0
-	var/list/skills = list()
 
 	var/icon/stand_icon = null
 	var/icon/lying_icon = null
@@ -115,4 +111,7 @@
 	var/shock_stage
 
 	var/obj/item/grab/current_grab_type 	// What type of grab they use when they grab someone.
-	var/skin_state = SKIN_NORMAL
+
+	//vars for fountain of youth examine lines
+	var/became_older
+	var/became_younger

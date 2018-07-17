@@ -1,7 +1,8 @@
 /obj/machinery/beehive
-	name = "beehive"
+	name = "apiary"
 	icon = 'icons/obj/beekeeping.dmi'
-	icon_state = "beehive"
+	icon_state = "beehive-0"
+	desc = "A wooden box designed specifically to house our buzzling buddies. Far more efficient than traditional hives. Just insert a frame and a queen, close it up, and you're good to go!"
 	density = 1
 	anchored = 1
 
@@ -12,9 +13,13 @@
 	var/frames = 0
 	var/maxFrames = 5
 
+/obj/machinery/beehive/Initialize()
+	. = ..()
+	update_icon()
+
 /obj/machinery/beehive/update_icon()
 	overlays.Cut()
-	icon_state = "beehive"
+	icon_state = "beehive-[closed]"
 	if(closed)
 		overlays += "lid"
 	if(frames)
@@ -23,12 +28,16 @@
 		overlays += "full[round(honeycombs / 100)]"
 	if(!smoked)
 		switch(bee_count)
-			if(1 to 40)
+			if(1 to 20)
 				overlays += "bees1"
-			if(41 to 80)
+			if(21 to 40)
 				overlays += "bees2"
-			if(81 to 100)
+			if(41 to 60)
 				overlays += "bees3"
+			if(61 to 80)
+				overlays += "bees4"
+			if(81 to 100)
+				overlays += "bees5"
 
 /obj/machinery/beehive/examine(var/mob/user)
 	. = ..()
@@ -36,12 +45,12 @@
 		to_chat(user, "The lid is open.")
 
 /obj/machinery/beehive/attackby(var/obj/item/I, var/mob/user)
-	if(istype(I, /obj/item/weapon/crowbar))
+	if(isCrowbar(I))
 		closed = !closed
 		user.visible_message("<span class='notice'>\The [user] [closed ? "closes" : "opens"] \the [src].</span>", "<span class='notice'>You [closed ? "close" : "open"] \the [src].</span>")
 		update_icon()
 		return
-	else if(istype(I, /obj/item/weapon/wrench))
+	else if(isWrench(I))
 		anchored = !anchored
 		user.visible_message("<span class='notice'>\The [user] [anchored ? "wrenches" : "unwrenches"] \the [src].</span>", "<span class='notice'>You [anchored ? "wrench" : "unwrench"] \the [src].</span>")
 		return
@@ -67,7 +76,6 @@
 		++frames
 		user.visible_message("<span class='notice'>\The [user] loads \the [I] into \the [src].</span>", "<span class='notice'>You load \the [I] into \the [src].</span>")
 		update_icon()
-		user.drop_from_inventory(I)
 		qdel(I)
 		return
 	else if(istype(I, /obj/item/bee_pack))
@@ -106,7 +114,7 @@
 		if(smoked)
 			to_chat(user, "The hive is smoked.")
 		return 1
-	else if(istype(I, /obj/item/weapon/screwdriver))
+	else if(isScrewdriver(I))
 		if(bee_count)
 			to_chat(user, "<span class='notice'>You can't dismantle \the [src] with these bees inside.</span>")
 			return
@@ -231,9 +239,7 @@
 	if(do_after(user, 30, src))
 		user.visible_message("<span class='notice'>\The [user] constructs a beehive.</span>", "<span class='notice'>You construct a beehive.</span>")
 		new /obj/machinery/beehive(get_turf(user))
-		user.drop_from_inventory(src)
 		qdel(src)
-	return
 
 /obj/item/stack/wax
 	name = "wax"
@@ -270,7 +276,7 @@ var/global/list/datum/stack_recipe/wax_recipes = list( \
 
 /obj/item/bee_pack/proc/fill()
 	full = initial(full)
-	name = initial(name)
+	SetName(initial(name))
 	desc = initial(desc)
 	overlays.Cut()
 	overlays += "beepack-full"

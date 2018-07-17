@@ -4,7 +4,7 @@
 	gender = PLURAL
 	icon = 'icons/obj/items.dmi'
 	icon_state = "handcuff"
-	flags = CONDUCT
+	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	slot_flags = SLOT_BELT
 	throwforce = 5
 	w_class = ITEM_SIZE_SMALL
@@ -18,13 +18,14 @@
 	var/cuff_sound = 'sound/weapons/handcuffs.ogg'
 	var/cuff_type = "handcuffs"
 
-/obj/item/weapon/handcuffs/get_mob_overlay(mob/user_mob, slot)
-	var/image/ret = ..()
+
+
+/obj/item/weapon/handcuffs/get_icon_state(mob/user_mob, slot)
 	if(slot == slot_handcuffed_str)
-		ret.icon_state = "handcuff1"
+		return "handcuff1"
 	if(slot == slot_legcuffed_str)
-		ret.icon_state = "legcuff1"
-	return ret
+		return "legcuff1"
+	return ..()
 
 /obj/item/weapon/handcuffs/attack(var/mob/living/carbon/C, var/mob/living/user)
 
@@ -36,16 +37,22 @@
 		place_handcuffs(user, user)
 		return
 
-	if(!C.handcuffed)
-		if (C == user)
-			place_handcuffs(user, user)
-			return
+	// only carbons can be handcuffed
+	if(istype(C))
+		if(!C.handcuffed)
+			if (C == user)
+				place_handcuffs(user, user)
+				return
 
-		//check for an aggressive grab (or robutts)
-		if(can_place(C, user))
-			place_handcuffs(C, user)
+			//check for an aggressive grab (or robutts)
+			if(can_place(C, user))
+				place_handcuffs(C, user)
+			else
+				to_chat(user, "<span class='danger'>You need to have a firm grip on [C] before you can put \the [src] on!</span>")
 		else
-			to_chat(user, "<span class='danger'>You need to have a firm grip on [C] before you can put \the [src] on!</span>")
+			to_chat(user, "<span class='warning'>\The [C] is already handcuffed!</span>")
+	else
+		..()
 
 /obj/item/weapon/handcuffs/proc/can_place(var/mob/target, var/mob/user)
 	if(user == target || istype(user, /mob/living/silicon/robot) || istype(user, /mob/living/bot))
@@ -79,6 +86,12 @@
 	if(!can_place(target, user)) // victim may have resisted out of the grab in the meantime
 		return 0
 
+	var/obj/item/weapon/handcuffs/cuffs = src
+	if(dispenser)
+		cuffs = new(get_turf(user))
+	else if(!user.unEquip(cuffs))
+		return 0
+
 	admin_attack_log(user, H, "Attempted to handcuff the victim", "Was target of an attempted handcuff", "attempted to handcuff")
 	feedback_add_details("handcuffs","H")
 
@@ -88,11 +101,6 @@
 	user.visible_message("<span class='danger'>\The [user] has put [cuff_type] on \the [H]!</span>")
 
 	// Apply cuffs.
-	var/obj/item/weapon/handcuffs/cuffs = src
-	if(dispenser)
-		cuffs = new(get_turf(user))
-	else
-		user.drop_from_inventory(cuffs)
 	target.equip_to_slot(cuffs,slot_handcuffed)
 	return 1
 
@@ -114,7 +122,7 @@ var/last_chew = 0
 	H.visible_message("<span class='warning'>\The [H] chews on \his [O.name]!</span>", "<span class='warning'>You chew on your [O.name]!</span>")
 	admin_attacker_log(H, "chewed on their [O.name]!")
 
-	O.take_damage(3,0, DAM_SHARP|DAM_EDGE ,"teeth marks")
+	O.take_external_damage(3,0, DAM_SHARP|DAM_EDGE ,"teeth marks")
 
 	last_chew = world.time
 
@@ -128,28 +136,28 @@ var/last_chew = 0
 	elastic = 1
 
 /obj/item/weapon/handcuffs/cable/red
-	color = "#dd0000"
+	color = COLOR_MAROON
 
 /obj/item/weapon/handcuffs/cable/yellow
-	color = "#dddd00"
+	color = COLOR_AMBER
 
 /obj/item/weapon/handcuffs/cable/blue
-	color = "#0000dd"
+	color = COLOR_CYAN_BLUE
 
 /obj/item/weapon/handcuffs/cable/green
-	color = "#00dd00"
+	color = COLOR_GREEN
 
 /obj/item/weapon/handcuffs/cable/pink
-	color = "#dd00dd"
+	color = COLOR_PURPLE
 
 /obj/item/weapon/handcuffs/cable/orange
-	color = "#dd8800"
+	color = COLOR_ORANGE
 
 /obj/item/weapon/handcuffs/cable/cyan
-	color = "#00dddd"
+	color = COLOR_SKY_BLUE
 
 /obj/item/weapon/handcuffs/cable/white
-	color = "#ffffff"
+	color = COLOR_SILVER
 
 /obj/item/weapon/handcuffs/cable/attackby(var/obj/item/I, mob/user as mob)
 	..()

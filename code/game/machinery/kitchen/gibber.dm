@@ -94,10 +94,12 @@
 		if(!G.force_danger())
 			to_chat(user, "<span class='danger'>You need a better grip to do that!</span>")
 			return
+		if(!user.unEquip(W))
+			return
 		move_into_gibber(user,G.affecting)
-		user.drop_from_inventory(G)
 	else if(istype(W, /obj/item/organ))
-		user.drop_from_inventory(W)
+		if(!user.unEquip(W))
+			return
 		qdel(W)
 		user.visible_message("<span class='danger'>\The [user] feeds \the [W] into \the [src], obliterating it.</span>")
 	else
@@ -206,7 +208,7 @@
 	for(var/i=1 to slab_count)
 		var/obj/item/weapon/reagent_containers/food/snacks/meat/new_meat = new slab_type(src, rand(3,8))
 		if(istype(new_meat))
-			new_meat.name = "[slab_name] [new_meat.name]"
+			new_meat.SetName("[slab_name] [new_meat.name]")
 			new_meat.reagents.add_reagent(/datum/reagent/nutriment,slab_nutrition)
 			if(src.occupant.reagents)
 				src.occupant.reagents.trans_to_obj(new_meat, round(occupant.reagents.total_volume/slab_count,1))

@@ -11,11 +11,15 @@
 	var/image/inv_overlay = null	//overlay used when attached to clothing.
 	var/list/mob_overlay = list()
 	var/overlay_state = null
-	var/list/accessory_icons = list(slot_w_uniform_str = 'icons/mob/ties.dmi', slot_wear_suit_str = 'icons/mob/ties.dmi')
+	var/list/accessory_icons = list(slot_w_uniform_str = 'icons/mob/onmob/ties.dmi', slot_wear_suit_str = 'icons/mob/onmob/ties.dmi')
 	sprite_sheets = list(
-		SPECIES_NABBER = 'icons/mob/species/nabber/ties.dmi'
+		SPECIES_NABBER = 'icons/mob/species/nabber/ties.dmi',
+		SPECIES_UNATHI = 'icons/mob/onmob/Unathi/ties.dmi'
 		)
 	var/list/on_rolled = list()	//used when jumpsuit sleevels are rolled ("rolled" entry) or it's rolled down ("down"). Set to "none" to hide in those states.
+	var/high_visibility	//if it should appear on examine without detailed view
+	var/slowdown //used when an accessory is meant to slow the wearer down when attached to clothing
+	var/removable = TRUE
 
 /obj/item/clothing/accessory/Destroy()
 	on_removed()
@@ -92,15 +96,6 @@
 	if(has_suit)
 		return	//we aren't an object on the ground so don't call parent
 	..()
-
-//Ranks
-/obj/item/clothing/accessory/rank
-	name = "ranks"
-	desc = "Insignia denoting rank of some kind. These appear blank."
-	icon_state = "fleetrank"
-	on_rolled = list("down" = "none")
-	slot = ACCESSORY_SLOT_RANK
-	gender = PLURAL
 
 //Necklaces
 /obj/item/clothing/accessory/necklace

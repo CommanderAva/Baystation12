@@ -152,7 +152,7 @@ This saves us from having to call add_fingerprint() any time something is put in
 				update_inv_wear_mask(0)
 		if(src)
 			var/obj/item/clothing/mask/wear_mask = src.get_equipped_item(slot_wear_mask)
-			if(!(wear_mask && (wear_mask.item_flags & AIRTIGHT)))
+			if(!(wear_mask && (wear_mask.item_flags & ITEM_FLAG_AIRTIGHT)))
 				REMOVE_INTERNALS
 		update_inv_head()
 	else if (W == l_ear)
@@ -229,6 +229,9 @@ This saves us from having to call add_fingerprint() any time something is put in
 	if(!has_organ_for_slot(slot)) return
 	if(!species || !species.hud || !(slot in species.hud.equip_slots)) return
 	W.forceMove(src)
+
+	var/obj/item/old_item = get_equipped_item(slot)
+
 	switch(slot)
 		if(slot_back)
 			src.back = W
@@ -311,6 +314,8 @@ This saves us from having to call add_fingerprint() any time something is put in
 			update_inv_wear_suit(redraw_mob)
 		if(slot_w_uniform)
 			src.w_uniform = W
+			if(w_uniform.flags_inv & HIDESHOES)
+				update_inv_shoes(0)
 			W.equipped(src, slot)
 			update_inv_w_uniform(redraw_mob)
 		if(slot_l_store)
@@ -331,7 +336,8 @@ This saves us from having to call add_fingerprint() any time something is put in
 			W.forceMove(src.back)
 		if(slot_tie)
 			var/obj/item/clothing/under/uniform = src.w_uniform
-			uniform.attackby(W,src)
+			if(uniform)
+				uniform.attackby(W,src)
 		else
 			to_chat(src, "<span class='danger'>You are trying to eqip this item to an unsupported inventory slot. If possible, please write a ticket with steps to reproduce. Slot was: [slot]</span>")
 			return
@@ -350,6 +356,10 @@ This saves us from having to call add_fingerprint() any time something is put in
 			W.screen_loc = gear["loc"]
 	if(W.action_button_name)
 		update_action_buttons()
+
+	// if we replaced an item, delete the old item. do this at the end to make the replacement seamless
+	if(old_item)
+		qdel(old_item)
 
 	return 1
 
@@ -413,5 +423,5 @@ This saves us from having to call add_fingerprint() any time something is put in
 		if(r_store)    . += r_store
 		if(handcuffed) . += handcuffed
 		if(s_store)    . += s_store
-		
+
 #undef REMOVE_INTERNALS

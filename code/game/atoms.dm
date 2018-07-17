@@ -1,6 +1,6 @@
 /atom
 	var/level = 2
-	var/flags = 0
+	var/atom_flags
 	var/list/blood_DNA
 	var/was_bloodied
 	var/blood_color
@@ -20,13 +20,13 @@
 
 	var/list/climbers = list()
 
-	var/initialized = FALSE
-
 /atom/New(loc, ...)
-	//. = ..() //uncomment if you are dumb enough to add a /datum/New() proc
+	//atom creation method that preloads variables at creation
+	if(GLOB.use_preloader && (src.type == GLOB._preloader.target_path))//in case the instanciated atom is creating other atoms in New()
+		GLOB._preloader.load(src)
 
 	var/do_initialize = SSatoms.initialized
-	if(do_initialize > INITIALIZATION_INSSATOMS)
+	if(do_initialize != INITIALIZATION_INSSATOMS)
 		args[1] = do_initialize == INITIALIZATION_INNEW_MAPLOAD
 		if(SSatoms.InitAtom(src, args))
 			//we were deleted
@@ -36,7 +36,7 @@
 	if(created)
 		created += src
 
-	if(flags & OBJ_CLIMBABLE)
+	if(atom_flags & ATOM_FLAG_CLIMBABLE)
 		verbs += /atom/proc/climb_on
 
 	if(opacity)
@@ -50,11 +50,11 @@
 //Must return an Initialize hint. Defined in __DEFINES/subsystems.dm
 
 /atom/proc/Initialize(mapload, ...)
-	if(initialized)
+	if(atom_flags & ATOM_FLAG_INITIALIZED)
 		crash_with("Warning: [src]([type]) initialized multiple times!")
-	initialized = TRUE
+	atom_flags |= ATOM_FLAG_INITIALIZED
 
-	if(light_power && light_range)
+	if(light_max_bright && light_outer_range)
 		update_light()
 
 	return INITIALIZE_HINT_NORMAL
@@ -99,7 +99,7 @@
 // returns true if open
 // false if closed
 /atom/proc/is_open_container()
-	return flags & OPENCONTAINER
+	return atom_flags & ATOM_FLAG_OPEN_CONTAINER
 
 /*//Convenience proc to see whether a container can be accessed in a certain way.
 
@@ -289,6 +289,12 @@ its easier to just keep the beam vertical.
 /atom/proc/melt()
 	return
 
+/atom/proc/lava_act()
+	visible_message("<span class='danger'>\The [src] sizzles and melts away, consumed by the lava!</span>")
+	playsound(src, 'sound/effects/flare.ogg', 100, 3)
+	qdel(src)
+	. = TRUE
+
 /atom/proc/hitby(atom/movable/AM as mob|obj)
 	if (density)
 		AM.throwing = 0
@@ -297,8 +303,7 @@ its easier to just keep the beam vertical.
 
 //returns 1 if made bloody, returns 0 otherwise
 /atom/proc/add_blood(mob/living/carbon/human/M as mob)
-
-	if(flags & NOBLOODY)
+	if(atom_flags & ATOM_FLAG_NO_BLOOD)
 		return 0
 
 	if(!blood_DNA || !istype(blood_DNA, /list))	//if our list of DNA doesn't exist yet (or isn't a list) initialise it.
@@ -434,7 +439,7 @@ its easier to just keep the beam vertical.
 	do_climb(usr)
 
 /atom/proc/can_climb(var/mob/living/user, post_climb_check=0)
-	if (!(flags & OBJ_CLIMBABLE) || !can_touch(user) || (!post_climb_check && (user in climbers)))
+	if (!(atom_flags & ATOM_FLAG_CLIMBABLE) || !can_touch(user) || (!post_climb_check && (user in climbers)))
 		return 0
 
 	if (!user.Adjacent(src))
@@ -466,16 +471,18 @@ its easier to just keep the beam vertical.
 	var/turf/T = get_turf(src)
 	if(!T || !istype(T))
 		return 0
-	for(var/obj/O in T.contents)
-		if(O.flags & OBJ_CLIMBABLE) continue
-		if(O && O.density && !(O.flags & ON_BORDER)) //ON_BORDER structures are handled by the Adjacent() check.
-			return O
+	for(var/atom/A in T.contents)
+		if(A.atom_flags & ATOM_FLAG_CLIMBABLE)
+			continue
+		if(A.density && !(A.atom_flags & ATOM_FLAG_CHECKS_BORDER)) //ON_BORDER structures are handled by the Adjacent() check.
+			return A
 	return 0
 
 /atom/proc/do_climb(var/mob/living/user)
 	if (!can_climb(user))
 		return
 
+	add_fingerprint(user)
 	user.visible_message("<span class='warning'>\The [user] starts climbing onto \the [src]!</span>")
 	climbers |= user
 
@@ -521,7 +528,7 @@ its easier to just keep the beam vertical.
 
 			if(affecting)
 				to_chat(M, "<span class='danger'>You land heavily on your [affecting.name]!</span>")
-				affecting.take_damage(damage, 0)
+				affecting.take_external_damage(damage, 0)
 				if(affecting.parent)
 					affecting.parent.add_autopsy_data("Misadventure", damage)
 			else
@@ -538,3 +545,6 @@ its easier to just keep the beam vertical.
 		do_climb(target)
 	else
 		return ..()
+
+/atom/proc/get_color()
+	return color

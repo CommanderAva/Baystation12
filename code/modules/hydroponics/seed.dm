@@ -66,6 +66,8 @@
 		sleep(-1)
 		update_growth_stages()
 
+	uid = plant_controller.seeds.len + 1
+
 /datum/seed/proc/get_trait(var/trait)
 	return traits["[trait]"]
 
@@ -118,7 +120,7 @@
 	var/blocked = target.run_armor_check(target_limb, "melee")
 	var/obj/item/organ/external/affecting = target.get_organ(target_limb)
 
-	if(blocked >= 100 || (target.species && target.species.flags & (NO_EMBED|NO_MINOR_CUT)))
+	if(blocked >= 100 || (target.species && target.species.species_flags & (SPECIES_FLAG_NO_EMBED|SPECIES_FLAG_NO_MINOR_CUT)))
 		to_chat(target, "<span class='danger'>\The [fruit]'s thorns scratch against the armour on your [affecting.name]!</span>")
 		return
 
@@ -152,10 +154,10 @@
 		var/obj/item/organ/external/affecting = pick(target.organs)
 
 		for(var/obj/item/clothing/C in list(target.head, target.wear_mask, target.wear_suit, target.w_uniform, target.gloves, target.shoes))
-			if(C && (C.body_parts_covered & affecting) && (C.item_flags & THICKMATERIAL))
+			if(C && (C.body_parts_covered & affecting) && (C.item_flags & ITEM_FLAG_THICKMATERIAL))
 				affecting = null
 
-		if(!(target.species && target.species.flags & (NO_EMBED|NO_MINOR_CUT)))	affecting = null
+		if(!(target.species && target.species.species_flags & (SPECIES_FLAG_NO_EMBED|SPECIES_FLAG_NO_MINOR_CUT)))	affecting = null
 
 		if(affecting)
 			to_chat(target, "<span class='danger'>You are stung by \the [fruit] in your [affecting.name]!</span>")
@@ -170,12 +172,12 @@
 	if(splat_type && !(locate(/obj/effect/vine) in T))
 		var/obj/effect/vine/splat = new splat_type(T, src)
 		if(!istype(splat)) // Plants handle their own stuff.
-			splat.name = "[thrown.name] [pick("smear","smudge","splatter")]"
+			splat.SetName("[thrown.name] [pick("smear","smudge","splatter")]")
 			if(get_trait(TRAIT_BIOLUM))
 				var/clr
 				if(get_trait(TRAIT_BIOLUM_COLOUR))
 					clr = get_trait(TRAIT_BIOLUM_COLOUR)
-				splat.set_light(get_trait(TRAIT_BIOLUM), l_color = clr)
+				splat.set_light(0.5, 0.1, 3, l_color = clr)
 			var/flesh_colour = get_trait(TRAIT_FLESH_COLOUR)
 			if(!flesh_colour) flesh_colour = get_trait(TRAIT_PRODUCT_COLOUR)
 			if(flesh_colour) splat.color = get_trait(TRAIT_PRODUCT_COLOUR)
@@ -434,10 +436,18 @@
 		var/list/banned_chems = list(
 			/datum/reagent/adminordrazine,
 			/datum/reagent/nutriment,
-			/datum/reagent/nanites
+			/datum/reagent/nanites,
+			/datum/reagent/water/holywater,
+			/datum/reagent/toxin/plantbgone,
+			/datum/reagent/chloralhydrate/beer2
 			)
+		banned_chems += subtypesof(/datum/reagent/ethanol)
+		banned_chems += subtypesof(/datum/reagent/tobacco)
+		banned_chems += typesof(/datum/reagent/drink)
+		banned_chems += typesof(/datum/reagent/nutriment)
+		banned_chems += typesof(/datum/reagent/toxin/fertilizer)
+		banned_chems += typesof(/datum/reagent/crayon_dust)
 
-		if(prob(30))	banned_chems |= typesof(/datum/reagent/ethanol)
 		if(prob(30))	banned_chems |= typesof(/datum/reagent/toxin)
 
 		for(var/x=1;x<=additional_chems;x++)
@@ -498,7 +508,7 @@
 	set_trait(TRAIT_ENDURANCE,rand(60,100))
 	set_trait(TRAIT_YIELD,rand(3,15))
 	set_trait(TRAIT_MATURATION,rand(5,15))
-	set_trait(TRAIT_PRODUCTION,get_trait(TRAIT_MATURATION)+rand(2,5))
+	set_trait(TRAIT_PRODUCTION,rand(1,10))
 
 	generate_name()
 
@@ -663,9 +673,9 @@
 		if(GENE_ENVIRONMENT)
 			traits_to_copy = list(TRAIT_IDEAL_HEAT,TRAIT_IDEAL_LIGHT,TRAIT_LIGHT_TOLERANCE)
 		if(GENE_PIGMENT)
-			traits_to_copy = list(TRAIT_PLANT_COLOUR,TRAIT_PRODUCT_COLOUR,TRAIT_BIOLUM_COLOUR)
+			traits_to_copy = list(TRAIT_PLANT_COLOUR,TRAIT_PRODUCT_COLOUR,TRAIT_BIOLUM_COLOUR,TRAIT_LEAVES_COLOUR)
 		if(GENE_STRUCTURE)
-			traits_to_copy = list(TRAIT_PLANT_ICON,TRAIT_PRODUCT_ICON,TRAIT_HARVEST_REPEAT)
+			traits_to_copy = list(TRAIT_PLANT_ICON,TRAIT_PRODUCT_ICON,TRAIT_HARVEST_REPEAT,TRAIT_LARGE)
 		if(GENE_FRUIT)
 			traits_to_copy = list(TRAIT_STINGS,TRAIT_EXPLOSIVE,TRAIT_FLESH_COLOUR,TRAIT_JUICY)
 		if(GENE_SPECIAL)
@@ -733,7 +743,7 @@
 				var/clr
 				if(get_trait(TRAIT_BIOLUM_COLOUR))
 					clr = get_trait(TRAIT_BIOLUM_COLOUR)
-				product.set_light(get_trait(TRAIT_BIOLUM), l_color = clr)
+				product.set_light(0.5, 0.1, 3, l_color = clr)
 
 			//Handle spawning in living, mobile products (like dionaea).
 			if(istype(product,/mob/living))
@@ -777,3 +787,43 @@
 		growth_stages = plant_controller.plant_sprites[get_trait(TRAIT_PLANT_ICON)]
 	else
 		growth_stages = 0
+
+/datum/seed/proc/get_growth_type()
+	if(get_trait(TRAIT_SPREAD) == 2)
+		switch(seed_noun)
+			if(SEED_NOUN_CUTTINGS)
+				return GROWTH_WORMS
+			if(SEED_NOUN_NODES)
+				return GROWTH_BIOMASS
+			if(SEED_NOUN_SPORES)
+				return GROWTH_MOLD
+			else
+				return GROWTH_VINES
+	return 0
+
+/datum/seed/proc/get_icon(growth_stage)
+	var/plant_icon = get_trait(TRAIT_PLANT_ICON)
+	var/image/res = image('icons/obj/hydroponics_growing.dmi', "[plant_icon]-[growth_stage]")
+	if(get_growth_type())
+		res.icon_state = "[get_growth_type()]-[growth_stage]"
+	else
+		res.icon_state = "[plant_icon]-[growth_stage]"
+
+	if(get_growth_type())
+		res.icon = 'icons/obj/hydroponics_vines.dmi'
+
+	res.color = get_trait(TRAIT_PLANT_COLOUR)
+
+	if(get_trait(TRAIT_LARGE))
+		res.icon = 'icons/obj/hydroponics_large.dmi'
+		res.pixel_x = -8
+		res.pixel_y = -16
+
+	var/leaves = get_trait(TRAIT_LEAVES_COLOUR)
+	if(leaves)
+		var/image/I = image(res.icon, "[plant_icon]-[growth_stage]-leaves")
+		I.color = leaves
+		I.appearance_flags = RESET_COLOR
+		res.overlays += I
+
+	return res

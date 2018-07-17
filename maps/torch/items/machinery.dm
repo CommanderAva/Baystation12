@@ -30,11 +30,16 @@
 /obj/machinery/telecomms/server/presets/service
 	id = "Service and Exploration Server"
 	freq_listening = list(SRV_FREQ, EXP_FREQ)
+	channel_tags = list(
+		list(SRV_FREQ, "Service", COMMS_COLOR_SERVICE),
+		list(EXP_FREQ, "Exploration", COMMS_COLOR_EXPLORER)
+	)
 	autolinkers = list("service", "exploration")
 
 /obj/machinery/telecomms/server/presets/exploration
 	id = "Utility Server"
 	freq_listening = list(EXP_FREQ)
+	channel_tags = list(list(EXP_FREQ, "Exploration", COMMS_COLOR_EXPLORER))
 	autolinkers = list("Exploration")
 
 // Suit cyclers and storage
@@ -43,14 +48,27 @@
 	model_text = "Exploration"
 	req_access = list(access_explorer)
 	departments = list("Exploration")
-	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL)
+	species = list(SPECIES_HUMAN,SPECIES_TAJARA,SPECIES_SKRELL,SPECIES_UNATHI)
 
 /obj/machinery/suit_storage_unit/explorer
 	name = "Exploration Voidsuit Storage Unit"
-	SUIT_TYPE = /obj/item/clothing/suit/space/void/exploration
-	HELMET_TYPE = /obj/item/clothing/head/helmet/space/void/exploration
-	BOOTS_TYPE = /obj/item/clothing/shoes/magboots
-	TANK_TYPE = /obj/item/weapon/tank/oxygen
-	MASK_TYPE = /obj/item/clothing/mask/breath
+	suit_type = /obj/item/clothing/suit/space/void/exploration
+	helmet_type = /obj/item/clothing/head/helmet/space/void/exploration
+	boots_type = /obj/item/clothing/shoes/magboots
+	tank_type = /obj/item/weapon/tank/oxygen
+	mask_type = /obj/item/clothing/mask/breath
 	req_access = list(access_explorer)
 	islocked = 1
+
+/obj/machinery/vending/security
+	name = "SecTech"
+	desc = "A security equipment vendor."
+	product_ads = "Crack capitalist skulls!;Beat some heads in!;Don't forget - harm is good!;Your weapons are right here.;Handcuffs!;Freeze, scumbag!;Don't tase me bro!;Tase them, bro.;Why not have a donut?"
+	icon_state = "sec"
+	icon_deny = "sec-deny"
+	icon_vend = "sec-vend"
+	vend_delay = 14
+	req_access = list(access_security)
+	products = list(/obj/item/weapon/handcuffs = 8,/obj/item/weapon/grenade/flashbang = 4,/obj/item/weapon/grenade/chem_grenade/teargas = 4,/obj/item/device/flash = 5,
+					/obj/item/weapon/reagent_containers/food/snacks/donut/normal = 12,/obj/item/weapon/storage/box/evidence = 6,/obj/item/clothing/accessory/badge/solgov/security = 6)
+	contraband = list(/obj/item/clothing/glasses/sunglasses = 2,/obj/item/weapon/storage/box/donut = 2)

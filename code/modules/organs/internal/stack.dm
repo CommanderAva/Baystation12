@@ -26,10 +26,6 @@
 /obj/item/organ/internal/stack/getToxLoss()
 	return 0
 
-/obj/item/organ/internal/stack/vox
-	name = "cortical stack"
-	invasive = 1
-
 /obj/item/organ/internal/stack/proc/do_backup()
 	if(owner && owner.stat != DEAD && !is_broken() && owner.mind)
 		languages = owner.languages.Copy()
@@ -63,14 +59,6 @@
 	do_backup()
 	..()
 
-/obj/item/organ/internal/stack/vox/removed()
-	var/obj/item/organ/external/head = owner.get_organ(parent_organ)
-	owner.visible_message("<span class='danger'>\The [src] rips gaping holes in \the [owner]'s [head.name] as it is torn loose!</span>")
-	head.take_damage(rand(15,20))
-	for(var/obj/item/organ/O in head.contents)
-		O.take_damage(rand(30,70))
-	..()
-
 /obj/item/organ/internal/stack/proc/overwrite()
 	if(owner.mind && owner.ckey) //Someone is already in this body!
 		owner.visible_message("<span class='danger'>\The [owner] spasms violently!</span>")
@@ -80,7 +68,7 @@
 		owner.ghostize() // Remove the previous owner to avoid their client getting reset.
 	//owner.dna.real_name = backup.name
 	//owner.real_name = owner.dna.real_name
-	//owner.name = owner.real_name
+	//owner.SetName(owner.real_name)
 	//The above three lines were commented out for
 	backup.active = 1
 	backup.transfer_to(owner)

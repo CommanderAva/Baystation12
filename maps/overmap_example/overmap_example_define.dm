@@ -1,16 +1,16 @@
 /datum/map/overmap_example
-	name = "Smelyj"
-	full_name = "Smelyj"
+	name = "Bearcat"
+	full_name = "Bearcat"
 	path = "overmap_example"
 
-	station_name  = "EV Smelij"
-	station_short = "Smelij"
+	station_name  = "FTV Bearcat"
+	station_short = "Bearcat"
 
-	dock_name     = "FTS Tetras Prime"
-	boss_name     = "TSR Exploration Fleet"
-	boss_short    = "Kontr-Admiral"
-	company_name  = "Avalanche Concern"
-	company_short = "Avalanche"
+	dock_name     = "FTS Capitalist's Rest"
+	boss_name     = "FTU Merchant Navy"
+	boss_short    = "Merchant Admiral"
+	company_name  = "Legit Cargo Ltd."
+	company_short = "LC"
 	overmap_event_areas = 11
 
 	default_law_type = /datum/ai_laws/corporate
@@ -37,10 +37,10 @@
 	salary_modifier = 0.2
 
 /datum/map/overmap_example/map_info(victim)
-	to_chat(victim, "You're aboard the <b>[station_name],</b> an exploration vessel affiliated with Tetras Stellar Republic and Avalanche Concern, on a SPACE FRONTIER. No major corporation or government has laid claim on the planets in this sector, so their exploitation is entirely up to you!")
+	to_chat(victim, "You're aboard the <b>[station_name],</b> an independent vessel affiliated with Free Trade Union, on a SPACE FRONTIER. No major corporation or government has laid claim on the planets in this sector, so their exploitation is entirely up to you - mine, poach and deforest all you want.")
 
 /datum/map/overmap_example/setup_map()
 	..()
-	GLOB.traders += new /datum/trader/xeno_shop
-	GLOB.traders += new /datum/trader/medical
-	GLOB.traders += new /datum/trader/mining
+	SStrade.traders += new /datum/trader/xeno_shop
+	SStrade.traders += new /datum/trader/medical
+	SStrade.traders += new /datum/trader/mining

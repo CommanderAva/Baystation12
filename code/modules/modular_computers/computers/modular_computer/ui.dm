@@ -1,6 +1,6 @@
 // Operates NanoUI
 /obj/item/modular_computer/ui_interact(mob/user, ui_key = "main", var/datum/nanoui/ui = null, var/force_open = 1)
-	if(!screen_on || !enabled)
+	if(!screen_on || !enabled || bsod)
 		if(ui)
 			ui.close()
 		return 0
@@ -38,7 +38,7 @@
 		programs.Add(list(program))
 
 	data["programs"] = programs
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "laptop_mainscreen.tmpl", "NTOS Main Menu", 400, 500)
 		ui.auto_update_layout = 1

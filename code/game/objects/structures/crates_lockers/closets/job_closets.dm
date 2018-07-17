@@ -61,7 +61,6 @@
 	return list(
 		/obj/item/clothing/under/rank/janitor,
 		/obj/item/device/radio/headset/headset_service,
-		/obj/item/weapon/cartridge/janitor,
 		/obj/item/clothing/gloves/thick,
 		/obj/item/clothing/head/soft/purple,
 		/obj/item/clothing/head/beret/purple,
@@ -87,9 +86,9 @@
 		/obj/item/clothing/under/lawyer/black,
 		/obj/item/clothing/under/lawyer/red,
 		/obj/item/clothing/under/lawyer/bluesuit,
-		/obj/item/clothing/suit/storage/toggle/lawyer/bluejacket,
+		/obj/item/clothing/suit/storage/toggle/suit/blue,
 		/obj/item/clothing/under/lawyer/purpsuit,
-		/obj/item/clothing/suit/storage/lawyer/purpjacket,
+		/obj/item/clothing/suit/storage/toggle/suit/purple,
 		/obj/item/clothing/shoes/brown,
 		/obj/item/clothing/shoes/black
 	)

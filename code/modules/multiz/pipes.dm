@@ -2,26 +2,26 @@
 // parent class for pipes //
 ////////////////////////////
 obj/machinery/atmospherics/pipe/zpipe
-		icon = 'icons/obj/structures.dmi'
-		icon_state = "up"
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "up"
 
-		name = "upwards pipe"
-		desc = "A pipe segment to connect upwards."
+	name = "upwards pipe"
+	desc = "A pipe segment to connect upwards."
 
-		volume = 70
+	volume = 70
 
-		dir = SOUTH
-		initialize_directions = SOUTH
+	dir = SOUTH
+	initialize_directions = SOUTH
 
-		var/minimum_temperature_difference = 300
-		var/thermal_conductivity = 0 //WALL_HEAT_TRANSFER_COEFFICIENT No
+	var/minimum_temperature_difference = 300
+	var/thermal_conductivity = 0 //WALL_HEAT_TRANSFER_COEFFICIENT No
 
-		var/maximum_pressure = 70*ONE_ATMOSPHERE
-		var/fatigue_pressure = 55*ONE_ATMOSPHERE
-		alert_pressure = 55*ONE_ATMOSPHERE
+	var/maximum_pressure = 70*ONE_ATMOSPHERE
+	var/fatigue_pressure = 55*ONE_ATMOSPHERE
+	alert_pressure = 55*ONE_ATMOSPHERE
 
 
-		level = 1
+	level = 1
 
 obj/machinery/atmospherics/pipe/zpipe/New()
 	..()
@@ -88,7 +88,7 @@ obj/machinery/atmospherics/pipe/zpipe/Destroy()
 		node1.disconnect(src)
 	if(node2)
 		node2.disconnect(src)
-	..()
+	. = ..()
 
 obj/machinery/atmospherics/pipe/zpipe/pipeline_expansion()
 	return list(node1, node2)
@@ -112,11 +112,11 @@ obj/machinery/atmospherics/pipe/zpipe/disconnect(obj/machinery/atmospherics/refe
 // the elusive up pipe //
 /////////////////////////
 obj/machinery/atmospherics/pipe/zpipe/up
-		icon = 'icons/obj/structures.dmi'
-		icon_state = "up"
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "up"
 
-		name = "upwards pipe"
-		desc = "A pipe segment to connect upwards."
+	name = "upwards pipe"
+	desc = "A pipe segment to connect upwards."
 
 obj/machinery/atmospherics/pipe/zpipe/up/atmos_init()
 	..()
@@ -151,11 +151,11 @@ obj/machinery/atmospherics/pipe/zpipe/up/atmos_init()
 ///////////////////////
 
 obj/machinery/atmospherics/pipe/zpipe/down
-		icon = 'icons/obj/structures.dmi'
-		icon_state = "down"
+	icon = 'icons/obj/structures.dmi'
+	icon_state = "down"
 
-		name = "downwards pipe"
-		desc = "A pipe segment to connect downwards."
+	name = "downwards pipe"
+	desc = "A pipe segment to connect downwards."
 
 obj/machinery/atmospherics/pipe/zpipe/down/atmos_init()
 	..()

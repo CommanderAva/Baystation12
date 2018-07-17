@@ -1,9 +1,11 @@
+#define SOUND_ID "pipe_leakage"
+
 /obj/machinery/atmospherics/pipe
 
 	var/datum/gas_mixture/air_temporary // used when reconstructing a pipeline that broke
 	var/datum/pipeline/parent
 	var/volume = 0
-	var/leaking = 0
+	var/leaking = 0		// Do not set directly, use set_leaking(TRUE/FALSE)
 	use_power = 0
 
 	var/alert_pressure = 170*ONE_ATMOSPHERE
@@ -13,6 +15,7 @@
 	can_buckle = 1
 	buckle_require_restraints = 1
 	buckle_lying = -1
+	var/datum/sound_token/sound_token
 
 /obj/machinery/atmospherics/pipe/drain_power()
 	return -1
@@ -24,6 +27,29 @@
 
 /obj/machinery/atmospherics/pipe/hides_under_flooring()
 	return level != 2
+
+/obj/machinery/atmospherics/pipe/proc/set_leaking(var/new_leaking)
+	if(new_leaking && !leaking)
+		START_PROCESSING(SSmachines, src)
+		leaking = TRUE
+		if(parent)
+			parent.leaks |= src
+			if(parent.network)
+				parent.network.leaks |= src
+	else if (!new_leaking && leaking)
+		update_sound(0)
+		STOP_PROCESSING(SSmachines, src)
+		leaking = FALSE
+		if(parent)
+			parent.leaks -= src
+			if(parent.network)
+				parent.network.leaks -= src
+
+/obj/machinery/atmospherics/pipe/proc/update_sound(var/playing)
+	if(playing && !sound_token)
+		sound_token = GLOB.sound_player.PlayLoopingSound(src, SOUND_ID, "sound/machines/pipeleak.ogg", volume = 8, range = 3, falloff = 1, prefer_mute = TRUE)
+	else if(!playing && sound_token)
+		QDEL_NULL(sound_token)
 
 /obj/machinery/atmospherics/pipe/proc/pipeline_expansion()
 	return null
@@ -64,6 +90,7 @@
 
 /obj/machinery/atmospherics/pipe/Destroy()
 	QDEL_NULL(parent)
+	QDEL_NULL(sound_token)
 	if(air_temporary)
 		loc.assume_air(air_temporary)
 
@@ -78,7 +105,7 @@
 	if(istype(W,/obj/item/device/pipe_painter))
 		return 0
 
-	if (!istype(W, /obj/item/weapon/wrench))
+	if(!isWrench(W))
 		return ..()
 	var/turf/T = src.loc
 	if (level==1 && isturf(T) && !T.is_plating())
@@ -194,6 +221,10 @@
 		..()
 	else if(leaking)
 		parent.mingle_with_turf(loc, volume)
+		if(!sound_token && parent.air.return_pressure())
+			update_sound(1)
+		else if(sound_token && !parent.air.return_pressure())
+			update_sound(0)
 	else
 		. = PROCESS_KILL
 
@@ -238,8 +269,7 @@
 		node1 = null
 	if(node2)
 		node2.disconnect(src)
-		node1 = null
-
+		node2 = null
 	. = ..()
 
 /obj/machinery/atmospherics/pipe/simple/pipeline_expansion()
@@ -273,13 +303,10 @@
 		qdel(src)
 	else if(node1 && node2)
 		overlays += icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]intact[icon_connect_type]")
-		if(leaking)
-			leaking = 0
+		set_leaking(FALSE)
 	else
 		overlays += icon_manager.get_atmos_icon("pipe", , pipe_color, "[pipe_icon]exposed[node1?1:0][node2?1:0][icon_connect_type]")
-		if(!leaking)
-			leaking = 1
-			START_PROCESSING(SSmachines, src)
+		set_leaking(TRUE)
 
 /obj/machinery/atmospherics/pipe/simple/update_underlays()
 	return
@@ -515,6 +542,7 @@
 	if(!check_icon_cache())
 		return
 
+	set_leaking(!(node1 && node2 && node3))
 	alpha = 255
 
 	if(!node1 && !node2 && !node3)
@@ -773,6 +801,7 @@
 	if(!check_icon_cache())
 		return
 
+	set_leaking(!(node1 && node2 && node3 && node4))
 	alpha = 255
 
 	if(!node1 && !node2 && !node3 && !node4)
@@ -1091,10 +1120,10 @@
 	initialize_directions = SOUTH
 	density = 1
 
-/obj/machinery/atmospherics/pipe/tank/New()
+/obj/machinery/atmospherics/pipe/tank/Initialize()
 	icon_state = "air"
 	initialize_directions = dir
-	..()
+	. = ..()
 
 /obj/machinery/atmospherics/pipe/tank/Process()
 	if(!parent)
@@ -1236,6 +1265,20 @@
 
 	..()
 	icon_state = "n2o"
+
+/obj/machinery/atmospherics/pipe/tank/hydrogen
+	name = "Pressure Tank (Hydrogen)"
+	icon_state = "h2_map"
+
+/obj/machinery/atmospherics/pipe/tank/hydrogen/New()
+	air_temporary = new
+	air_temporary.volume = volume
+	air_temporary.temperature = T20C
+
+	air_temporary.adjust_gas("hydrogen", (start_pressure)*(air_temporary.volume)/(R_IDEAL_GAS_EQUATION*air_temporary.temperature))
+
+	..()
+	icon_state = "h2"
 
 /obj/machinery/atmospherics/pipe/vent
 	icon = 'icons/obj/atmospherics/pipe_vent.dmi'
@@ -1419,3 +1462,5 @@
 			underlays += icon_manager.get_atmos_icon("underlay", direction, color_cache_name(node), "intact" + icon_connect_type)
 	else
 		underlays += icon_manager.get_atmos_icon("underlay", direction, color_cache_name(node), "retracted" + icon_connect_type)
+
+#undef SOUND_ID

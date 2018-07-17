@@ -42,7 +42,7 @@
 		if(enemies.len && prob(10))
 			enemies = list()
 			LoseTarget()
-			src.visible_message("<span class='notice'>[src] calms down.</span>")
+			src.visible_message("<span class='notice'>\The [src] calms down.</span>")
 
 		if(stat == CONSCIOUS)
 			if(udder && prob(5))
@@ -69,8 +69,8 @@
 
 /mob/living/simple_animal/hostile/retaliate/goat/Retaliate()
 	..()
-	if(stat == CONSCIOUS)
-		visible_message("<span class='warning'>[src] gets an evil-looking gleam in their eye.</span>")
+	if(stat == CONSCIOUS && prob(50))
+		visible_message("<span class='warning'>\The [src] gets an evil-looking gleam in their eye.</span>")
 
 /mob/living/simple_animal/hostile/retaliate/goat/attackby(var/obj/item/O as obj, var/mob/user as mob)
 	var/obj/item/weapon/reagent_containers/glass/G = O
@@ -83,6 +83,7 @@
 			to_chat(user, "<span class='warning'>The udder is dry. Wait a bit longer...</span>")
 	else
 		..()
+
 //cow
 /mob/living/simple_animal/cow
 	name = "cow"
@@ -167,7 +168,7 @@
 	attacktext = "kicked"
 	health = 1
 	var/amount_grown = 0
-	pass_flags = PASSTABLE | PASSGRILLE
+	pass_flags = PASS_FLAG_TABLE | PASS_FLAG_GRILLE
 	mob_size = MOB_MINISCULE
 
 /mob/living/simple_animal/chick/New()
@@ -209,7 +210,7 @@ var/global/chicken_count = 0
 	health = 10
 	var/eggsleft = 0
 	var/body_color
-	pass_flags = PASSTABLE
+	pass_flags = PASS_FLAG_TABLE
 	mob_size = MOB_SMALL
 
 /mob/living/simple_animal/chicken/New()
@@ -233,7 +234,6 @@ var/global/chicken_count = 0
 		if(G.seed && G.seed.kitchen_tag == "wheat")
 			if(!stat && eggsleft < 8)
 				user.visible_message("<span class='notice'>[user] feeds [O] to [name]! It clucks happily.</span>","<span class='notice'>You feed [O] to [name]! It clucks happily.</span>")
-				user.drop_item()
 				qdel(O)
 				eggsleft += rand(1, 4)
 			else

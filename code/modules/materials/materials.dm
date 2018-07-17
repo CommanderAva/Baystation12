@@ -73,6 +73,7 @@ var/list/name_to_material
 	var/sheet_singular_name = "sheet"
 	var/sheet_plural_name = "sheets"
 	var/is_fusion_fuel
+	var/list/chem_products				  //Used with the grinder to produce chemicals.
 
 	// Shards/tables/structures
 	var/shard_type = SHARD_SHRAPNEL       // Path of debris object.
@@ -86,6 +87,8 @@ var/list/name_to_material
 	var/icon_base = "metal"                              // Wall and table base icon tag. See header.
 	var/door_icon_base = "metal"                         // Door base icon tag. See header.
 	var/icon_reinf = "reinf_metal"                       // Overlay used
+	var/table_icon_base = "metal"
+	var/table_reinf = "reinf_metal"
 	var/list/stack_origin_tech = list(TECH_MATERIAL = 1) // Research level for stacks.
 
 	// Attributes
@@ -101,8 +104,6 @@ var/list/name_to_material
 	var/conductive = 1           // Objects with this var add CONDUCTS to flags on spawn.
 	var/luminescence
 	var/list/composite_material  // If set, object matter var will be a list containing these values.
-	var/power //This one and lower are for ammo creation
-	var/incendiary
 
 	// Placeholder vars for the time being, todo properly integrate windows/light tiles/rods.
 	var/created_window
@@ -172,10 +173,6 @@ var/list/name_to_material
 /material/proc/build_windows(var/mob/living/user, var/obj/item/stack/used_stack)
 	return 0
 
-// Weapons handle applying a divisor for this value locally.
-/material/proc/get_blunt_damage()
-	return weight //todo
-
 // Return the matter comprising this material.
 /material/proc/get_matter()
 	var/list/temp_matter = list()
@@ -186,9 +183,20 @@ var/list/name_to_material
 		temp_matter[name] = SHEET_MATERIAL_AMOUNT
 	return temp_matter
 
+// Weapons handle applying a divisor for this value locally.
+/material/proc/get_blunt_damage()
+	return weight //todo
+
 // As above.
 /material/proc/get_edge_damage()
 	return hardness //todo
+
+/material/proc/get_attack_cooldown()
+	if(weight < 19)
+		return FAST_WEAPON_COOLDOWN
+	if(weight > 23)
+		return SLOW_WEAPON_COOLDOWN
+	return DEFAULT_WEAPON_COOLDOWN
 
 // Snowflakey, only checked for alien doors at the moment.
 /material/proc/can_open_material_door(var/mob/living/user)
@@ -238,11 +246,15 @@ var/list/name_to_material
 	stack_type = /obj/item/stack/material/uranium
 	radioactivity = 12
 	icon_base = "stone"
+	door_icon_base = "stone"
+	table_icon_base = "stone"
 	icon_reinf = "reinf_stone"
 	icon_colour = "#007a00"
 	weight = 22
 	stack_origin_tech = list(TECH_MATERIAL = 5)
-	door_icon_base = "stone"
+	chem_products = list(
+				/datum/reagent/uranium = 20
+				)
 
 /material/diamond
 	name = "diamond"
@@ -269,6 +281,9 @@ var/list/name_to_material
 	stack_origin_tech = list(TECH_MATERIAL = 4)
 	sheet_singular_name = "ingot"
 	sheet_plural_name = "ingots"
+	chem_products = list(
+				/datum/reagent/gold = 20
+				)
 
 /material/gold/bronze //placeholder for ashtrays
 	name = "bronze"
@@ -283,12 +298,16 @@ var/list/name_to_material
 	stack_origin_tech = list(TECH_MATERIAL = 3)
 	sheet_singular_name = "ingot"
 	sheet_plural_name = "ingots"
+	chem_products = list(
+				/datum/reagent/silver = 20
+				)
 
 /material/phoron
 	name = "phoron"
 	stack_type = /obj/item/stack/material/phoron
 	ignition_point = PHORON_MINIMUM_BURN_TEMPERATURE
 	icon_base = "stone"
+	table_icon_base = "stone"
 	icon_colour = "#e37108"
 	shard_type = SHARD_SHARD
 	hardness = 30
@@ -297,7 +316,9 @@ var/list/name_to_material
 	sheet_singular_name = "crystal"
 	sheet_plural_name = "crystals"
 	is_fusion_fuel = 1
-	incendiary = 1.2
+	chem_products = list(
+				/datum/reagent/toxin/phoron = 20
+				)
 
 /material/phoron/supermatter
 	name = "supermatter"
@@ -328,6 +349,7 @@ var/list/name_to_material
 	name = "sandstone"
 	stack_type = /obj/item/stack/material/sandstone
 	icon_base = "stone"
+	table_icon_base = "stone"
 	icon_reinf = "reinf_stone"
 	icon_colour = "#d9c179"
 	shard_type = SHARD_STONE_PIECE
@@ -357,6 +379,10 @@ var/list/name_to_material
 	icon_reinf = "reinf_over"
 	icon_colour = "#666666"
 	hitsound = 'sound/weapons/smash.ogg'
+	chem_products = list(
+				/datum/reagent/iron = 15,
+				/datum/reagent/carbon = 5
+				)
 
 /material/diona
 	name = "biomass"
@@ -396,6 +422,7 @@ var/list/name_to_material
 	weight = 23
 	stack_origin_tech = list(TECH_MATERIAL = 2)
 	composite_material = list(DEFAULT_WALL_MATERIAL = 3750, "platinum" = 3750) //todo
+	hitsound = 'sound/weapons/smash.ogg'
 
 /material/plasteel/titanium
 	name = "titanium"
@@ -403,6 +430,7 @@ var/list/name_to_material
 	burn_armor = 8
 	integrity = 200
 	melting_point = 3000
+	weight = 18
 	stack_type = null
 	icon_base = "metal"
 	door_icon_base = "metal"
@@ -439,6 +467,7 @@ var/list/name_to_material
 	brute_armor = 1
 	burn_armor = 2
 	door_icon_base = "stone"
+	table_icon_base = "solid"
 	destruction_desc = "shatters"
 	window_options = list("One Direction" = 1, "Full Window" = 4)
 	created_window = /obj/structure/window/basic
@@ -584,6 +613,9 @@ var/list/name_to_material
 	melting_point = T0C+371 //assuming heat resistant plastic
 	stack_origin_tech = list(TECH_MATERIAL = 3)
 	conductive = 0
+	chem_products = list(
+				/datum/reagent/toxin/plasticide = 20
+				)
 
 /material/plastic/holographic
 	name = "holoplastic"
@@ -623,6 +655,9 @@ var/list/name_to_material
 	icon_colour = "#e6c5de"
 	stack_origin_tech = list(TECH_MATERIAL = 6, TECH_POWER = 6, TECH_MAGNET = 5)
 	is_fusion_fuel = 1
+	chem_products = list(
+				/datum/reagent/hydrazine = 20
+				)
 
 /material/platinum
 	name = "platinum"
@@ -635,13 +670,15 @@ var/list/name_to_material
 
 /material/iron
 	name = "iron"
-	display_name = "iron"
 	stack_type = /obj/item/stack/material/iron
 	icon_colour = "#5c5454"
 	weight = 22
 	sheet_singular_name = "ingot"
 	sheet_plural_name = "ingots"
 	hitsound = 'sound/weapons/smash.ogg'
+	chem_products = list(
+				/datum/reagent/iron = 20
+				)
 
 // Adminspawn only, do not let anyone get this.
 /material/voxalloy
@@ -668,6 +705,7 @@ var/list/name_to_material
 	icon_colour = "#824b28"
 	integrity = 50
 	icon_base = "solid"
+	table_icon_base = "solid"
 	explosion_resistance = 2
 	shard_type = SHARD_SPLINTER
 	shard_can_repair = 0 // you can't weld splinters back into planks
@@ -684,6 +722,10 @@ var/list/name_to_material
 	sheet_plural_name = "planks"
 	hitsound = 'sound/effects/woodhit.ogg'
 	conductive = 0
+	chem_products = list(
+				/datum/reagent/carbon = 10,
+				/datum/reagent/water = 5
+				)
 
 /material/wood/holographic
 	name = "holowood"
@@ -733,15 +775,9 @@ var/list/name_to_material
 /material/cult/place_dismantled_girder(var/turf/target)
 	new /obj/structure/girder/cult(target)
 
-/material/cult/place_dismantled_product(var/turf/target)
-	new /obj/effect/decal/cleanable/blood(target)
-
 /material/cult/reinf
 	name = "cult2"
-	display_name = "human remains"
-
-/material/cult/reinf/place_dismantled_product(var/turf/target)
-	new /obj/item/remains/human(target)
+	display_name = "runic inscriptions"
 
 /material/resin
 	name = "resin"
@@ -755,12 +791,13 @@ var/list/name_to_material
 
 /material/resin/can_open_material_door(var/mob/living/user)
 	var/mob/living/carbon/M = user
-	if(istype(M) && locate(/obj/item/organ/internal/xenos/hivenode) in M.internal_organs)
+	if(istype(M) && locate(/obj/item/organ/internal/xeno/hivenode) in M.internal_organs)
 		return 1
 	return 0
 
 /material/aliumium
-	name = "alien alloy"
+	name = "aliumium"
+	display_name = "alien alloy"
 	stack_type = null
 	icon_base = "jaggy"
 	door_icon_base = "metal"
@@ -768,9 +805,10 @@ var/list/name_to_material
 	hitsound = 'sound/weapons/smash.ogg'
 	sheet_singular_name = "chunk"
 	sheet_plural_name = "chunks"
+	stack_type = /obj/item/stack/material/aliumium
 
 /material/aliumium/New()
-	icon_base = pick("jaggy","curvy")
+	icon_base = "metal"
 	icon_colour = rgb(rand(10,150),rand(10,150),rand(10,150))
 	explosion_resistance = rand(25,40)
 	brute_armor = rand(10,20)
@@ -797,7 +835,7 @@ var/list/name_to_material
 	name = "carpet"
 	display_name = "comfy"
 	use_name = "red upholstery"
-	icon_colour = "#da020a"
+	icon_colour = "#9d2300"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300
@@ -814,11 +852,20 @@ var/list/name_to_material
 	melting_point = T0C+300
 	conductive = 0
 
+/material/cloth_yellow
+	name = "yellow"
+	display_name ="yellow"
+	icon_colour = "#ffbf00"
+	flags = MATERIAL_PADDING
+	ignition_point = T0C+232
+	melting_point = T0C+300
+	conductive = 0
+
 /material/cloth_teal
 	name = "teal"
 	display_name ="teal"
 	use_name = "teal cloth"
-	icon_colour = "#00eafa"
+	icon_colour = "#00e1ff"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300
@@ -838,7 +885,7 @@ var/list/name_to_material
 	name = "green"
 	display_name = "green"
 	use_name = "green cloth"
-	icon_colour = "#01c608"
+	icon_colour = "#b7f27d"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300
@@ -848,7 +895,7 @@ var/list/name_to_material
 	name = "purple"
 	display_name = "purple"
 	use_name = "purple cloth"
-	icon_colour = "#9c56c4"
+	icon_colour = "#9933ff"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300
@@ -858,7 +905,7 @@ var/list/name_to_material
 	name = "blue"
 	display_name = "blue"
 	use_name = "blue cloth"
-	icon_colour = "#6b6fe3"
+	icon_colour = "#46698c"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300
@@ -868,7 +915,7 @@ var/list/name_to_material
 	name = "beige"
 	display_name = "beige"
 	use_name = "beige cloth"
-	icon_colour = "#e8e7c8"
+	icon_colour = "#ceb689"
 	flags = MATERIAL_PADDING
 	ignition_point = T0C+232
 	melting_point = T0C+300

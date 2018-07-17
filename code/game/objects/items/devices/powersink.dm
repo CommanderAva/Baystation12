@@ -6,7 +6,7 @@
 	icon_state = "powersink0"
 	item_state = "electronic"
 	w_class = ITEM_SIZE_LARGE
-	flags = CONDUCT
+	obj_flags = OBJ_FLAG_CONDUCTIBLE
 	throwforce = 5
 	throw_speed = 1
 	throw_range = 2
@@ -31,7 +31,7 @@
 	. = ..()
 
 /obj/item/device/powersink/attackby(var/obj/item/I, var/mob/user)
-	if(istype(I, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(I))
 		if(mode == 0)
 			var/turf/T = loc
 			if(isturf(T) && !!T.is_plating())
@@ -82,17 +82,13 @@
 /obj/item/device/powersink/pwr_drain()
 	if(!attached)
 		return 0
-
 	if(drained_this_tick)
 		return 1
 	drained_this_tick = 1
-
 	var/drained = 0
-
 	if(!PN)
 		return 1
-
-	set_light(12)
+	set_light(0.5, 0.1, 12)
 	PN.trigger_warning()
 	// found a powernet, so drain up to max power from it
 	drained = PN.draw_power(drain_rate)

@@ -1,31 +1,31 @@
 /datum/shuttle/autodock/multi
-	var/list/destinations
-
+	var/list/destination_tags
+	var/list/destinations_cache = list()
+	var/last_cache_rebuild_time = 0
 	category = /datum/shuttle/autodock/multi
-
-/datum/shuttle/autodock/multi/New(_name)
-	..(_name)
-
-	//build destination list
-	var/list/found_waypoints = list()
-	for(var/waypoint_tag in destinations)
-		var/obj/effect/shuttle_landmark/WP = locate(waypoint_tag)
-		if(WP)
-			found_waypoints["[WP.name]"] = WP
-		else
-			log_error("Shuttle [name] could not find waypoint with tag [waypoint_tag]!")
-	destinations = found_waypoints
 
 /datum/shuttle/autodock/multi/proc/set_destination(var/destination_key, mob/user)
 	if(moving_status != SHUTTLE_IDLE)
 		return
-	next_location = destinations[destination_key]
+	next_location = destinations_cache[destination_key]
 
+/datum/shuttle/autodock/multi/proc/get_destinations()
+	if (last_cache_rebuild_time < SSshuttle.last_landmark_registration_time)
+		build_destinations_cache()
+	return destinations_cache
+
+/datum/shuttle/autodock/multi/proc/build_destinations_cache()
+	last_cache_rebuild_time = world.time
+	destinations_cache.Cut()
+	for(var/destination_tag in destination_tags)
+		var/obj/effect/shuttle_landmark/landmark = SSshuttle.get_landmark(destination_tag)
+		if (istype(landmark))
+			destinations_cache["[landmark.name]"] = landmark
 
 //Antag play announcements when they leave/return to their home area
 /datum/shuttle/autodock/multi/antag
 	warmup_time = 10 SECONDS //replaced the old move cooldown
-
+	 //This variable is type-abused initially: specify the landmark_tag, not the actual landmark.
 	var/obj/effect/shuttle_landmark/home_waypoint
 
 	var/cloaked = 1
@@ -39,7 +39,7 @@
 /datum/shuttle/autodock/multi/antag/New()
 	..()
 	if(home_waypoint)
-		home_waypoint = locate(home_waypoint)
+		home_waypoint = SSshuttle.get_landmark(home_waypoint)
 	else
 		home_waypoint = current_location
 

@@ -5,7 +5,6 @@
 	icon_closed = "securece"
 	icon_locked = "securece1"
 	icon_opened = "secureceopen"
-	icon_broken = "securecebroken"
 	icon_off = "secureceoff"
 
 /obj/structure/closet/secure_closet/engineering_chief/WillContain()
@@ -19,7 +18,6 @@
 		/obj/item/clothing/head/welding,
 		/obj/item/clothing/gloves/insulated,
 		/obj/item/clothing/shoes/brown,
-		/obj/item/weapon/cartridge/ce,
 		/obj/item/device/radio/headset/heads/ce,
 		/obj/item/weapon/storage/toolbox/mechanical,
 		/obj/item/clothing/suit/storage/hazardvest,
@@ -37,7 +35,6 @@
 	icon_closed = "secureengelec"
 	icon_locked = "secureengelec1"
 	icon_opened = "toolclosetopen"
-	icon_broken = "secureengelecbroken"
 	icon_off = "secureengelecoff"
 
 /obj/structure/closet/secure_closet/engineering_electrical/WillContain()
@@ -56,7 +53,6 @@
 	icon_closed = "secureengweld"
 	icon_locked = "secureengweld1"
 	icon_opened = "toolclosetopen"
-	icon_broken = "secureengweldbroken"
 	icon_off = "secureengweldoff"
 
 /obj/structure/closet/secure_closet/engineering_welding/WillContain()
@@ -64,7 +60,8 @@
 		/obj/item/clothing/head/welding = 3,
 		/obj/item/weapon/weldingtool/largetank = 3,
 		/obj/item/weapon/weldpack = 3,
-		/obj/item/clothing/glasses/welding = 3
+		/obj/item/clothing/glasses/welding = 3,
+		/obj/item/weapon/welder_tank = 6
 	)
 
 /obj/structure/closet/secure_closet/engineering_personal
@@ -74,7 +71,6 @@
 	icon_closed = "secureeng"
 	icon_locked = "secureeng1"
 	icon_opened = "secureengopen"
-	icon_broken = "secureengbroken"
 	icon_off = "secureengoff"
 
 /obj/structure/closet/secure_closet/engineering_personal/WillContain()
@@ -87,7 +83,6 @@
 		/obj/item/clothing/suit/storage/hazardvest,
 		/obj/item/clothing/mask/gas,
 		/obj/item/clothing/glasses/meson,
-		/obj/item/weapon/cartridge/engineering,
 		/obj/item/taperoll/engineering
 	)
 
@@ -98,7 +93,6 @@
 	icon_closed = "secureatm"
 	icon_locked = "secureatm1"
 	icon_opened = "secureatmopen"
-	icon_broken = "secureatmbroken"
 	icon_off = "secureatmoff"
 
 /obj/structure/closet/secure_closet/atmos_personal/WillContain()
@@ -112,6 +106,5 @@
 		/obj/item/device/radio/headset/headset_eng,
 		/obj/item/clothing/suit/storage/hazardvest,
 		/obj/item/clothing/mask/gas,
-		/obj/item/weapon/cartridge/atmos,
 		/obj/item/taperoll/atmos
 	)

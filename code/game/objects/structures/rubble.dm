@@ -9,14 +9,15 @@
 	anchored = 1
 
 	var/list/loot = list(/obj/item/weapon/cell,/obj/item/stack/material/iron,/obj/item/stack/rods)
-	var/lootleft = 2
-	var/emptyprob = 30
+	var/lootleft = 1
+	var/emptyprob = 95
 	var/health = 40
+	var/is_rummaging = 0
 
 /obj/structure/rubble/New()
-	..()
 	if(prob(emptyprob)) 
 		lootleft = 0
+	..()
 
 /obj/structure/rubble/Initialize()
 	. = ..()
@@ -43,18 +44,25 @@
 		I.transform = M
 		parts += I
 	overlays = parts
+	if(lootleft)
+		overlays += image(icon,"twinkle[rand(1,3)]")
 
 /obj/structure/rubble/attack_hand(mob/user)
-	if(!lootleft)
-		to_chat(user, "<span class='warning'>There's nothing left in this one but unusable garbage...</span>")
-		return
-	visible_message("[user] starts rummaging through \the [src].")
-	if(do_after(user, 30))
-		var/obj/item/booty = pick(loot)
-		booty = new booty(loc)
-		lootleft--
-		update_icon()
-		to_chat(user, "<span class='notice'>You find \a [booty] and pull it carefully out of \the [src].</span>")
+	if(!is_rummaging)
+		if(!lootleft)
+			to_chat(user, "<span class='warning'>There's nothing left in this one but unusable garbage...</span>")
+			return
+		visible_message("[user] starts rummaging through \the [src].")
+		is_rummaging = 1
+		if(do_after(user, 30))
+			var/obj/item/booty = pick(loot)
+			booty = new booty(loc)
+			lootleft--
+			update_icon()
+			to_chat(user, "<span class='notice'>You find \a [booty] and pull it carefully out of \the [src].</span>")
+		is_rummaging = 0
+	else
+		to_chat(user, "<span class='warning'>Someone is already rummaging here!</span>")
 		
 /obj/structure/rubble/attackby(var/obj/item/I, var/mob/user)
 	if (istype(I, /obj/item/weapon/pickaxe))
@@ -75,7 +83,7 @@
 
 /obj/structure/rubble/house
 	loot = list(/obj/item/weapon/archaeological_find/bowl,
-	/obj/item/weapon/archaeological_find/remains/,
+	/obj/item/weapon/archaeological_find/remains,
 	/obj/item/weapon/archaeological_find/bowl/urn,
 	/obj/item/weapon/archaeological_find/cutlery,
 	/obj/item/weapon/archaeological_find/statuette,
@@ -83,15 +91,15 @@
 	/obj/item/weapon/archaeological_find/container,
 	/obj/item/weapon/archaeological_find/mask,
 	/obj/item/weapon/archaeological_find/coin,
-	/obj/item/weapon/archaeological_find/,
+	/obj/item/weapon/archaeological_find,
 	/obj/item/weapon/archaeological_find/material)
 
 /obj/structure/rubble/war
-	emptyprob = 70 //can't have piles upon piles of guns
+	emptyprob = 95 //can't have piles upon piles of guns
 	loot = list(/obj/item/weapon/archaeological_find/knife,
 	/obj/item/weapon/archaeological_find/remains/xeno,
 	/obj/item/weapon/archaeological_find/remains/robot,
-	/obj/item/weapon/archaeological_find/remains/,
+	/obj/item/weapon/archaeological_find/remains,
 	/obj/item/weapon/archaeological_find/gun,
 	/obj/item/weapon/archaeological_find/laser,
 	/obj/item/weapon/archaeological_find/statuette,

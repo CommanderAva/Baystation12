@@ -3,6 +3,7 @@
 	filedesc = "Email Administration Utility"
 	extended_desc = "This program may be used to administrate NTNet's emailing service."
 	program_icon_state = "comm_monitor"
+	program_key_state = "generic_key"
 	program_menu_icon = "mail-open"
 	size = 12
 	requires_ntnet = 1
@@ -14,7 +15,7 @@
 
 
 /datum/nano_module/email_administration/
-	name = "Email Client"
+	name = "Email Administration"
 	var/datum/computer_file/data/email_account/current_account = null
 	var/datum/computer_file/data/email_message/current_message = null
 	var/error = ""
@@ -54,7 +55,7 @@
 		data["accounts"] = all_accounts
 		data["accountcount"] = all_accounts.len
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "email_administration.tmpl", "Email Administration Utility", 600, 450, state = state)
 		if(host.update_layout())
@@ -132,7 +133,7 @@
 			return 1
 
 		var/complete_login = "[newlogin]@[newdomain]"
-		if(ntnet_global.does_email_exist(complete_login))
+		if(ntnet_global.find_email_by_name(complete_login))
 			error = "Error creating account: An account with same address already exists."
 			return 1
 

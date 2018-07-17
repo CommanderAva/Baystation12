@@ -4,7 +4,7 @@
 	icon_state = "hydrotray3"
 	density = 1
 	anchored = 1
-	flags = OPENCONTAINER
+	atom_flags = ATOM_FLAG_OPEN_CONTAINER
 	volume = 100
 
 	var/mechanical = 1         // Set to 0 to stop it from drawing the alert lights.
@@ -27,7 +27,7 @@
 	var/mutation_mod = 0       // Modifier to mutation chance
 	var/toxins = 0             // Toxicity in the tray?
 	var/mutation_level = 0     // When it hits 100, the plant mutates.
-	var/tray_light = 1         // Supplied lighting.
+	var/tray_light = 5         // Supplied lighting.
 
 	// Mechanical concerns.
 	var/health = 0             // Plant health.
@@ -37,7 +37,6 @@
 	var/closed_system          // If set, the tray will attempt to take atmos from a pipe.
 	var/force_update           // Set this to bypass the cycle time check.
 	var/obj/temp_chem_holder   // Something to hold reagents during process_reagents()
-	var/labelled
 
 	// Seed details/line data.
 	var/datum/seed/seed = null // The currently planted seed
@@ -81,9 +80,11 @@
 		/datum/reagent/adminordrazine = -5
 		)
 	var/global/list/pestkiller_reagents = list(
-		/datum/reagent/sugar =           2,
-		/datum/reagent/diethylamine =   -2,
-		/datum/reagent/adminordrazine = -5
+		/datum/reagent/sugar =                 2,
+		/datum/reagent/diethylamine =         -2,
+		/datum/reagent/toxin/bromide =        -2,
+		/datum/reagent/toxin/methyl_bromide = -4,
+		/datum/reagent/adminordrazine =       -5
 		)
 	var/global/list/water_reagents = list(
 		/datum/reagent/water =           1,
@@ -120,8 +121,8 @@
 	// than a bound as the lists above specify.
 	var/global/list/mutagenic_reagents = list(
 		/datum/reagent/radium =  8,
-		/datum/reagent/mutagen = 15
-		)
+		/datum/reagent/mutagen = 15,
+		/datum/reagent/toxin/fertilizer/left4zed = 30)
 
 /obj/machinery/portable_atmospherics/hydroponics/AltClick()
 	if(mechanical && !usr.incapacitated() && Adjacent(usr))
@@ -161,15 +162,21 @@
 			nymph.visible_message("<font color='blue'><b>[nymph]</b> rolls around in [src] for a bit.</font>","<font color='blue'>You roll around in [src] for a bit.</font>")
 		return
 
-/obj/machinery/portable_atmospherics/hydroponics/New()
-	..()
+/obj/machinery/portable_atmospherics/hydroponics/Initialize()
+	. = ..()
 	temp_chem_holder = new()
 	temp_chem_holder.create_reagents(10)
-	temp_chem_holder.flags |= OPENCONTAINER
+	temp_chem_holder.atom_flags |= ATOM_FLAG_OPEN_CONTAINER
 	create_reagents(200)
 	if(mechanical)
 		connect()
 	update_icon()
+	return INITIALIZE_HINT_LATELOAD
+
+/obj/machinery/portable_atmospherics/hydroponics/LateInitialize()
+	. = ..()
+	if(locate(/obj/item/seeds) in get_turf(src))
+		plant()
 
 /obj/machinery/portable_atmospherics/hydroponics/bullet_act(var/obj/item/projectile/Proj)
 
@@ -195,16 +202,17 @@
 /obj/machinery/portable_atmospherics/hydroponics/CanPass(atom/movable/mover, turf/target, height=0, air_group=0)
 	if(air_group || (height==0)) return 1
 
-	if(istype(mover) && mover.checkpass(PASSTABLE))
+	if(istype(mover) && mover.checkpass(PASS_FLAG_TABLE))
 		return 1
 	else
-		return 0
+		return !density
 
-/obj/machinery/portable_atmospherics/hydroponics/proc/check_health()
+/obj/machinery/portable_atmospherics/hydroponics/proc/check_health(var/icon_update = 1)
 	if(seed && !dead && health <= 0)
 		die()
 	check_level_sanity()
-	update_icon()
+	if(icon_update)
+		update_icon()
 
 /obj/machinery/portable_atmospherics/hydroponics/proc/die()
 	dead = 1
@@ -355,23 +363,6 @@
 
 	return
 
-/obj/machinery/portable_atmospherics/hydroponics/verb/remove_label()
-
-	set name = "Remove Label"
-	set category = "Object"
-	set src in view(1)
-
-	if(usr.incapacitated())
-		return
-	if(ishuman(usr) || istype(usr, /mob/living/silicon/robot))
-		if(labelled)
-			to_chat(usr, "You remove the label.")
-			labelled = null
-			update_icon()
-		else
-			to_chat(usr, "There is no label to remove.")
-	return
-
 /obj/machinery/portable_atmospherics/hydroponics/verb/setlight()
 	set name = "Set Light"
 	set category = "Object"
@@ -428,7 +419,7 @@
 	if (O.is_open_container())
 		return 0
 
-	if(istype(O, /obj/item/weapon/wirecutters) || istype(O, /obj/item/weapon/scalpel))
+	if(isWirecutter(O) || istype(O, /obj/item/weapon/scalpel))
 
 		if(!seed)
 			to_chat(user, "There is nothing to take a sample from in \the [src].")
@@ -477,9 +468,7 @@
 	else if (istype(O, /obj/item/seeds))
 
 		if(!seed)
-
 			var/obj/item/seeds/S = O
-			user.remove_from_mob(O)
 
 			if(!S.seed)
 				to_chat(user, "The packet seems to be empty. You throw it away.")
@@ -495,21 +484,29 @@
 			health = (istype(S, /obj/item/seeds/cutting) ? round(seed.get_trait(TRAIT_ENDURANCE)/rand(2,5)) : seed.get_trait(TRAIT_ENDURANCE))
 			lastcycle = world.time
 
+			var/needed_skill = seed.mysterious ? SKILL_ADEPT : SKILL_BASIC
+			if(prob(user.skill_fail_chance(SKILL_BOTANY, 40, needed_skill)))
+				dead = 1
+				health = 0
 			qdel(O)
 
 			check_health()
 
 		else
-			to_chat(user, "<span class='danger'>\The [src] already has seeds in it!</span>")
+			to_chat(user, "<span class='warning'>\The [src] already has seeds in it!</span>")
 
 	else if (istype(O, /obj/item/weapon/material/minihoe))  // The minihoe
 
 		if(weedlevel > 0)
-			user.visible_message("<span class='danger'>[user] starts uprooting the weeds.</span>", "<span class='danger'>You remove the weeds from the [src].</span>")
+			user.visible_message("<span class='notice'>[user] starts uprooting the weeds.</span>", "<span class='notice'>You remove the weeds from the [src].</span>")
 			weedlevel = 0
-			update_icon()
+			if(seed)
+				var/needed_skill = seed.mysterious ? SKILL_ADEPT : SKILL_BASIC
+				if(!user.skill_check(SKILL_BOTANY, needed_skill))
+					health -= rand(40,60)
+					check_health(1)
 		else
-			to_chat(user, "<span class='danger'>This plot is completely devoid of weeds. It doesn't need uprooting.</span>")
+			to_chat(user, "<span class='notice'>This plot is completely devoid of weeds. It doesn't need uprooting.</span>")
 
 	else if (istype(O, /obj/item/weapon/storage/plants))
 
@@ -524,7 +521,6 @@
 	else if ( istype(O, /obj/item/weapon/plantspray) )
 
 		var/obj/item/weapon/plantspray/spray = O
-		user.remove_from_mob(O)
 		toxins += spray.toxicity
 		pestlevel -= spray.pest_kill_str
 		weedlevel -= spray.weed_kill_str
@@ -533,7 +529,7 @@
 		qdel(O)
 		check_health()
 
-	else if(mechanical && istype(O, /obj/item/weapon/wrench))
+	else if(mechanical && isWrench(O))
 
 		//If there's a connector here, the portable_atmospherics setup can handle it.
 		if(locate(/obj/machinery/atmospherics/portables_connector/) in loc)
@@ -546,6 +542,7 @@
 	else if(O.force && seed)
 		user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
 		user.visible_message("<span class='danger'>\The [seed.display_name] has been attacked by [user] with \the [O]!</span>")
+		playsound(get_turf(src), O.hitsound, 100, 1)
 		if(!dead)
 			health -= O.force
 			check_health()
@@ -583,15 +580,16 @@
 	to_chat(usr, "Water: [round(waterlevel,0.1)]/100")
 	to_chat(usr, "Nutrient: [round(nutrilevel,0.1)]/10")
 
-	if(weedlevel >= 5)
-		to_chat(usr, "\The [src] is <span class='danger'>infested with weeds</span>!")
-	if(pestlevel >= 5)
-		to_chat(usr, "\The [src] is <span class='danger'>infested with tiny worms</span>!")
+	if(usr.skill_check(SKILL_BOTANY, SKILL_BASIC))
+		if(weedlevel >= 5)
+			to_chat(usr, "\The [src] is <span class='danger'>infested with weeds</span>!")
+		if(pestlevel >= 5)
+			to_chat(usr, "\The [src] is <span class='danger'>infested with tiny worms</span>!")
 
-	if(dead)
-		to_chat(usr, "<span class='danger'>The plant is dead.</span>")
-	else if(health <= (seed.get_trait(TRAIT_ENDURANCE)/ 2))
-		to_chat(usr, "The plant looks <span class='danger'>unhealthy</span>.")
+		if(dead)
+			to_chat(usr, "<span class='danger'>The plant is dead.</span>")
+		else if(health <= (seed.get_trait(TRAIT_ENDURANCE)/ 2))
+			to_chat(usr, "The plant looks <span class='danger'>unhealthy</span>.")
 
 	if(mechanical)
 		var/turf/T = loc
@@ -631,3 +629,15 @@
 	closed_system = !closed_system
 	to_chat(user, "You [closed_system ? "close" : "open"] the tray's lid.")
 	update_icon()
+
+//proc for trays to spawn pre-planted
+/obj/machinery/portable_atmospherics/hydroponics/proc/plant()
+	var/obj/item/seeds/S = locate() in get_turf(src)
+	seed = S.seed
+	lastproduce = 0
+	dead = 0
+	age = 1
+	health = (istype(S, /obj/item/seeds/cutting) ? round(seed.get_trait(TRAIT_ENDURANCE)/rand(2,5)) : seed.get_trait(TRAIT_ENDURANCE))
+	lastcycle = world.time
+	qdel(S)
+	check_health()

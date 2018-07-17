@@ -70,7 +70,7 @@
 
 		discount_item = new_discount_item
 		update_nano_data()
-		GLOB.nanomanager.update_uis(src)
+		SSnano.update_uis(src)
 
 /obj/item/device/uplink/proc/is_improper_item(var/datum/uplink_item/new_discount_item, discount_amount)
 	if(!new_discount_item)
@@ -128,7 +128,7 @@
 	data += nanoui_data
 
 	// update the ui if it exists, returns null if no ui is passed/found
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)	// No auto-refresh
 		ui = new(user, src, ui_key, "uplink.tmpl", title, 450, 600, state = uistate)
 		ui.set_initial_data(data)
@@ -145,29 +145,28 @@
 	return ..()
 
 // The purchasing code.
-/obj/item/device/uplink/Topic(href, href_list)
-	if(..())
-		return 1
-
-	var/mob/user = usr
+/obj/item/device/uplink/OnTopic(user, href_list)
 	if(href_list["buy_item"])
 		var/datum/uplink_item/UI = (locate(href_list["buy_item"]) in uplink.items)
 		UI.buy(src, usr)
+		. = TOPIC_REFRESH
 	else if(href_list["lock"])
 		toggle()
-		var/datum/nanoui/ui = GLOB.nanomanager.get_open_ui(user, src, "main")
-		ui.close()
+		SSnano.close_user_uis(user, src, "main")
+		. = TOPIC_HANDLED
 	else if(href_list["return"])
 		nanoui_menu = round(nanoui_menu/10)
+		. = TOPIC_REFRESH
 	else if(href_list["menu"])
 		nanoui_menu = text2num(href_list["menu"])
 		if(href_list["id"])
-			exploit_id = href_list["id"]
+			exploit_id = text2num(href_list["id"])
 		if(href_list["category"])
 			category = locate(href_list["category"]) in uplink.categories
+		. = TOPIC_REFRESH
 
-	update_nano_data()
-	return 1
+	if(. == TOPIC_REFRESH)
+		update_nano_data()
 
 /obj/item/device/uplink/proc/update_nano_data()
 	if(nanoui_menu == 0)
@@ -186,30 +185,15 @@
 		nanoui_data["items"] = items
 	else if(nanoui_menu == 2)
 		var/permanentData[0]
-		for(var/datum/computer_file/crew_record/L in GLOB.all_crew_records)
-			permanentData[++permanentData.len] = list(Name = L.GetName(),"id" = L.uid)
+		for(var/datum/computer_file/report/crew_record/L in GLOB.all_crew_records)
+			permanentData[++permanentData.len] = list(Name = L.get_name(),"id" = L.uid, "exploit" = length(L.get_antagRecord()))
 		nanoui_data["exploit_records"] = permanentData
 	else if(nanoui_menu == 21)
 		nanoui_data["exploit_exists"] = 0
 
-		for(var/datum/computer_file/crew_record/L in GLOB.all_crew_records)
+		for(var/datum/computer_file/report/crew_record/L in GLOB.all_crew_records)
 			if(L.uid == exploit_id)
-				nanoui_data["exploit"] = list()  // Setting this to equal L.fields passes it's variables that are lists as reference instead of value.
-								 // We trade off being able to automatically add shit for more control over what gets passed to json
-								 // and if it's sanitized for html.
-				nanoui_data["exploit"]["nanoui_exploit_record"] = html_encode(L.GetAntagRecord())                         		// Change stuff into html
-				nanoui_data["exploit"]["nanoui_exploit_record"] = replacetext(nanoui_data["exploit"]["nanoui_exploit_record"], "\n", "<br>")    // change line breaks into <br>
-				nanoui_data["exploit"]["name"] =  html_encode(L.GetName())
-				nanoui_data["exploit"]["sex"] =  html_encode(L.GetSex())
-				nanoui_data["exploit"]["age"] =  html_encode(L.GetAge())
-				nanoui_data["exploit"]["species"] =  html_encode(L.GetSpecies())
-				nanoui_data["exploit"]["rank"] =  html_encode(L.GetRank())
-				nanoui_data["exploit"]["home_system"] =  html_encode(L.GetHomeSystem())
-				nanoui_data["exploit"]["citizenship"] =  html_encode(L.GetCitizenship())
-				nanoui_data["exploit"]["faction"] =  html_encode(L.GetFaction())
-				nanoui_data["exploit"]["religion"] =  html_encode(L.GetReligion())
-				nanoui_data["exploit"]["fingerprint"] =  html_encode(L.GetFingerprint())
-
+				nanoui_data["exploit"] = L.generate_nano_data()
 				nanoui_data["exploit_exists"] = 1
 				break
 
@@ -231,9 +215,9 @@
 // Includes normal radio uplink, multitool uplink,
 // implant uplink (not the implant tool) and a preset headset uplink.
 
-/obj/item/device/radio/uplink/New(var/loc, var/owner)
+/obj/item/device/radio/uplink/New(var/loc, var/owner, var/amount)
 	..()
-	hidden_uplink = new(src, owner)
+	hidden_uplink = new(src, owner, amount)
 	icon_state = "radio"
 
 /obj/item/device/radio/uplink/attack_self(mob/user as mob)

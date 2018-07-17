@@ -31,9 +31,11 @@
 	var/poison_type = /datum/reagent/toxin
 	faction = "spiders"
 	var/busy = 0
-	pass_flags = PASSTABLE
+	pass_flags = PASS_FLAG_TABLE
 	move_to_delay = 6
 	speed = 3
+	max_gas = list("phoron" = 1, "carbon_dioxide" = 5, "methyl_bromide" = 1)
+	mob_size = MOB_LARGE
 
 //nursemaids - these create webs and eggs
 /mob/living/simple_animal/hostile/giant_spider/nurse

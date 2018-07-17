@@ -25,7 +25,6 @@
 #define MODE_BORER "borer"
 #define MODE_XENOMORPH "xeno"
 #define MODE_LOYALIST "loyalist"
-#define MODE_MUTINEER "mutineer"
 #define MODE_COMMANDO "commando"
 #define MODE_DEATHSQUAD "deathsquad"
 #define MODE_ERT "ert"
@@ -39,14 +38,13 @@
 #define MODE_MONKEY "monkey"
 #define MODE_RENEGADE "renegade"
 #define MODE_REVOLUTIONARY "revolutionary"
-#define MODE_LOYALIST "loyalist"
 #define MODE_MALFUNCTION "malf"
 #define MODE_TRAITOR "traitor"
 #define MODE_DEITY "deity"
 #define MODE_GODCULTIST "god cultist"
-#define MODE_MAFIA "mafia"
 
 #define DEFAULT_TELECRYSTAL_AMOUNT 130
+#define IMPLANT_TELECRYSTAL_AMOUNT(x) (round(x * 0.49)) // If this cost is ever greater than half of DEFAULT_TELECRYSTAL_AMOUNT then it is possible to buy more TC than you spend
 
 /////////////////
 ////WIZARD //////
@@ -63,6 +61,8 @@
 //Targeted spells
 #define INCLUDEUSER		0x40	//does the spell include the caster in its target selection?
 #define SELECTABLE		0x80	//can you select each target for the spell?
+#define NOFACTION		0x1000  //Don't do the same as our faction
+#define NONONFACTION	0x2000  //Don't do people other than our faction
 //AOE spells
 #define IGNOREDENSE		0x40	//are dense turfs ignored in selection?
 #define IGNORESPACE		0x80	//are space turfs ignored in selection?

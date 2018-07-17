@@ -2,6 +2,16 @@
 	name = "snow exoplanet"
 	desc = "Cold planet with limited plant life."
 	color = "#e8faff"
+	possible_features = list(/datum/map_template/ruin/exoplanet/monolith,
+							/datum/map_template/ruin/exoplanet/marooned) 
+
+	possible_features = list(/datum/map_template/ruin/exoplanet/monolith,
+							 /datum/map_template/ruin/exoplanet/oasis,
+							 /datum/map_template/ruin/exoplanet/oasis/oasis2,
+							 /datum/map_template/ruin/exoplanet/oasis/oasis3,
+							 /datum/map_template/ruin/exoplanet/fountain,
+							 /datum/map_template/ruin/exoplanet/hydrobase,
+							 /datum/map_template/ruin/exoplanet/lodge)
 
 /obj/effect/overmap/sector/exoplanet/snow/generate_map()
 	for(var/zlevel in map_z)
@@ -18,7 +28,7 @@
 /datum/random_map/noise/exoplanet/snow
 	descriptor = "snow exoplanet"
 	smoothing_iterations = 1
-	flora_prob = 30
+	flora_prob = 10
 	large_flora_prob = 20
 	water_level_max = 3
 	land_type = /turf/simulated/floor/exoplanet/snow
@@ -33,7 +43,9 @@
 
 /datum/random_map/noise/ore/poor
 	deep_val = 0.8
-	rare_val = 0.9
+	rare_val = 0.7
+	min_rare_ratio = 0.02
+	min_rare_ratio = 0.01
 
 /turf/simulated/floor/exoplanet/ice
 	name = "ice"

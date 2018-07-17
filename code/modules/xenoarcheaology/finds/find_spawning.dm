@@ -19,12 +19,16 @@
 /obj/item/weapon/archaeological_find/Initialize()
 	. = ..()
 	var/obj/item/I = spawn_item()
-
 	var/source_material = ""
 	var/material_descriptor = ""
 	if(prob(40))
 		material_descriptor = pick("rusted","dusty","archaic","fragile")
-	source_material = pick("cordite","quadrinium",DEFAULT_WALL_MATERIAL,"titanium","aluminium","ferritic-alloy","plasteel","duranium")
+	if(istype(I, /obj/item/weapon/material))
+		var/obj/item/weapon/material/M = I
+		M.set_material("aliumium")
+		source_material = "alien alloy"
+	else
+		source_material = pick("cordite","quadrinium",DEFAULT_WALL_MATERIAL,"titanium","aluminium","ferritic-alloy","plasteel","duranium")
 
 	var/decorations = ""
 	if(apply_material_decorations)
@@ -56,11 +60,11 @@
 	var/engravings = ""
 	if(apply_image_decorations)
 		var/obj/effect/overmap/sector/exoplanet/E = map_sectors["[z]"]
+		engravings = "[pick("Engraved","Carved","Etched")] on the item is [pick("an image of","a frieze of","a depiction of")] "
 		if(istype(E))
-			engravings = E.get_engravings()
+			engravings += E.get_engravings()
 		else
-			engravings = "[pick("Engraved","Carved","Etched")] on the item is [pick("an image of","a frieze of","a depiction of")] \
-			[pick("an alien humanoid","an amorphic blob","a short, hairy being","a rodent-like creature","a robot","a primate","a reptilian alien","an unidentifiable object","a statue","a starship","unusual devices","a structure")] \
+			engravings += "[pick("an alien humanoid","an amorphic blob","a short, hairy being","a rodent-like creature","a robot","a primate","a reptilian alien","an unidentifiable object","a statue","a starship","unusual devices","a structure")] \
 			[pick("surrounded by","being held aloft by","being struck by","being examined by","communicating with")] \
 			[pick("alien humanoids","amorphic blobs","short, hairy beings","rodent-like creatures","robots","primates","reptilian aliens")]"
 			if(prob(50))
@@ -83,7 +87,7 @@
 		desc = "This item is completely [pick("alien","bizarre")]."
 
 	//icon and icon_state should have already been set
-	I.name = name
+	I.SetName(name)
 	I.desc = desc
 
 	if(prob(5))
@@ -157,7 +161,7 @@
 		new_item = new /obj/item/weapon/vampiric(loc)
 	else
 		new_item = new(loc)
-	new_item.name = "statuette"
+	new_item.SetName("statuette")
 	new_item.icon = 'icons/obj/xenoarchaeology.dmi'
 	new_item.icon_state = "statuette"
 
@@ -173,7 +177,7 @@
 
 /obj/item/weapon/archaeological_find/instrument/spawn_item()
 	var/obj/item/new_item = new(loc)
-	new_item.name = "instrument"
+	new_item.SetName("instrument")
 	new_item.icon = 'icons/obj/xenoarchaeology.dmi'
 	new_item.icon_state = "instrument"
 	if(prob(30))
@@ -277,16 +281,9 @@
 
 /obj/item/weapon/archaeological_find/material/spawn_item()
 	var/list/possible_spawns = list()
-	possible_spawns += /obj/item/stack/material/steel
-	possible_spawns += /obj/item/stack/material/plasteel
-	possible_spawns += /obj/item/stack/material/glass
-	possible_spawns += /obj/item/stack/material/glass/reinforced
+	possible_spawns += /obj/item/stack/material/aliumium
 	possible_spawns += /obj/item/stack/material/phoron
-	possible_spawns += /obj/item/stack/material/gold
-	possible_spawns += /obj/item/stack/material/silver
 	possible_spawns += /obj/item/stack/material/uranium
-	possible_spawns += /obj/item/stack/material/sandstone
-	possible_spawns += /obj/item/stack/material/silver
 	var/new_type = pick(possible_spawns)
 	var/obj/item/stack/material/new_item = new new_type(loc)
 	new_item.amount = rand(5,45)

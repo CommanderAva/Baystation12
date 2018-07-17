@@ -63,6 +63,7 @@
 	display_name = "blueberry bush"
 	mutants = list("berries","poisonberries","glowberries")
 	chems = list(/datum/reagent/nutriment = list(1,10), /datum/reagent/drink/juice/berry = list(10,10))
+	kitchen_tag = "blueberries"
 
 /datum/seed/berry/blue/New()
 	..()
@@ -262,7 +263,7 @@
 	seed_name = "apple"
 	display_name = "apple tree"
 	mutants = list("poisonapple","goldapple")
-	chems = list(/datum/reagent/nutriment = list(1,10))
+	chems = list(/datum/reagent/nutriment = list(1,10), /datum/reagent/drink/juice/apple = list(10,10))
 	kitchen_tag = "apple"
 
 /datum/seed/apple/New()
@@ -384,13 +385,15 @@
 
 /datum/seed/mushroom/plump/New()
 	..()
+	set_trait(TRAIT_HARVEST_REPEAT,1)
 	set_trait(TRAIT_MATURATION,8)
-	set_trait(TRAIT_YIELD,4)
-	set_trait(TRAIT_POTENCY,0)
+	set_trait(TRAIT_YIELD,2)
+	set_trait(TRAIT_POTENCY,2)
 	set_trait(TRAIT_PRODUCT_ICON,"mushroom10")
 	set_trait(TRAIT_PRODUCT_COLOUR,"#b57bb0")
 	set_trait(TRAIT_PLANT_COLOUR,"#9e4f9d")
 	set_trait(TRAIT_PLANT_ICON,"mushroom2")
+	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.35)
 
 /datum/seed/mushroom/plump/walking
 	name = "walkingmushroom"
@@ -648,9 +651,27 @@
 	set_trait(TRAIT_PRODUCTION,6)
 	set_trait(TRAIT_YIELD,6)
 	set_trait(TRAIT_POTENCY,10)
-	set_trait(TRAIT_PRODUCT_ICON,"potato")
+	set_trait(TRAIT_PRODUCT_ICON,"nuts")
 	set_trait(TRAIT_PRODUCT_COLOUR,"#c4ae7a")
 	set_trait(TRAIT_PLANT_ICON,"bush2")
+	set_trait(TRAIT_IDEAL_LIGHT, 6)
+
+/datum/seed/peppercorn
+	name = "peppercorn"
+	seed_name = "peppercorn"
+	display_name = "black pepper"
+	chems = list(/datum/reagent/blackpepper = list(10,10))
+
+/datum/seed/peppercorn/New()
+	..()
+	set_trait(TRAIT_HARVEST_REPEAT,1)
+	set_trait(TRAIT_MATURATION,4)
+	set_trait(TRAIT_PRODUCTION,4)
+	set_trait(TRAIT_YIELD,3)
+	set_trait(TRAIT_POTENCY,5)
+	set_trait(TRAIT_PRODUCT_ICON,"nuts")
+	set_trait(TRAIT_PRODUCT_COLOUR,"#4d4d4d")
+	set_trait(TRAIT_PLANT_ICON,"vine2")
 	set_trait(TRAIT_IDEAL_LIGHT, 6)
 
 /datum/seed/cabbage
@@ -679,7 +700,7 @@
 	name = "banana"
 	seed_name = "banana"
 	display_name = "banana tree"
-	chems = list(/datum/reagent/drink/juice/banana = list(10,10))
+	chems = list(/datum/reagent/drink/juice/banana = list(10,10), /datum/reagent/potassium = list(2,3))
 	trash_type = /obj/item/weapon/bananapeel
 	kitchen_tag = "banana"
 
@@ -737,6 +758,42 @@
 	set_trait(TRAIT_PRODUCT_COLOUR,"#d4cab4")
 	set_trait(TRAIT_PLANT_ICON,"bush2")
 	set_trait(TRAIT_WATER_CONSUMPTION, 6)
+
+/datum/seed/garlic
+	name = "garlic"
+	seed_name = "garlic"
+	display_name = "garlic"
+	chems = list(/datum/reagent/nutriment = list(1,10), /datum/reagent/drink/juice/garlic = list(10,10))
+	kitchen_tag = "garlic"
+
+/datum/seed/garlic/New()
+	..()
+	set_trait(TRAIT_MATURATION,10)
+	set_trait(TRAIT_PRODUCTION,1)
+	set_trait(TRAIT_YIELD,5)
+	set_trait(TRAIT_POTENCY,12)
+	set_trait(TRAIT_PRODUCT_ICON,"bulb")
+	set_trait(TRAIT_PRODUCT_COLOUR,"#fff8dd")
+	set_trait(TRAIT_PLANT_ICON,"stalk")
+	set_trait(TRAIT_WATER_CONSUMPTION, 7)
+
+/datum/seed/onion
+	name = "onion"
+	seed_name = "onion"
+	display_name = "onions"
+	chems = list(/datum/reagent/nutriment = list(1,10), /datum/reagent/drink/juice/onion = list(10,10))
+	kitchen_tag = "onion"
+
+/datum/seed/onion/New()
+	..()
+	set_trait(TRAIT_MATURATION,10)
+	set_trait(TRAIT_PRODUCTION,1)
+	set_trait(TRAIT_YIELD,4)
+	set_trait(TRAIT_POTENCY,10)
+	set_trait(TRAIT_PRODUCT_ICON,"bulb")
+	set_trait(TRAIT_PRODUCT_COLOUR,"#ffeedd")
+	set_trait(TRAIT_PLANT_ICON,"stalk")
+	set_trait(TRAIT_WATER_CONSUMPTION, 5)
 
 /datum/seed/soybean
 	name = "soybean"
@@ -810,7 +867,7 @@
 	set_trait(TRAIT_YIELD,5)
 	set_trait(TRAIT_POTENCY,10)
 	set_trait(TRAIT_PRODUCT_ICON,"carrot")
-	set_trait(TRAIT_PRODUCT_COLOUR,"#ffdb4a")
+	set_trait(TRAIT_PRODUCT_COLOUR,"#ff9900")
 	set_trait(TRAIT_PLANT_ICON,"carrot")
 	set_trait(TRAIT_WATER_CONSUMPTION, 6)
 
@@ -1098,6 +1155,54 @@
 	set_trait(TRAIT_IDEAL_HEAT, 283)
 	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.15)
 
+/datum/seed/tobacco
+	name = "tobacco"
+	seed_name = "tobacco"
+	display_name = "tobacco leaves"
+	mutants = list("finetobacco", "puretobacco")
+	chems = list(/datum/reagent/tobacco = list(1,10))
+
+/datum/seed/tobacco/New()
+	..()
+	set_trait(TRAIT_MATURATION,6)
+	set_trait(TRAIT_PRODUCTION,6)
+	set_trait(TRAIT_YIELD,5)
+	set_trait(TRAIT_PRODUCT_ICON,"tobacco")
+	set_trait(TRAIT_PRODUCT_COLOUR,"#749733")
+	set_trait(TRAIT_PLANT_COLOUR,"#749733")
+	set_trait(TRAIT_PLANT_ICON,"vine2")
+	set_trait(TRAIT_IDEAL_HEAT, 299)
+	set_trait(TRAIT_IDEAL_LIGHT, 7)
+	set_trait(TRAIT_WATER_CONSUMPTION, 6)
+	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.15)
+
+/datum/seed/tobacco/finetobacco
+	name = "finetobacco"
+	seed_name = "fine tobacco"
+	display_name = "fine tobacco leaves"
+	chems = list(/datum/reagent/tobacco/fine = list(1,10))
+
+/datum/seed/tobacco/finetobacco/New()
+	..()
+	set_trait(TRAIT_YIELD,4)
+	set_trait(TRAIT_PRODUCT_COLOUR,"#33571b")
+	set_trait(TRAIT_PLANT_COLOUR,"#33571b")
+	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.20)
+
+/datum/seed/tobacco/puretobacco //provides the pure nicotine reagent
+	name = "puretobacco"
+	seed_name = "succulent tobacco"
+	display_name = "succulent tobacco leaves"
+	chems = list(/datum/reagent/nicotine = list(1,10))
+
+/datum/seed/tobacco/puretobacco/New()
+	..()
+	set_trait(TRAIT_YIELD,3)
+	set_trait(TRAIT_JUICY,1)
+	set_trait(TRAIT_PRODUCT_COLOUR,"#b7c61a")
+	set_trait(TRAIT_PLANT_COLOUR,"#b7c61a")
+	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.30)
+
 // Alien weeds.
 /datum/seed/xenomorph
 	name = "xenomorph"
@@ -1117,3 +1222,29 @@
 	set_trait(TRAIT_YIELD,-1)
 	set_trait(TRAIT_SPREAD,2)
 	set_trait(TRAIT_POTENCY,50)
+
+/datum/seed/algae
+	name = "algae"
+	seed_name = "algae"
+	display_name = "algae"
+	chems = list(
+		/datum/reagent/nutriment = list(2,12),
+		/datum/reagent/toxin/bromide = list(3,8)
+	)
+	kitchen_tag = "algae"
+	exude_gasses = list("methyl_bromide" = 3)
+
+/datum/seed/algae/New()
+	..()
+	set_trait(TRAIT_HARVEST_REPEAT,1)
+	set_trait(TRAIT_MATURATION,3)
+	set_trait(TRAIT_PRODUCTION,5)
+	set_trait(TRAIT_YIELD,4)
+	set_trait(TRAIT_POTENCY,10)
+	set_trait(TRAIT_PRODUCT_ICON,"algae")
+	set_trait(TRAIT_PRODUCT_COLOUR,"#84bd82")
+	set_trait(TRAIT_PLANT_COLOUR,"#6d9c6b")
+	set_trait(TRAIT_PLANT_ICON,"algae")
+	set_trait(TRAIT_IDEAL_LIGHT, 6)
+	set_trait(TRAIT_WATER_CONSUMPTION, 6)
+	set_trait(TRAIT_NUTRIENT_CONSUMPTION, 0.15)

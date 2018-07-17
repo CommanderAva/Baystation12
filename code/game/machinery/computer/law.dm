@@ -90,23 +90,3 @@
 
 	attack_ghost(user as mob)
 		return 1
-
-datum/laws_list
-	var/laws = list()
-
-/*
-/obj/machinery/computer/law
-	name = "law management console"
-	icon = 'icons/obj/computer.dmi'
-	icon_keyboard = "security_key"
-	icon_screen = "explosive"
-	light_color = "#a91515"
-	req_access = list(access_captain)
-	var/cooldown = 6000
-	var/laws = list()
-	var/
-
-
-	attack_ai(var/mob/user as mob)
-		return src.attack_hand(user)
-*/

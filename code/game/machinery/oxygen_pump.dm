@@ -4,6 +4,7 @@
 /obj/machinery/oxygen_pump
 	name = "emergency oxygen pump"
 	icon = 'icons/obj/walllocker.dmi'
+	desc = "A wall mounted oxygen pump with a retractable face mask that you can pull over your face in case of emergencies."
 	icon_state = "emerg"
 
 	anchored = TRUE
@@ -34,7 +35,7 @@
 	if(tank)
 		qdel(tank)
 	if(breather)
-		breather.remove_from_mob(contained)
+		breather.drop_from_inventory(contained)
 		src.visible_message("<span class='notice'>The mask rapidly retracts just before /the [src] is destroyed!</span>")
 	qdel(contained)
 	contained = null
@@ -47,12 +48,13 @@
 		if(!can_apply_to_target(target, usr)) // There is no point in attempting to apply a mask if it's impossible.
 			return
 		usr.visible_message("\The [usr] begins placing the mask onto [target]..")
-		if(!do_mob(usr, target, 25) || !can_apply_to_target(target, usr))
-			return
-		// place mask and add fingerprints
-		usr.visible_message("\The [usr] has placed \the mask on [target]'s mouth.")
-		attach_mask(target)
-		src.add_fingerprint(usr)
+		if(do_mob(usr, target, 25))
+			if(!can_apply_to_target(target, usr))
+				return
+			// place mask and add fingerprints
+			usr.visible_message("\The [usr] has placed \the mask on [target]'s mouth.")
+			attach_mask(target)
+			src.add_fingerprint(usr)
 
 
 /obj/machinery/oxygen_pump/attack_hand(mob/user as mob)
@@ -67,15 +69,10 @@
 		to_chat(user, "<span class='warning'>There is no tank in \the [src]!</span>")
 		return
 	if(breather)
-		if(tank)
-			tank.forceMove(src)
-		breather.remove_from_mob(contained)
-		contained.forceMove(src)
-		src.visible_message("<span class='notice'>\The [user] makes \The [contained] rapidly retracts back into \the [src]!</span>")
-		if(breather.internals)
-			breather.internals.icon_state = "internal0"
-		breather = null
-		use_power = 1
+		detach_mask(user)
+	else
+		ui_interact(usr)
+
 
 /obj/machinery/oxygen_pump/attack_ai(mob/user as mob)
 	ui_interact(user)
@@ -87,12 +84,27 @@
 		if(tank)
 			tank.forceMove(C)
 		breather = C
-		spawn(1)
-		if(!breather.internal && tank)
-			breather.internal = tank
-			if(breather.internals)
-				breather.internals.icon_state = "internal1"
+
+/obj/machinery/oxygen_pump/proc/set_internals(var/mob/living/carbon/C)
+	if(C && istype(C))
+		if(!C.internal && tank)
+			C.internal = tank
+			if(C.internals)
+				C.internals.icon_state = "internal1"
 		use_power = 2
+
+/obj/machinery/oxygen_pump/proc/detach_mask(mob/user)
+	if(tank)
+		tank.forceMove(src)
+	breather.drop_from_inventory(contained, src)
+	if(user)
+		visible_message("<span class='notice'>\The [user] detaches \the [contained] and it rapidly retracts back into \the [src]!</span>")
+	else
+		visible_message("<span class='notice'>\The [contained] rapidly retracts back into \the [src]!</span>")
+	if(breather.internals)
+		breather.internals.icon_state = "internal0"
+	breather = null
+	use_power = 1
 
 /obj/machinery/oxygen_pump/proc/can_apply_to_target(var/mob/living/carbon/human/target, mob/user as mob)
 	if(!user)
@@ -111,17 +123,17 @@
 		to_chat(user, "<span class='warning'>Remove their [target.head] first.</span>")
 		return
 	if(!tank)
-		to_chat(user, "<span class='warning'>There is no tank in \the [src]!</span>")
+		to_chat(user, "<span class='warning'>There is no tank in \the [src].</span>")
 		return
 	if(stat & MAINT)
-		to_chat(user, "<span class='warning'>Please close \the maintenance hatch first!</span>")
+		to_chat(user, "<span class='warning'>Please close \the maintenance hatch first.</span>")
 		return
 	if(!Adjacent(target))
-		to_chat(user, "<span class='warning'>Please close stay close to /the [src].</span>")
+		to_chat(user, "<span class='warning'>Please stay close to \the [src].</span>")
 		return
 	//when there is a breather:
 	if(breather && target != breather)
-		to_chat(user, "<span class='warning'>\The pump is already in use</span>")
+		to_chat(user, "<span class='warning'>\The pump is already in use.</span>")
 		return
 	//Checking if breather is still valid
 	if(target == breather && target.wear_mask != contained)
@@ -130,7 +142,7 @@
 	return 1
 
 /obj/machinery/oxygen_pump/attackby(obj/item/weapon/W as obj, mob/user as mob)
-	if(istype(W, /obj/item/weapon/screwdriver))
+	if(isScrewdriver(W))
 		stat ^= MAINT
 		user.visible_message("<span class='notice'>\The [user] [stat & MAINT ? "opens" : "closes"] \the [src].</span>", "<span class='notice'>You [stat & MAINT ? "open" : "close"] \the [src].</span>")
 		if(stat & MAINT)
@@ -142,8 +154,8 @@
 		if(tank)
 			to_chat(user, "<span class='warning'>\The [src] already has a tank installed!</span>")
 		else
-			user.drop_item()
-			W.forceMove(src)
+			if(!user.unEquip(W, src))
+				return
 			tank = W
 			user.visible_message("<span class='notice'>\The [user] installs \the [tank] into \the [src].</span>", "<span class='notice'>You install \the [tank] into \the [src].</span>")
 			src.add_fingerprint(user)
@@ -161,17 +173,9 @@
 /obj/machinery/oxygen_pump/Process()
 	if(breather)
 		if(!can_apply_to_target(breather))
-			if(tank)
-				tank.forceMove(src)
-			breather.remove_from_mob(contained)
-			contained.forceMove(src)
-			src.visible_message("<span class='notice'>\The [contained] rapidly retracts back into \the [src]!</span>")
-			breather = null
-			use_power = 1
+			detach_mask()
 		else if(!breather.internal && tank)
-			breather.internal = tank
-			if(breather.internals)
-				breather.internals.icon_state = "internal0"
+			set_internals(breather)
 
 
 //Create rightclick to view tank settings
@@ -208,7 +212,7 @@
 
 
 	// update the ui if it exists, returns null if no ui is passed/found
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		// the ui does not exist, so we'll create a new() one
 		// for a list of parameters and their descriptions see the code docs in \code\modules\nano\nanoui.dm
@@ -234,11 +238,3 @@
 			tank.distribute_pressure += cp
 		tank.distribute_pressure = min(max(round(tank.distribute_pressure), 0), TANK_MAX_RELEASE_PRESSURE)
 		return 1
-
-/obj/machinery/oxygen_pump/anesthetic
-	name = "anesthetic pump"
-	spawn_type = /obj/item/weapon/tank/anesthetic
-	icon_state = "anesthetic_tank"
-	icon_state_closed = "anesthetic_tank"
-	icon_state_open = "anesthetic_tank_open"
-	mask_type = /obj/item/clothing/mask/breath/anesthetic

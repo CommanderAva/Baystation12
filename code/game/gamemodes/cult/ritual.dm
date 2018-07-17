@@ -145,7 +145,6 @@ var/list/Tier1Runes = list(
 	/mob/proc/wall_rune,
 	/mob/proc/ajorney_rune,
 	/mob/proc/defile_rune,
-	/mob/proc/stun_imbue,
 	/mob/proc/emp_imbue,
 	/mob/proc/cult_communicate
 	)
@@ -274,12 +273,6 @@ var/list/Tier4Runes = list(
 
 	make_rune(/obj/effect/rune/tearreality, cost = 50, tome_required = 1)
 
-/mob/proc/stun_imbue()
-	set category = "Cult Magic"
-	set name = "Imbue: Stun"
-
-	make_rune(/obj/effect/rune/imbue/stun)
-
 /mob/proc/emp_imbue()
 	set category = "Cult Magic"
 	set name = "Imbue: EMP"
@@ -305,7 +298,7 @@ var/list/Tier4Runes = list(
 
 	input = sanitize(input)
 	log_and_message_admins("used a communicate verb to say '[input]'")
-	for(var/datum/mind/H in cult.current_antagonists)
+	for(var/datum/mind/H in GLOB.cult.current_antagonists)
 		if(H.current && !H.current.stat)
 			to_chat(H.current, "<span class='cult'>[input]</span>")
 

@@ -2,11 +2,11 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 /obj/machinery/computer/helm
 	name = "helm control console"
-	icon_state = "thick"
 	icon_keyboard = "teleport_key"
 	icon_screen = "helm"
 	light_color = "#7faaff"
 	circuit = /obj/item/weapon/circuitboard/helm
+	core_skill = SKILL_PILOT
 	var/obj/effect/overmap/ship/linked			//connected overmap object
 	var/autopilot = 0
 	var/manual_control = 0
@@ -70,6 +70,7 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 	if(!isAI(user))
 		user.set_machine(src)
+		operator_skill = user.get_skill_value(core_skill)
 		if(linked)
 			user.reset_view(linked)
 
@@ -101,7 +102,7 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 	if(linked.get_speed())
 		data["ETAnext"] = "[round(linked.ETA()/10)] seconds"
-	else	
+	else
 		data["ETAnext"] = "N/A"
 
 	var/list/locations[0]
@@ -116,7 +117,7 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 	data["locations"] = locations
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "helm.tmpl", "[linked.name] Helm Control", 380, 530)
 		ui.set_initial_data(data)
@@ -133,7 +134,7 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 	if (href_list["add"])
 		var/datum/computer_file/data/waypoint/R = new()
 		var/sec_name = input("Input naviation entry name", "New navigation entry", "Sector #[known_sectors.len]") as text
-		if(!CanInteract(usr,state)) 
+		if(!CanInteract(usr,state))
 			return
 		if(!sec_name)
 			sec_name = "Sector #[known_sectors.len]"
@@ -147,10 +148,10 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 				R.fields["y"] = linked.y
 			if("new")
 				var/newx = input("Input new entry x coordinate", "Coordinate input", linked.x) as num
-				if(!CanInteract(usr,state)) 
+				if(!CanInteract(usr,state))
 					return
 				var/newy = input("Input new entry y coordinate", "Coordinate input", linked.y) as num
-				if(!CanInteract(usr,state)) 
+				if(!CanInteract(usr,state))
 					return
 				R.fields["x"] = Clamp(newx, 1, world.maxx)
 				R.fields["y"] = Clamp(newy, 1, world.maxy)
@@ -164,14 +165,14 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 	if (href_list["setx"])
 		var/newx = input("Input new destiniation x coordinate", "Coordinate input", dx) as num|null
-		if(!CanInteract(usr,state)) 
+		if(!CanInteract(usr,state))
 			return
 		if (newx)
 			dx = Clamp(newx, 1, world.maxx)
 
 	if (href_list["sety"])
 		var/newy = input("Input new destiniation y coordinate", "Coordinate input", dy) as num|null
-		if(!CanInteract(usr,state)) 
+		if(!CanInteract(usr,state))
 			return
 		if (newy)
 			dy = Clamp(newy, 1, world.maxy)
@@ -191,6 +192,9 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 	if (href_list["move"])
 		var/ndir = text2num(href_list["move"])
+		var/mob/M = usr
+		if(istype(M) && prob(M.skill_fail_chance(SKILL_PILOT, 50, SKILL_ADEPT, factor = 1)))
+			ndir = turn(ndir,pick(90,-90))
 		linked.relaymove(usr, ndir)
 
 	if (href_list["brake"])
@@ -235,10 +239,10 @@ LEGACY_RECORD_STRUCTURE(all_waypoints, waypoint)
 
 	if(linked.get_speed())
 		data["ETAnext"] = "[round(linked.ETA()/10)] seconds"
-	else	
+	else
 		data["ETAnext"] = "N/A"
 
-	ui = GLOB.nanomanager.try_update_ui(user, src, ui_key, ui, data, force_open)
+	ui = SSnano.try_update_ui(user, src, ui_key, ui, data, force_open)
 	if (!ui)
 		ui = new(user, src, ui_key, "nav.tmpl", "[linked.name] Navigation Screen", 380, 530)
 		ui.set_initial_data(data)

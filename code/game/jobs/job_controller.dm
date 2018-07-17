@@ -396,7 +396,7 @@ var/global/datum/controller/occupations/job_master
 								permitted = 1
 						else
 							permitted = 1
-		
+
 						if(permitted)
 							if(G.allowed_roles)
 								if(job.type in G.allowed_roles)
@@ -587,6 +587,7 @@ var/global/datum/controller/occupations/job_master
  *  preference is not set, or the preference is not appropriate for the rank, in
  *  which case a fallback will be selected.
  */
+/*
 /datum/controller/occupations/proc/get_spawnpoint_for(var/client/C, var/rank)
 
 	if(!C)
@@ -626,6 +627,23 @@ var/global/datum/controller/occupations/job_master
 		spawnpos = spawntypes()[pick(GLOB.using_map.allowed_spawns)]
 
 	return spawnpos
+*/
+
+/datum/controller/occupations/proc/get_spawnpoint_for(var/client/C, var/branch)
+	if(!C)
+		CRASH("Null client passed to get_spawnpoint_for() proc!")
+
+	var/mob/H = C.mob
+	var/datum/spawnpoint/spawnpos
+	world << "([branch])"
+	if(branch == "Srpska Svemirska Armija")
+		spawnpos = spawntypes()["Serbian Forces Barracks"]
+		return spawnpos
+	if(branch == "United States Marine Corps")
+		spawnpos = spawntypes()["USMC FOB"]
+		return spawnpos
+
+
 
 /datum/controller/occupations/proc/GetJobByType(var/job_type)
 	return occupations_by_type[job_type]

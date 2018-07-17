@@ -319,10 +319,10 @@
 	if(job.is_restricted(client.prefs, src))
 		return
 
-	var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, job.title)
+	var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, get_branch_pref())
 	var/turf/spawn_turf = pick(spawnpoint.turfs)
 	if(job.latejoin_at_spawnpoints)
-		var/obj/S = job_master.get_roundstart_spawnpoint(job.title)
+		var/obj/S = job_master.get_roundstart_spawnpoint(get_branch_pref())
 		spawn_turf = get_turf(S)
 	var/radlevel = SSradiation.get_rads_at_turf(spawn_turf)
 	var/airstatus = IsTurfAtmosUnsafe(spawn_turf)
@@ -443,7 +443,7 @@
 		chosen_species = all_species[client.prefs.species]
 
 	if(!spawn_turf)
-		var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, get_rank_pref())
+		var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, get_branch_pref())
 		spawn_turf = pick(spawnpoint.turfs)
 
 	if(chosen_species)

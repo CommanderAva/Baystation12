@@ -63,11 +63,11 @@
 			delete_me = 1
 			return
 		if("SerbSpawn")
-			serb_spawn += loc
+			GLOB.serb_spawn += loc
 			delete_me = 1
 			return
 		if("MarineSpawn")
-			marine_spawn += loc
+			GLOB.marine_spawn += loc
 			delete_me = 1
 			return
 

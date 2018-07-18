@@ -310,7 +310,7 @@
 			switch(vote_type)
 				if("restart")
 					choices.Add("Restart Round","Continue Playing")
-				if("gamemode")
+			/*	if("gamemode")
 					if(ticker.current_state >= GAME_STATE_SETTING_UP)
 						return 0
 					choices.Add(config.votable_modes)
@@ -320,7 +320,7 @@
 							continue
 						gamemode_names[M.config_tag] = capitalize(M.name) //It's ugly to put this here but it works
 						additional_text.Add("<td align = 'center'>[M.required_players]</td>")
-					gamemode_names["secret"] = "Secret"
+					gamemode_names["secret"] = "Secret"*/
 				if("crew_transfer")
 					if(check_rights(R_ADMIN|R_MOD, 0))
 						question = "End the shift?"
@@ -511,6 +511,7 @@
 				if("toggle_restart")
 					if(usr.client.holder)
 						config.allow_vote_restart = !config.allow_vote_restart
+				/*
 				if("toggle_gamemode")
 					if(usr.client.holder)
 						config.allow_vote_mode = !config.allow_vote_mode
@@ -526,6 +527,7 @@
 				if("add_antagonist")
 					if(config.allow_extra_antags)
 						initiate_vote("add_antagonist",usr.key)
+				*/
 				if("map")
 					if(config.allow_map_switching && usr.client.holder)
 						initiate_vote("map", usr.key)

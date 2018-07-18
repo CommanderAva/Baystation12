@@ -7,6 +7,7 @@
 	body_parts_covered = HEAD|EYES
 	cold_protection = HEAD|EYES
 	heat_protection = HEAD|EYES
+	flags_inv = HIDEEARS|HIDEEYES|HIDEFACE
 	armor = list(melee = 60, bullet = 60, laser = 10, energy = 15, bomb = 20, bio = 0, rad = 0)
 	siemens_coefficient = 0.4
 	var/toggleable = TRUE

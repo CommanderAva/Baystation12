@@ -633,7 +633,6 @@ var/global/datum/controller/occupations/job_master
 	if(!C)
 		CRASH("Null client passed to get_spawnpoint_for() proc!")
 
-	var/mob/H = C.mob
 	var/datum/spawnpoint/spawnpos
 	world << "([branch])"
 	if(branch == "Srpska Svemirska Armija")
@@ -658,3 +657,4 @@ var/global/datum/controller/occupations/job_master
 		return pick(loc_list)
 	else
 		return locate("start*[rank]") // use old stype
+

@@ -62,26 +62,26 @@
 /datum/mil_rank/ssa/r1
 	name = "Razvodnik"
 	name_short = "RV"
-//	accessory = list(/obj/item/clothing/accessory/solgov/rank/fleet/enlisted, /obj/item/clothing/accessory/solgov/specialty/enlisted)
+	accessory = list(/obj/item/clothing/accessory/ssa/rank/razvodnik, /obj/item/clothing/accessory/ssa/speciality/)
 	sort_order = 1
 
 /datum/mil_rank/ssa/r2
 	name = "Decetar"
 	name_short = "DT"
-//	accessory = list(/obj/item/clothing/accessory/solgov/rank/fleet/enlisted, /obj/item/clothing/accessory/solgov/specialty/enlisted)
+	accessory = list(/obj/item/clothing/accessory/ssa/rank/decetar, /obj/item/clothing/accessory/ssa/speciality/)
 	sort_order = 2
 
 /datum/mil_rank/ssa/s1
 	name = "Vodnik"
 	name_short = "VD"
-//	accessory = list(/obj/item/clothing/accessory/solgov/rank/fleet/enlisted, /obj/item/clothing/accessory/solgov/specialty/enlisted)
+	accessory = list(/obj/item/clothing/accessory/ssa/rank/vodnik, /obj/item/clothing/accessory/ssa/speciality/)
 	sort_order = 3
 
 
 /datum/mil_rank/ssa/k1
 	name = "Podporucnik"
 	name_short = "PP"
-//	accessory = list(/obj/item/clothing/accessory/solgov/rank/fleet/enlisted, /obj/item/clothing/accessory/solgov/specialty/enlisted)
+	accessory = list(/obj/item/clothing/accessory/ssa/rank/podporucnik, /obj/item/clothing/accessory/ssa/speciality/)
 	sort_order = 4
 
 //****USMC*****

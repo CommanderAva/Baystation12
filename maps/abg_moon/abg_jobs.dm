@@ -22,7 +22,7 @@
 	total_positions = 1
 	spawn_positions = 1
 	supervisors = "the USSR Kosmichesky Kod and serbian admirality"
-	outfit_type = /decl/hierarchy/mil_uniform/serb
+	outfit_type = /decl/hierarchy/outfit/job/serb/komandant
 	minimal_player_age = 22
 	ideal_character_age = 30
 	allowed_branches = list(
@@ -39,11 +39,11 @@
 	return "You are the Commanding Officer of Serbian Space Forces during this operation. Be resilent and lead your men in a proper way to defend this installation."
 
 /datum/job/serbian_sergeant
-	title = "Vodnik"
+	title = "Decetar"
 	total_positions = 5
 	spawn_positions = 5
 	supervisors = "Komandant"
-	outfit_type = /decl/hierarchy/mil_uniform/serb
+	outfit_type = /decl/hierarchy/outfit/job/serb
 	minimal_player_age = 22
 	ideal_character_age = 30
 	allowed_branches = list(
@@ -64,7 +64,7 @@
 	total_positions = 1
 	spawn_positions = 1
 	supervisors = "the NATO Space Marine Code and NATO General Command"
-	outfit_type = /decl/hierarchy/mil_uniform/serb
+	outfit_type = /decl/hierarchy/outfit/job/serb
 	minimal_player_age = 24
 	ideal_character_age = 30
 	allowed_branches = list(

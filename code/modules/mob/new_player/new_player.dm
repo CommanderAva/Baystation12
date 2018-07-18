@@ -312,11 +312,15 @@
 	if(!config.enter_allowed)
 		to_chat(usr, "<span class='notice'>There is an administrative lock on entering the game!</span>")
 		return 0
-
 	if(!IsJobAvailable(job))
 		alert("[job.title] is not available. Please try another.")
 		return 0
 	if(job.is_restricted(client.prefs, src))
+		return
+
+	var/permission
+	permission = job_master.balancing(get_branch_pref())
+	if(permission == 0)
 		return
 
 	var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, get_branch_pref())
@@ -386,7 +390,20 @@
 		equip_wheelchair(character)
 
 	qdel(src)
-
+//	add_to_faction(get_branch_pref())
+/*
+/mob/new_player/proc/add_to_faction(var/branch) //muh code don't work - Ava
+	world << "([branch]) is checked when adding"
+	if(branch == "United States Marine Corps")
+		marine_amount += 1
+		world << "Plus one marine"
+	if(branch == "Srpska Svemirska Armija")
+		serb_amount += 1
+		world << "Plus one serb"
+	if(branch != "United States Marine Corps" && branch != "Srpska Svemirska Armija")
+		world << "yo this nigga is eating BEANS"
+		return
+*/
 
 /mob/new_player/proc/AnnounceCyborg(var/mob/living/character, var/rank, var/join_message)
 	if (ticker.current_state == GAME_STATE_PLAYING)
@@ -441,6 +458,8 @@
 	var/datum/species/chosen_species
 	if(client.prefs.species)
 		chosen_species = all_species[client.prefs.species]
+
+
 
 	if(!spawn_turf)
 		var/datum/spawnpoint/spawnpoint = job_master.get_spawnpoint_for(client, get_branch_pref())
@@ -509,6 +528,7 @@
 	new_character.regenerate_icons()
 
 	new_character.key = key		//Manually transfer the key to log them in
+
 	return new_character
 
 /mob/new_player/proc/ViewManifest()

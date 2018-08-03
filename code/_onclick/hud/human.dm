@@ -1,5 +1,6 @@
 /mob/living/carbon/human
 	hud_type = /datum/hud/human
+	var/crafted = 0
 
 /datum/hud/human/FinalizeInstantiation(var/ui_style='icons/mob/screen1_White.dmi', var/ui_color = "#ffffff", var/ui_alpha = 255)
 	var/mob/living/carbon/human/target = mymob
@@ -136,6 +137,15 @@
 		using.icon = ui_style
 		using.icon_state = "hand2"
 		using.screen_loc = ui_swaphand2
+		using.color = ui_color
+		using.alpha = ui_alpha
+		src.adding += using
+
+		using = new /obj/screen/craft
+		using.SetName("craft")
+		using.icon = 'icons/mob/screen1_Midnight.dmi'
+		using.icon_state = "craft"
+		using.screen_loc = ui_crafting
 		using.color = ui_color
 		using.alpha = ui_alpha
 		src.adding += using

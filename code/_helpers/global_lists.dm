@@ -25,6 +25,8 @@ var/list/mannequins_
 var/global/list/all_grabstates[0]
 var/global/list/all_grabobjects[0]
 
+var/global/list/crafting_recipes = list()
+
 // Uplinks
 var/list/obj/item/device/uplink/world_uplinks = list()
 

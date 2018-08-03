@@ -28,6 +28,18 @@
 	maptext_height = 480
 	maptext_width = 480
 
+/obj/screen/craft
+	name = "crafting menu"
+	icon = 'icons/mob/screen1_Midnight.dmi'
+	icon_state = "craft"
+	screen_loc = ui_crafting
+
+/obj/screen/craft/Click()
+	var/mob/living/M = usr
+	if(isobserver(usr))
+		return
+	world << "Click went through"
+	M.OpenCraftingMenu()
 
 /obj/screen/inventory
 	var/slot_id	//The indentifier for the slot. It has nothing to do with ID cards.

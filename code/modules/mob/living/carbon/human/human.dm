@@ -10,7 +10,6 @@
 	var/obj/item/weapon/rig/wearing_rig // This is very not good, but it's much much better than calling get_rig() every update_canmove() call.
 
 /mob/living/carbon/human/New(var/new_loc, var/new_species = null)
-
 	if(!dna)
 		dna = new /datum/dna(null)
 		// Species name is handled by set_species()
@@ -47,6 +46,7 @@
 		dna.s_base = s_base
 		sync_organ_dna()
 	make_blood()
+	handcrafting = new
 
 /mob/living/carbon/human/Destroy()
 	GLOB.human_mob_list -= src

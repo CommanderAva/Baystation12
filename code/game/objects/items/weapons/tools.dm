@@ -1,5 +1,8 @@
 //This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:32
 
+#define TOOL_SCREWDRIVING 1
+
+
 /* Tools!
  * Note: Multitools are /obj/item/device
  *
@@ -59,6 +62,7 @@
 	center_of_mass = "x=16;y=7"
 	attack_verb = list("stabbed")
 	lock_picking_level = 5
+	tool_ability = TOOL_SCREWDRIVING
 
 /obj/item/weapon/screwdriver/Initialize()
 	switch(pick("red","blue","purple","brown","green","cyan","yellow"))
